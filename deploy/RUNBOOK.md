@@ -1,0 +1,114 @@
+# K'ART Production Runbook
+
+## Architecture
+
+```text
+Internet
+  |
+  v
+Cloudflare (k-artracing.com, www)
+  |
+  v
+[ shared VPS ]  vx-nginx container (from the vexara repo) owns 80/443
+  |
+  v
+k-art.service (systemd, Node)  on 172.17.0.1:8789
+  |
+  |- /opt/k-art/current  ->  releases/<git sha>
+  '- /opt/k-art/data         content.json, backups/, uploads/
+```
+
+The site shares a VPS with Vexara, Treble Quest and the portfolio. It runs on
+the host as the `k-art` systemd unit (user `kart`), bound to the docker0
+gateway. Vexara's nginx container reaches it as `host.docker.internal:8789`,
+the same way it reaches the Treble Quest API. The server block lives in the
+**vexara** repo: `deploy/nginx/kart.conf.template` (www redirects to the apex).
+
+GitHub Actions type-checks and builds the site, copies a tarball to the VPS,
+extracts it into a release directory, repoints `current`, restarts the service
+and smoke-tests it through the local nginx edge.
+
+Content lives in `/opt/k-art/data`, outside the releases, so deploys never
+touch it. Vexara's nightly `deploy/backup.sh` archives it with the other apps.
+
+## First-time setup
+
+On a host bootstrapped before K'ART existed, the first deploy sets itself up:
+the `kart` user, `/opt/k-art/data`, the UFW rule for port 8789 and the Let's
+Encrypt cert for `k-artracing.com` + `www`. On a fresh host, vexara's
+`deploy/bootstrap-vps.sh` does the same.
+
+DNS (Cloudflare):
+
+| Type | Name | Value |
+| --- | --- | --- |
+| A | `@` | VPS IPv4 |
+| A | `www` | VPS IPv4 |
+
+The cert is issued with DNS-01 when `/root/.secrets/cloudflare.ini` holds a
+Cloudflare token that can edit the `k-artracing.com` zone. Otherwise it falls
+back to HTTP-01, which needs both records unproxied (grey cloud) for the first
+issue. Turn the proxy on once the site is up.
+
+Order for the very first deploy:
+
+1. Deploy K'ART (push to main, or Actions > Deploy > Run workflow). It issues
+   the cert and starts the service, and warns that nginx is not routing yet.
+2. Deploy Vexara (Actions > CI/CD > Run workflow). It renders `kart.conf` now
+   that the cert exists.
+
+## GitHub Actions secrets
+
+| Name | Description |
+| --- | --- |
+| `VPS_HOST` | VPS IP address or hostname |
+| `VPS_USER` | SSH user, `deploy` |
+| `VPS_SSH_KEY` | Private SSH key for the deploy user |
+| `VPS_PORT` | Optional SSH port, defaults to `22` |
+| `ADMIN_USER` | Sign-in for `/admin` |
+| `ADMIN_PASSWORD` | Password for `/admin`, a long random string |
+
+The deploy writes the rest of `/etc/k-art.env` (port, data dir, upload limit,
+proxy headers) itself.
+
+## Manual deploy
+
+From the VPS, after placing `k-art-build.tar.gz` in `/opt/k-art`:
+
+```bash
+cd /opt/k-art
+bash deploy/deploy.sh
+```
+
+Without `ADMIN_USER` / `ADMIN_PASSWORD` in the environment it keeps the
+existing `/etc/k-art.env`.
+
+## Rollback
+
+```bash
+ls -lt /opt/k-art/releases
+ln -sfn /opt/k-art/releases/<release> /opt/k-art/current
+sudo systemctl restart k-art
+```
+
+To undo a content change, use the version history in the admin (Site settings).
+
+## Restore the data from a backup
+
+```bash
+sudo systemctl stop k-art
+sudo mv /opt/k-art/data /opt/k-art/data.old
+sudo tar -xzf k-art_YYYY-MM-DDTHH-MM-SSZ.tar.gz -C /opt/k-art
+sudo chown -R kart:kart /opt/k-art/data
+sudo systemctl start k-art
+```
+
+## Common checks
+
+```bash
+curl -I https://k-artracing.com
+curl -I --resolve k-artracing.com:443:127.0.0.1 https://k-artracing.com
+systemctl status k-art
+journalctl -u k-art -n 50 --no-pager
+docker logs --tail 50 vx-nginx
+```

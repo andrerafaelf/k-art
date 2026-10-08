@@ -1,0 +1,115 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 22
+  DOMAIN: k-artracing.com
+  APP_DIR: /opt/k-art
+  VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+
+jobs:
+  check:
+    name: Check and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Check deploy script
+        run: bash -n deploy/deploy.sh
+
+      # The server build has no runtime dependencies, so build/ and
+      # package.json (for "type": "module") are all the VPS needs.
+      - name: Package build
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: tar -czf k-art-build.tar.gz build package.json
+
+      - name: Upload build artifact
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: k-art-build
+          path: k-art-build.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: check
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: k-art-build
+
+      - name: Prepare app dir on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ env.VPS_PORT }}
+          script: |
+            set -e
+            sudo install -d -o "$(id -un)" -g "$(id -gn)" ${{ env.APP_DIR }}
+            rm -rf ${{ env.APP_DIR }}/deploy
+
+      - name: Copy deploy files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ env.VPS_PORT }}
+          source: "k-art-build.tar.gz,deploy/"
+          target: ${{ env.APP_DIR }}
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          ADMIN_USER: ${{ secrets.ADMIN_USER }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ env.VPS_PORT }}
+          envs: ADMIN_USER,ADMIN_PASSWORD
+          script: |
+            set -e
+            cd ${{ env.APP_DIR }}
+            DOMAIN=${{ env.DOMAIN }} APP_DIR=${{ env.APP_DIR }} RELEASE=${{ github.sha }} bash deploy/deploy.sh

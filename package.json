@@ -1,0 +1,33 @@
+{
+	"name": "k-art",
+	"private": true,
+	"version": "1.0.0",
+	"type": "module",
+	"imports": {
+		"#lib/*": "./src/lib/*"
+	},
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"start": "node --env-file-if-exists=.env build",
+		"preview": "vite preview",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-node": "^6.0.0",
+		"@sveltejs/kit": "^3.0.0",
+		"@sveltejs/vite-plugin-svelte": "^7.3.1",
+		"@types/node": "^24.19.1",
+		"svelte": "^5.57.1",
+		"svelte-check": "^4.7.6",
+		"typescript": "^6.0.3",
+		"vite": "^8.3.2"
+	},
+	"dependencies": {
+		"@fontsource-variable/archivo": "^5.3.0",
+		"@fontsource-variable/jetbrains-mono": "^5.3.0"
+	},
+	"engines": {
+		"node": ">=22.9"
+	}
+}

@@ -1,0 +1,27 @@
+[Unit]
+Description=K'ART Racing Team website (k-artracing.com)
+# Binds to the docker0 gateway (HOST in /etc/k-art.env), which only exists
+# once Docker is up. vx-nginx reaches it as host.docker.internal.
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kart
+WorkingDirectory=/opt/k-art/current
+EnvironmentFile=/etc/k-art.env
+ExecStart=/usr/bin/node /opt/k-art/current/build
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+# content.json, backups/ and uploads/
+ReadWritePaths=/opt/k-art/data
+
+[Install]
+WantedBy=multi-user.target

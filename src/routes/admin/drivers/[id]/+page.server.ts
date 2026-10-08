@@ -1,0 +1,130 @@
+import { error, redirect } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
+import { slugify, type Alumnus, type Pilot } from '#lib/content.ts';
+import { getContent, update, newId } from '#lib/server/store.ts';
+import { FormReader } from '#lib/server/form.ts';
+import { readImage } from '#lib/server/images.ts';
+
+const blank = (): Pilot => ({
+	id: '',
+	number: 0,
+	first: '',
+	last: '',
+	category: '',
+	age: 0,
+	hometown: '',
+	since: new Date().getFullYear(),
+	chassis: '',
+	engine: '',
+	accent: 'lime',
+	record: { starts: 0, wins: 0, podiums: 0, poles: 0 },
+	best: { pt: '', en: '' },
+	quote: { pt: '', en: '' }
+});
+
+export const load: PageServerLoad = async ({ params }) => {
+	const { pilots } = await getContent();
+	const pilot = params.id === 'new' ? blank() : pilots.find((p) => p.id === params.id);
+	if (!pilot) error(404, 'Driver not found');
+	return {
+		pilot,
+		isNew: params.id === 'new',
+		categories: [...new Set(pilots.map((p) => p.category))]
+	};
+};
+
+export const actions: Actions = {
+	save: async ({ request, params }) => {
+		const f = new FormReader(await request.formData());
+		const content = await getContent();
+		const existing = content.pilots.find((p) => p.id === params.id);
+		if (params.id !== 'new' && !existing) error(404, 'Driver not found');
+
+		const year = new Date().getFullYear();
+		const fields = {
+			first: f.text('first', { required: true, max: 40 }),
+			last: f.text('last', { required: true, max: 40 }),
+			number: f.int('number', { min: 0, max: 999 }),
+			accent: f.choice('accent', ['lime', 'cyan'] as const, 'lime'),
+			category: f.text('category', { required: true, max: 40 }),
+			age: f.int('age', { min: 4, max: 99 }),
+			hometown: f.text('hometown', { max: 60 }),
+			since: f.int('since', { min: 1950, max: year }),
+			chassis: f.text('chassis', { max: 60 }),
+			engine: f.text('engine', { max: 60 }),
+			record: {
+				starts: f.int('starts', { min: 0, max: 9999 }),
+				wins: f.int('wins', { min: 0, max: 9999 }),
+				podiums: f.int('podiums', { min: 0, max: 9999 }),
+				poles: f.int('poles', { min: 0, max: 9999 })
+			},
+			best: f.l('best', { max: 120 }),
+			quote: f.l('quote', { max: 200 })
+		};
+
+		const clash = content.pilots.find((p) => p.number === fields.number && p.id !== existing?.id);
+		if (clash) f.error('number', `Number ${fields.number} is already used by ${clash.first} ${clash.last}`);
+		const r = fields.record;
+		if (r.podiums < r.wins) f.error('podiums', 'Every win is also a podium, so this can’t be lower than wins');
+		if (r.starts < r.podiums) f.error('starts', 'Can’t be lower than podiums');
+		if (r.starts < r.poles) f.error('starts', 'Can’t be lower than poles');
+		if (!f.ok) return f.fail();
+
+		const photo = await readImage(f, 'photo', existing?.photo);
+		if (!f.ok) return f.fail();
+
+		let id = existing?.id ?? slugify(`${fields.first}-${fields.last}`);
+		if (!existing && content.pilots.some((p) => p.id === id)) id = `${id}-${newId()}`;
+
+		await update((draft) => {
+			const pilot: Pilot = { id, ...fields, photo };
+			if (!pilot.photo) delete pilot.photo;
+			const i = draft.pilots.findIndex((p) => p.id === id);
+			if (i >= 0) draft.pilots[i] = pilot;
+			else draft.pilots.push(pilot);
+			// Keep the name on past results in step with the driver
+			for (const round of draft.season) {
+				for (const result of round.results) if (result.pilotId === id) result.name = fields.last;
+			}
+		});
+
+		if (!existing) redirect(303, `/admin/drivers/${id}?saved=${encodeURIComponent('Driver added')}`);
+		return { message: 'Driver saved' };
+	},
+
+	delete: async ({ params }) => {
+		await update((draft) => {
+			draft.pilots = draft.pilots.filter((p) => p.id !== params.id);
+		});
+		redirect(303, `/admin/drivers?saved=${encodeURIComponent('Driver removed')}`);
+	},
+
+	/** Takes a driver out of the line-up and into the Hall of Fame */
+	retire: async ({ params }) => {
+		let id = '';
+		await update((draft) => {
+			const p = draft.pilots.find((x) => x.id === params.id);
+			if (!p) error(404, 'Driver not found');
+			const year = draft.settings.seasonYear;
+			id = draft.alumni.some((a) => a.id === p.id) ? `${p.id}-${newId()}` : p.id;
+			const alumnus: Alumnus = {
+				id,
+				number: p.number,
+				first: p.first,
+				last: p.last,
+				accent: p.accent,
+				from: year,
+				to: year,
+				categories: p.category,
+				photo: p.photo,
+				record: { ...p.record },
+				titles: { pt: p.best.pt ? [p.best.pt] : [], en: p.best.en ? [p.best.en] : [] },
+				now: { pt: '', en: '' }
+			};
+			if (!alumnus.photo) delete alumnus.photo;
+			draft.alumni.push(alumnus);
+			draft.pilots = draft.pilots.filter((x) => x.id !== p.id);
+		});
+		redirect(303, `/admin/hall/drivers/${id}?saved=${encodeURIComponent('Moved to the Hall of Fame. Check the years and record.')}`);
+	}
+};
