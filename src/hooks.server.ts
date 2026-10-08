@@ -1,6 +1,7 @@
 import type { Handle } from '@sveltejs/kit/hooks';
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { ADMIN_USER, ADMIN_PASSWORD } from '$app/env/private';
+import { gate } from '#lib/server/gate.ts';
 
 // /admin is protected with HTTP Basic Auth. Credentials come from the
 // ADMIN_USER and ADMIN_PASSWORD environment variables; the site must be served
@@ -70,6 +71,9 @@ const guard: Handle = async ({ event, resolve }) => {
 };
 
 export const handle: Handle = async ({ event, resolve }) => {
+	const blocked = gate(event);
+	if (blocked) return blocked;
+
 	const { pathname } = event.url;
 	if (pathname === '/admin' || pathname.startsWith('/admin/')) return guard({ event, resolve });
 

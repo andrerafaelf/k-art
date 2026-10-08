@@ -103,12 +103,13 @@ jobs:
         env:
           ADMIN_USER: ${{ secrets.ADMIN_USER }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          SITE_ALLOW_IPS: ${{ vars.SITE_ALLOW_IPS }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ env.VPS_PORT }}
-          envs: ADMIN_USER,ADMIN_PASSWORD
+          envs: ADMIN_USER,ADMIN_PASSWORD,SITE_ALLOW_IPS
           script: |
             set -e
             cd ${{ env.APP_DIR }}

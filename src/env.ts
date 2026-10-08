@@ -14,5 +14,10 @@ export const variables = defineEnvVars({
 	DATA_DIR: {
 		schema: (value) => value || 'data',
 		description: 'Folder for content.json, backups and uploaded images. Must survive redeploys.'
+	},
+	SITE_ALLOW_IPS: {
+		schema: optional,
+		description:
+			'Before launch: comma-separated IPs or CIDR ranges that can open the site. Everyone else gets a holding page. Unset means open to everyone.'
 	}
 });

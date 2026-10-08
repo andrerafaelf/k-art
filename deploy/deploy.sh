@@ -98,9 +98,10 @@ find "$APP_DIR/releases" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
   | xargs -r rm -rf
 
 # ─── Service ──────────────────────────────────────────────────────────────────
-# ADMIN_USER and ADMIN_PASSWORD come from CI; on a manual run without them the
-# existing $ENV_FILE is kept. The proxy headers are what vx-nginx sends, without
-# them saving in the admin fails SvelteKit's cross-site POST check.
+# ADMIN_USER, ADMIN_PASSWORD and SITE_ALLOW_IPS come from CI; on a manual run
+# without them the existing $ENV_FILE is kept. The proxy headers are what
+# vx-nginx sends, without them saving in the admin fails SvelteKit's cross-site
+# POST check. SITE_ALLOW_IPS, when set, limits the site to those addresses.
 if [ -n "${ADMIN_USER:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
   printf '%s\n' \
     "NODE_ENV=production" \
@@ -113,6 +114,7 @@ if [ -n "${ADMIN_USER:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
     "ADDRESS_HEADER=x-forwarded-for" \
     "ADMIN_USER=$ADMIN_USER" \
     "ADMIN_PASSWORD=$ADMIN_PASSWORD" \
+    "SITE_ALLOW_IPS=${SITE_ALLOW_IPS:-}" \
     | sudo tee "$ENV_FILE" > /dev/null
   sudo chown root:"$SERVICE_USER" "$ENV_FILE"
   sudo chmod 0640 "$ENV_FILE"
@@ -127,7 +129,7 @@ sudo systemctl enable --quiet k-art
 sudo systemctl restart k-art
 
 for attempt in $(seq 1 15); do
-  if curl -fsS -o /dev/null "http://$SITE_HOST:$SITE_PORT/"; then
+  if curl -fsS -o /dev/null "http://$SITE_HOST:$SITE_PORT/healthz"; then
     echo "[deploy] Site service healthy"
     break
   fi
@@ -150,10 +152,11 @@ if [ ! -s "$KART_CONF" ]; then
   exit 0
 fi
 
-# Hit the edge locally (cert + vhost + upstream), independent of DNS/Cloudflare
+# Hit the edge locally (cert + vhost + upstream), independent of DNS/Cloudflare.
+# /healthz, because SITE_ALLOW_IPS may keep this host out of the pages.
 echo "[deploy] Running local smoke test..."
 for attempt in $(seq 1 12); do
-  if curl -fsS -o /dev/null --resolve "$DOMAIN:443:127.0.0.1" "https://$DOMAIN/"; then
+  if curl -fsS -o /dev/null --resolve "$DOMAIN:443:127.0.0.1" "https://$DOMAIN/healthz"; then
     echo "[deploy] Smoke test passed"
     echo "[deploy] Deploy complete: https://$DOMAIN"
     exit 0

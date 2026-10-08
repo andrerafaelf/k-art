@@ -71,6 +71,19 @@ Order for the very first deploy:
 The deploy writes the rest of `/etc/k-art.env` (port, data dir, upload limit,
 proxy headers) itself.
 
+## Before launch: limit the site to some IPs
+
+The repo variable `SITE_ALLOW_IPS` (Settings > Secrets and variables > Actions >
+Variables) takes comma-separated IPs or CIDR ranges, IPv4 and IPv6. While it is
+set, everyone else gets a holding page (403) on every page, the admin and the
+uploads. Static build files (scripts, styles, the logo) stay public. Home
+connections with IPv6 change their address often, so allow the `/64`, not a
+single IPv6 address.
+
+Change or delete the variable, then run the workflow again (Actions > Deploy >
+Run workflow). Deleting it opens the site to everyone. `/healthz` always
+answers, for the deploy checks.
+
 ## Manual deploy
 
 From the VPS, after placing `k-art-build.tar.gz` in `/opt/k-art`:
