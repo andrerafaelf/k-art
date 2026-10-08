@@ -1,72 +1,91 @@
 <script lang="ts">
 	import Icon from '#lib/admin/Icon.svelte';
+	import Entry from '#lib/admin/Entry.svelte';
 	import { daysUntil, longDate } from '#lib/content.ts';
+	import { t, lang } from '#lib/admin/i18n.ts';
 
 	let { data } = $props();
 
 	const days = $derived(data.next ? daysUntil(data.next, Date.now()) : 0);
-	const when = $derived(days <= 0 ? 'This weekend' : days === 1 ? 'Tomorrow' : `In ${days} days`);
 </script>
 
 <header class="a-head">
 	<div>
-		<p class="a-crumb">K'ART Racing Team</p>
-		<h1 class="a-title">Overview</h1>
+		<p class="a-crumb">{t().common.team}</p>
+		<h1 class="a-title">{t().overview.title}</h1>
 	</div>
 	<div class="a-actions">
-		<a class="btn btn-ghost" href="/admin/news/new"><Icon name="plus" /> Write a post</a>
-		<a class="btn" href="/" target="_blank" rel="noreferrer">View the site <Icon name="external" /></a>
+		<a class="btn btn-ghost" href="/admin/news/new"><Icon name="plus" /> {t().overview.write}</a>
+		<a class="btn" href="/" target="_blank" rel="noreferrer">{t().nav.site} <Icon name="external" /></a>
 	</div>
 </header>
 
 <div class="tiles">
 	<a class="tile next" href={data.next ? `/admin/season/${data.next.id}` : '/admin/season/new'}>
-		<span class="k">Next race</span>
+		<span class="k">{t().overview.next}</span>
 		{#if data.next}
 			<span class="v">{data.next.location}</span>
-			<span class="s">{longDate(data.next.date, 'en')}, {when.toLowerCase()}</span>
-			<span class="s">Round {data.next.round} of {data.total}</span>
+			<span class="s">{longDate(data.next.date, lang())}, {t().overview.when(days)}</span>
+			<span class="s">{t().overview.round(data.next.round, data.total)}</span>
 		{:else}
-			<span class="v">None scheduled</span>
-			<span class="s">Add the next round to the calendar</span>
+			<span class="v">{t().overview.none}</span>
+			<span class="s">{t().overview.addNext}</span>
 		{/if}
 	</a>
 	<a class="tile" href="/admin/season">
-		<span class="k">{data.year} season</span>
-		<span class="v num">{data.summary.wins}<small>wins</small> {data.summary.podiums}<small>podiums</small></span>
-		<span class="s">From {data.summary.raced} of {data.total} rounds, counted from the results you enter</span>
+		<span class="k">{t().overview.season(data.year)}</span>
+		<span class="v num">{data.summary.wins}<small>{t().overview.wins}</small> {data.summary.podiums}<small>{t().overview.podiums}</small></span>
+		<span class="s">{t().overview.fromRounds(data.summary.raced, data.total)}</span>
 	</a>
 	<a class="tile" href="/admin/drivers">
-		<span class="k">Team career record</span>
-		<span class="v num">{data.record.wins}<small>wins</small> {data.record.podiums}<small>podiums</small></span>
-		<span class="s">Totals of every driver's record, shown in the team section</span>
+		<span class="k">{t().overview.career}</span>
+		<span class="v num">{data.record.wins}<small>{t().overview.wins}</small> {data.record.podiums}<small>{t().overview.podiums}</small></span>
+		<span class="s">{t().overview.careerNote}</span>
 	</a>
 	<a class="tile" href="/admin/news">
-		<span class="k">News</span>
-		<span class="v num">{data.posts.published}<small>published</small></span>
-		<span class="s">{data.posts.drafts} {data.posts.drafts === 1 ? 'draft' : 'drafts'}</span>
+		<span class="k">{t().overview.news}</span>
+		<span class="v num">{data.posts.published}<small>{t().overview.published}</small></span>
+		<span class="s">
+			{t().overview.drafts(data.posts.drafts)}{#if data.posts.scheduled}, {t().overview.scheduled(data.posts.scheduled)}{/if}
+		</span>
 	</a>
 </div>
 
-<section class="a-card todo">
-	<h2>To do</h2>
-	{#if data.checks.length}
-		<p class="a-desc">Suggestions based on what is on the site right now.</p>
-		<ul>
-			{#each data.checks as c}
-				<li>
-					<a href={c.href}>
-						<span class="dot {c.kind}"></span>
-						<span class="t">{c.text}</span>
-						<Icon name="edit" />
-					</a>
-				</li>
-			{/each}
-		</ul>
-	{:else}
-		<p class="a-desc">Everything is up to date.</p>
-	{/if}
-</section>
+<div class="cols">
+	<section class="a-card todo">
+		<h2>{t().overview.todo}</h2>
+		{#if data.checks.length}
+			<p class="a-desc">{t().overview.todoNote}</p>
+			<ul>
+				{#each data.checks as c}
+					<li>
+						<a href={c.href}>
+							<span class="dot {c.kind}"></span>
+							<span class="t">{c.text}</span>
+							<Icon name="edit" />
+						</a>
+					</li>
+				{/each}
+			</ul>
+		{:else}
+			<p class="a-desc">{t().overview.allDone}</p>
+		{/if}
+	</section>
+
+	<section class="a-card recent">
+		<h2>{t().overview.activity}</h2>
+		{#if data.recent.length}
+			<ul>
+				{#each data.recent as row (row.id)}
+					<li><Entry {row} compact /></li>
+				{/each}
+			</ul>
+			<a class="all" href="/admin/history"><Icon name="history" /> {t().overview.activityAll}</a>
+		{:else}
+			<p class="a-desc">{t().overview.noActivity}</p>
+		{/if}
+	</section>
+</div>
 
 <style>
 	.tiles {
@@ -111,6 +130,9 @@
 		letter-spacing: -0.03em;
 		line-height: 1;
 		text-transform: uppercase;
+		/* Long place names like Bombarral shrink to fit the tile */
+		font-size: clamp(1.4rem, 2.3vw, 2rem);
+		overflow-wrap: anywhere;
 	}
 	.v.num {
 		font-size: 2.6rem;
@@ -128,6 +150,44 @@
 	.s {
 		font-size: 0.825rem;
 		opacity: 0.7;
+	}
+
+	.cols {
+		display: grid;
+		gap: 1rem;
+		align-items: start;
+	}
+	@media (min-width: 1100px) {
+		.cols {
+			grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+		}
+	}
+	.cols > .a-card + .a-card {
+		margin-top: 0;
+	}
+	.recent ul {
+		display: grid;
+		gap: 1.1rem;
+		margin: 1.25rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+	.recent .all {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		margin-top: 1.5rem;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--fg-2);
+		transition: color 0.2s;
+	}
+	.recent .all:hover {
+		color: var(--fg);
+	}
+	.recent .all :global(svg) {
+		width: 0.95rem;
+		color: var(--lime);
 	}
 
 	.todo ul {

@@ -3,7 +3,9 @@
 	import Icon from '#lib/admin/Icon.svelte';
 	import TextField from '#lib/admin/TextField.svelte';
 	import LangField from '#lib/admin/LangField.svelte';
+	import SaveBar from '#lib/admin/SaveBar.svelte';
 	import { keep, confirmFirst } from '#lib/admin/forms.ts';
+	import { t } from '#lib/admin/i18n.ts';
 
 	let { data, form } = $props();
 
@@ -13,13 +15,10 @@
 
 <header class="a-head">
 	<div>
-		<a class="a-crumb" href="/admin/hall"><Icon name="back" /> Hall of Fame</a>
-		<h1 class="a-title">{data.isNew ? `Season ${s.year}` : `${s.year}`}</h1>
+		<a class="a-crumb" href="/admin/hall"><Icon name="back" /> {t().nav.hall}</a>
+		<h1 class="a-title">{data.isNew ? t().archive.title(s.year) : `${s.year}`}</h1>
 		{#if data.fromCalendar}
-			<p class="a-lede">
-				Rounds, wins, podiums and the line-up are filled in from this year's calendar and drivers.
-				Add the poles, a headline and any titles, then save.
-			</p>
+			<p class="a-lede">{t().archive.fromCalendar}</p>
 		{/if}
 	</div>
 </header>
@@ -27,12 +26,12 @@
 <form method="post" action="?/save" use:enhance={keep} novalidate>
 	<div class="a-stack">
 		<section class="a-card">
-			<h2>The season</h2>
+			<h2>{t().archive.season}</h2>
 			<div class="a-fields">
-				<TextField name="year" label="Year" type="number" value={s.year} error={e.year} required />
+				<TextField name="year" label={t().archive.year} type="number" value={s.year} error={e.year} required />
 				<LangField
 					name="headline"
-					label="Headline"
+					label={t().archive.headline}
 					value={s.headline}
 					errors={e}
 					maxlength={60}
@@ -40,39 +39,39 @@
 					required
 					wide
 				/>
-				<LangField name="summary" label="Story of the season" value={s.summary} errors={e} rows={3} wide />
+				<LangField name="summary" label={t().archive.summary} value={s.summary} errors={e} rows={3} wide />
 			</div>
 		</section>
 
 		<section class="a-card">
-			<h2>Numbers</h2>
-			<p class="a-desc">Team totals for the year, all drivers together.</p>
+			<h2>{t().archive.numbers}</h2>
+			<p class="a-desc">{t().archive.numbersDesc}</p>
 			<div class="a-fields nums">
-				<TextField name="rounds" label="Rounds" type="number" min="0" value={s.stats.rounds} error={e.rounds} />
-				<TextField name="wins" label="Wins" type="number" min="0" value={s.stats.wins} error={e.wins} />
-				<TextField name="podiums" label="Podiums" type="number" min="0" value={s.stats.podiums} error={e.podiums} />
-				<TextField name="poles" label="Pole positions" type="number" min="0" value={s.stats.poles} error={e.poles} />
+				<TextField name="rounds" label={t().archive.rounds} type="number" min="0" value={s.stats.rounds} error={e.rounds} />
+				<TextField name="wins" label={t().common.wins} type="number" min="0" value={s.stats.wins} error={e.wins} />
+				<TextField name="podiums" label={t().common.podiums} type="number" min="0" value={s.stats.podiums} error={e.podiums} />
+				<TextField name="poles" label={t().common.poles} type="number" min="0" value={s.stats.poles} error={e.poles} />
 			</div>
 		</section>
 
 		<section class="a-card">
-			<h2>Titles and line-up</h2>
+			<h2>{t().archive.titlesLineup}</h2>
 			<div class="a-fields">
 				<LangField
 					name="titles"
-					label="Titles and highlights"
+					label={t().archive.titles}
 					value={s.titles}
 					errors={e}
 					rows={4}
-					hint="One per line, for example: Beatriz Gouveia, Campeã Regional da Madeira, Júnior X30. Each line counts as a title on the site."
+					hint={t().archive.titlesHint}
 					wide
 				/>
 				<TextField
 					name="lineup"
-					label="Line-up"
+					label={t().archive.lineup}
 					value={s.lineup}
 					error={e.lineup}
-					hint="Surnames, separated by commas"
+					hint={t().archive.lineupHint}
 					optional
 					wide
 				/>
@@ -80,22 +79,16 @@
 		</section>
 	</div>
 
-	<div class="a-savebar">
-		<span class="a-help">Changes go live on the site as soon as you save.</span>
-		<div class="a-actions">
-			<a class="btn btn-ghost" href="/admin/hall">Cancel</a>
-			<button class="btn">{data.isNew ? 'Add to the Hall of Fame' : 'Save changes'}</button>
-		</div>
-	</div>
+	<SaveBar cancel="/admin/hall" label={data.isNew ? t().archive.create : undefined} rev={data.rev} />
 </form>
 
 {#if !data.isNew}
-	<form class="a-danger a-card" method="post" action="?/delete" use:enhance={confirmFirst(`Remove ${s.year} from the Hall of Fame?`)}>
+	<form class="a-danger a-card" method="post" action="?/delete" use:enhance={confirmFirst(t().archive.delConfirm(s.year))}>
 		<div>
-			<h2>Remove season</h2>
-			<p class="a-desc">Takes it off the site. An earlier version can be restored from site settings.</p>
+			<h2>{t().archive.del}</h2>
+			<p class="a-desc">{t().archive.delDesc}</p>
 		</div>
-		<button class="btn btn-danger"><Icon name="trash" /> Remove {s.year}</button>
+		<button class="btn btn-danger"><Icon name="trash" /> {t().archive.delBtn(s.year)}</button>
 	</form>
 {/if}
 

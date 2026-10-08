@@ -1,0 +1,55 @@
+/* The text of a news post, shared by the post page and the preview in the admin */
+
+.prose {
+	font-size: 1.125rem;
+	line-height: 1.7;
+	color: rgb(243 243 239 / 0.82);
+}
+.prose p + p,
+.prose ul,
+.prose blockquote {
+	margin-top: 1.4em;
+}
+.prose h2,
+.prose h3 {
+	margin-top: 2.2em;
+	color: var(--fg);
+	font-weight: 800;
+	font-stretch: 115%;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+}
+.prose h2 {
+	font-size: 1.75rem;
+}
+.prose h3 {
+	font-size: 1.3rem;
+}
+.prose h2 + p,
+.prose h3 + p {
+	margin-top: 0.8em;
+}
+.prose strong {
+	color: var(--fg);
+}
+.prose a {
+	color: var(--fg);
+	text-decoration: underline;
+	text-decoration-color: var(--lime);
+	text-underline-offset: 0.2em;
+}
+.prose ul {
+	padding-left: 1.2em;
+}
+.prose li::marker {
+	color: var(--lime);
+}
+.prose blockquote {
+	margin-inline: 0;
+	padding-left: 1.25rem;
+	border-left: 3px solid var(--lime);
+	font-size: 1.4rem;
+	font-weight: 600;
+	line-height: 1.35;
+	color: var(--fg);
+}

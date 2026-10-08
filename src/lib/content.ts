@@ -216,6 +216,15 @@ export const hallTotals = (history: SeasonArchive[], alumni: Alumnus[]) => ({
 	alumni: alumni.length
 });
 
+// ---------- news ----------
+
+/** Today's date in Madeira, as YYYY-MM-DD */
+export const madeiraToday = (now = Date.now()) =>
+	new Intl.DateTimeFormat('en-CA', { timeZone: 'Atlantic/Madeira' }).format(now);
+
+/** Published, and its date has come: a published post with a future date waits until that day. */
+export const isLive = (post: Post, now = Date.now()) => post.published && post.date <= madeiraToday(now);
+
 // ---------- text ----------
 
 export const slugify = (s: string) =>

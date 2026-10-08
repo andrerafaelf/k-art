@@ -1,5 +1,10 @@
 import { fail } from '@sveltejs/kit';
 import type { L } from '#lib/content.ts';
+import type { Kind } from '#lib/admin/changes.ts';
+import { when } from '#lib/admin/i18n.ts';
+import { msg } from './lang.ts';
+import { lastChange } from './log.ts';
+import { revision } from './revision.ts';
 
 /**
  * Reads and validates a submitted admin form. Problems are collected per field
@@ -7,17 +12,19 @@ import type { L } from '#lib/content.ts';
  */
 export class FormReader {
 	errors: Record<string, string> = {};
+	private m = msg().errors;
 
 	constructor(private data: FormData) {}
 
-	private raw(name: string) {
+	/** The submitted value as it is, trimmed */
+	raw(name: string) {
 		return String(this.data.get(name) ?? '').trim();
 	}
 
 	text(name: string, { required = false, max = 200 } = {}) {
 		const value = this.raw(name);
-		if (required && !value) this.errors[name] = 'Required';
-		else if (value.length > max) this.errors[name] = `Keep this under ${max} characters`;
+		if (required && !value) this.errors[name] = this.m.required;
+		else if (value.length > max) this.errors[name] = this.m.maxChars(max);
 		return value;
 	}
 
@@ -37,9 +44,9 @@ export class FormReader {
 				.split('\n')
 				.map((l) => l.trim())
 				.filter(Boolean);
-			if (lang === 'pt' && required && !lines.length) this.errors[key] = 'Required';
-			else if (lines.length > maxLines) this.errors[key] = `Use at most ${maxLines} lines`;
-			else if (lines.some((l) => l.length > max)) this.errors[key] = `Keep each line under ${max} characters`;
+			if (lang === 'pt' && required && !lines.length) this.errors[key] = this.m.required;
+			else if (lines.length > maxLines) this.errors[key] = this.m.maxLines(maxLines);
+			else if (lines.some((l) => l.length > max)) this.errors[key] = this.m.lineChars(max);
 			return lines;
 		};
 		return { pt: read('pt'), en: read('en') };
@@ -49,16 +56,16 @@ export class FormReader {
 		const value = this.raw(name);
 		if (!value && !required) return min;
 		const n = Number(value);
-		if (!value) this.errors[name] = 'Required';
-		else if (!Number.isInteger(n)) this.errors[name] = 'Use a whole number';
-		else if (n < min || n > max) this.errors[name] = `Between ${min} and ${max}`;
+		if (!value) this.errors[name] = this.m.required;
+		else if (!Number.isInteger(n)) this.errors[name] = this.m.whole;
+		else if (n < min || n > max) this.errors[name] = this.m.between(min, max);
 		return Number.isInteger(n) ? n : min;
 	}
 
 	date(name: string) {
 		const value = this.raw(name);
 		if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(value))) {
-			this.errors[name] = 'Pick a date';
+			this.errors[name] = this.m.date;
 		}
 		return value;
 	}
@@ -81,14 +88,14 @@ export class FormReader {
 			if (!url.hostname.includes('.')) throw new Error();
 			return url.href;
 		} catch {
-			this.errors[name] = 'Use a full web address, like https://example.com';
+			this.errors[name] = this.m.url;
 			return undefined;
 		}
 	}
 
 	email(name: string) {
 		const value = this.raw(name);
-		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) this.errors[name] = 'Use a valid email address';
+		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) this.errors[name] = this.m.email;
 		return value;
 	}
 
@@ -106,6 +113,23 @@ export class FormReader {
 	}
 
 	fail() {
-		return fail(400, { errors: this.errors, message: 'Some fields need attention.' });
+		return fail(400, { errors: this.errors, message: this.m.fix });
+	}
+
+	/**
+	 * Stops a save from quietly overwriting what someone else saved after this
+	 * page was opened. The form sends the revision it was loaded with; if the
+	 * item has changed since, the page asks whether to save over it.
+	 */
+	async conflict(current: unknown, kind: Kind, id?: string) {
+		const seen = this.raw('rev');
+		if (!current || !seen || this.raw('force') === '1' || seen === revision(current)) return;
+		const m = msg();
+		const last = await lastChange(kind, id);
+		return fail(409, {
+			errors: this.errors,
+			message: m.conflict.toast,
+			conflict: { name: last?.by?.name, when: last ? when(last.at, m) : undefined }
+		});
 	}
 }

@@ -1,33 +1,29 @@
 <script lang="ts">
 	import Icon from '#lib/admin/Icon.svelte';
+	import { t } from '#lib/admin/i18n.ts';
 
 	let { data } = $props();
-
-	const years = (a: { from: number; to: number }) => (a.from === a.to ? `${a.from}` : `${a.from} to ${a.to}`);
 </script>
 
 <header class="a-head">
 	<div>
-		<p class="a-crumb">K'ART Racing Team</p>
-		<h1 class="a-title">Hall of Fame</h1>
-		<p class="a-lede">
-			Past seasons and former drivers, shown on the homepage and at /hall-of-fame. Every title line
-			counts towards the trophy total.
-		</p>
+		<p class="a-crumb">{t().common.team}</p>
+		<h1 class="a-title">{t().nav.hall}</h1>
+		<p class="a-lede">{t().hall.lede}</p>
 	</div>
 </header>
 
 <section class="a-card">
 	<div class="row-head">
 		<div>
-			<h2>Seasons</h2>
-			<p class="a-desc">Newest first. When a season ends, archive it from the calendar in one click.</p>
+			<h2>{t().hall.seasons}</h2>
+			<p class="a-desc">{t().hall.seasonsDesc}</p>
 		</div>
 		<div class="a-actions">
 			{#if data.hasCalendar && !data.archived}
-				<a class="btn" href="/admin/hall/seasons/new?from=calendar"><Icon name="archive" /> Archive the {data.year} season</a>
+				<a class="btn" href="/admin/hall/seasons/new?from=calendar"><Icon name="archive" /> {t().hall.archive(data.year)}</a>
 			{/if}
-			<a class="btn btn-ghost" href="/admin/hall/seasons/new"><Icon name="plus" /> Add a season</a>
+			<a class="btn btn-ghost" href="/admin/hall/seasons/new"><Icon name="plus" /> {t().hall.addSeason}</a>
 		</div>
 	</div>
 
@@ -37,33 +33,30 @@
 				<li class="a-row">
 					<span class="year">{s.year}</span>
 					<span class="grow">
-						<a class="name" href="/admin/hall/seasons/{s.id}">{s.headline.pt || s.headline.en || 'Untitled season'}</a>
+						<a class="name" href="/admin/hall/seasons/{s.id}">{s.headline.pt || s.headline.en || t().hall.untitled}</a>
 						<span class="meta">
-							{s.stats.rounds} rounds, {s.stats.wins} wins, {s.stats.podiums} podiums, {s.titles.pt.filter((t) => t.trim()).length} titles
+							{t().hall.seasonMeta(s.stats.rounds, s.stats.wins, s.stats.podiums, s.titles.pt.filter((x) => x.trim()).length)}
 						</span>
 					</span>
 					<span class="tools">
-						<a class="a-icon-btn" href="/admin/hall/seasons/{s.id}" aria-label="Edit {s.year}"><Icon name="edit" /></a>
+						<a class="a-icon-btn" href="/admin/hall/seasons/{s.id}" aria-label={t().common.edit(String(s.year))}><Icon name="edit" /></a>
 					</span>
 				</li>
 			{/each}
 		</ul>
 	{:else}
-		<p class="a-help">No seasons yet.</p>
+		<p class="a-help">{t().hall.noSeasons}</p>
 	{/if}
 </section>
 
 <section class="a-card">
 	<div class="row-head">
 		<div>
-			<h2>Former drivers</h2>
-			<p class="a-desc">
-				When a driver leaves, use "Move to the Hall of Fame" on their page in Drivers, or add someone
-				here.
-			</p>
+			<h2>{t().hall.drivers}</h2>
+			<p class="a-desc">{t().hall.driversDesc}</p>
 		</div>
 		<div class="a-actions">
-			<a class="btn btn-ghost" href="/admin/hall/drivers/new"><Icon name="plus" /> Add a former driver</a>
+			<a class="btn btn-ghost" href="/admin/hall/drivers/new"><Icon name="plus" /> {t().hall.addDriver}</a>
 		</div>
 	</div>
 
@@ -74,16 +67,16 @@
 					<span class="a-plate {a.accent}">{a.number}</span>
 					<span class="grow">
 						<a class="name" href="/admin/hall/drivers/{a.id}">{a.first} {a.last}</a>
-						<span class="meta">{years(a)}, {a.categories}{a.now.pt ? `, now ${a.now.pt}` : ''}</span>
+						<span class="meta">{t().hall.years(a.from, a.to)}, {a.categories}{a.now.pt ? `, ${t().hall.now(a.now.pt)}` : ''}</span>
 					</span>
 					<span class="tools">
-						<a class="a-icon-btn" href="/admin/hall/drivers/{a.id}" aria-label="Edit {a.first} {a.last}"><Icon name="edit" /></a>
+						<a class="a-icon-btn" href="/admin/hall/drivers/{a.id}" aria-label={t().common.edit(`${a.first} ${a.last}`)}><Icon name="edit" /></a>
 					</span>
 				</li>
 			{/each}
 		</ul>
 	{:else}
-		<p class="a-help">No former drivers yet.</p>
+		<p class="a-help">{t().hall.noDrivers}</p>
 	{/if}
 </section>
 

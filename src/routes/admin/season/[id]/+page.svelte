@@ -3,14 +3,16 @@
 	import Icon from '#lib/admin/Icon.svelte';
 	import TextField from '#lib/admin/TextField.svelte';
 	import LangField from '#lib/admin/LangField.svelte';
+	import SaveBar from '#lib/admin/SaveBar.svelte';
 	import { keep, confirmFirst } from '#lib/admin/forms.ts';
+	import { t } from '#lib/admin/i18n.ts';
 	import { roundEnd } from '#lib/content.ts';
 
 	let { data, form } = $props();
 
 	const r = $derived(data.round);
 	const e = $derived((form?.errors ?? {}) as Record<string, string>);
-	const title = $derived(data.isNew ? 'New round' : `Round ${'round' in r ? r.round : ''}, ${r.location}`);
+	const title = $derived(data.isNew ? t().round.new : t().round.title((r as { round?: number }).round ?? 0, r.location));
 
 	// Editable list of results, reset from the saved round after every load
 	const fromSaved = () => data.round.results.map((x) => ({ pilotId: x.pilotId, pos: String(x.pos), name: x.name }));
@@ -28,7 +30,7 @@
 
 <header class="a-head">
 	<div>
-		<a class="a-crumb" href="/admin/season"><Icon name="back" /> Calendar & results</a>
+		<a class="a-crumb" href="/admin/season"><Icon name="back" /> {t().nav.season}</a>
 		<h1 class="a-title">{title}</h1>
 	</div>
 </header>
@@ -36,12 +38,12 @@
 <form method="post" action="?/save" use:enhance={keep} novalidate>
 	<div class="a-stack">
 		<section class="a-card">
-			<h2>Race weekend</h2>
-			<p class="a-desc">The location is shown large on the calendar, with the circuit underneath.</p>
+			<h2>{t().round.weekend}</h2>
+			<p class="a-desc">{t().round.weekendDesc}</p>
 			<div class="a-fields">
 				<TextField
 					name="date"
-					label="First day of the weekend"
+					label={t().round.date}
 					type="date"
 					value={r.date}
 					error={e.date}
@@ -49,23 +51,23 @@
 				/>
 				<TextField
 					name="location"
-					label="Location"
+					label={t().round.location}
 					value={r.location}
 					error={e.location}
 					list="locations"
-					hint="Town or region, for example Braga or Madeira"
+					hint={t().round.locationHint}
 					required
 				/>
 				<datalist id="locations">
 					{#each data.locations as l}<option value={l}></option>{/each}
 				</datalist>
-				<LangField name="venue" label="Circuit" value={r.venue} errors={e} required wide />
+				<LangField name="venue" label={t().round.circuit} value={r.venue} errors={e} required wide />
 				<LangField
 					name="series"
-					label="Championship"
+					label={t().round.series}
 					value={r.series}
 					errors={e}
-					hint="For example CPK, or Regional, prova final"
+					hint={t().round.seriesHint}
 					required
 					wide
 				/>
@@ -73,24 +75,21 @@
 		</section>
 
 		<section class="a-card">
-			<h2>Results</h2>
-			<p class="a-desc">
-				Every team driver's finishing position. The calendar shows the best one, and the wins and
-				podiums on the site are counted from all of them.
-			</p>
+			<h2>{t().round.results}</h2>
+			<p class="a-desc">{t().round.resultsDesc}</p>
 
 			{#if rows.length}
 				<ol class="results">
 					{#each rows as row, i}
 						<li class:invalid={e[`result_${i}`]}>
 							<span class="n num">{i + 1}</span>
-							<select name="result_pilot" aria-label="Driver" bind:value={row.pilotId}>
-								<option value="">Choose a driver</option>
+							<select name="result_pilot" aria-label={t().round.driver} bind:value={row.pilotId}>
+								<option value="">{t().round.choose}</option>
 								{#each data.pilots as p}
 									<option value={p.id}>{p.name}, {p.category}</option>
 								{/each}
 								{#if row.pilotId && !known(row.pilotId)}
-									<option value={row.pilotId}>{row.name} (no longer in the team)</option>
+									<option value={row.pilotId}>{t().round.left(row.name)}</option>
 								{/if}
 							</select>
 							<label class="pos">
@@ -100,11 +99,11 @@
 									type="number"
 									min="1"
 									max="99"
-									aria-label="Finishing position"
+									aria-label={t().round.position}
 									bind:value={row.pos}
 								/>
 							</label>
-							<button type="button" class="a-icon-btn danger" onclick={() => remove(i)} aria-label="Remove this result">
+							<button type="button" class="a-icon-btn danger" onclick={() => remove(i)} aria-label={t().round.removeResult}>
 								<Icon name="trash" />
 							</button>
 							{#if e[`result_${i}`]}<p class="a-err">{e[`result_${i}`]}</p>{/if}
@@ -113,24 +112,18 @@
 				</ol>
 			{:else}
 				<p class="a-help none">
-					{finished ? 'No results yet for this round.' : 'Results can be added once the race weekend has happened.'}
+					{finished ? t().round.noResults : t().round.notYet}
 				</p>
 			{/if}
 
 			<button type="button" class="btn btn-ghost" onclick={add} disabled={!data.pilots.length}>
-				<Icon name="plus" /> Add a result
+				<Icon name="plus" /> {t().round.addResult}
 			</button>
 			{#if e.date && rows.length}<p class="a-err gap">{e.date}</p>{/if}
 		</section>
 	</div>
 
-	<div class="a-savebar">
-		<span class="a-help">Changes go live on the site as soon as you save.</span>
-		<div class="a-actions">
-			<a class="btn btn-ghost" href="/admin/season">Cancel</a>
-			<button class="btn">{data.isNew ? 'Add round' : 'Save changes'}</button>
-		</div>
-	</div>
+	<SaveBar cancel="/admin/season" label={data.isNew ? t().round.create : undefined} rev={data.rev} />
 </form>
 
 {#if !data.isNew}
@@ -138,13 +131,13 @@
 		class="a-danger a-card"
 		method="post"
 		action="?/delete"
-		use:enhance={confirmFirst(`Delete the ${r.location} round and its results?`)}
+		use:enhance={confirmFirst(t().round.delConfirm(r.location))}
 	>
 		<div>
-			<h2>Delete round</h2>
-			<p class="a-desc">Removes it from the calendar, along with its results.</p>
+			<h2>{t().round.del}</h2>
+			<p class="a-desc">{t().round.delDesc}</p>
 		</div>
-		<button class="btn btn-danger"><Icon name="trash" /> Delete round</button>
+		<button class="btn btn-danger"><Icon name="trash" /> {t().round.del}</button>
 	</form>
 {/if}
 

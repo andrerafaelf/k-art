@@ -1,5 +1,8 @@
 <script lang="ts">
 	import Icon from './Icon.svelte';
+	import { t } from './i18n.ts';
+	import { prepare } from './photo.ts';
+	import { busy } from './unsaved.svelte.ts';
 
 	interface Props {
 		name: string;
@@ -20,23 +23,39 @@
 	let preview = $state<string>();
 	let remove = $state(false);
 	let tooBig = $state<string>();
+	let preparing = $state(false);
 
 	const MAX_MB = $derived(svg ? 4 : 8);
 
-	function pick(e: Event) {
+	async function pick(e: Event) {
 		const input = e.currentTarget as HTMLInputElement;
 		const file = input.files?.[0];
 		if (preview) URL.revokeObjectURL(preview);
 		preview = undefined;
 		tooBig = undefined;
-		// Catch oversized files here rather than after a slow upload
-		if (file && file.size > MAX_MB * 1024 * 1024) {
-			tooBig = `That image is ${(file.size / 1024 / 1024).toFixed(1)} MB. Use one under ${MAX_MB} MB.`;
-			input.value = '';
-			return;
+		if (!file) return;
+
+		// Shrink the photo and drop its metadata (including where it was taken) before it goes anywhere
+		preparing = true;
+		busy.count++;
+		try {
+			const ready = await prepare(file);
+			if (ready.size > MAX_MB * 1024 * 1024) {
+				tooBig = t().image.tooBig((ready.size / 1024 / 1024).toFixed(1), MAX_MB);
+				input.value = '';
+				return;
+			}
+			if (ready !== file) {
+				const swap = new DataTransfer();
+				swap.items.add(ready);
+				input.files = swap.files;
+			}
+			preview = URL.createObjectURL(ready);
+			remove = false;
+		} finally {
+			preparing = false;
+			busy.count--;
 		}
-		preview = file ? URL.createObjectURL(file) : undefined;
-		if (file) remove = false;
 	}
 
 	// Drop the local preview once the saved image comes back from the server
@@ -53,7 +72,7 @@
 <div class="a-field img" class:wide class:invalid={error}>
 	<span class="a-label">{label}</span>
 	<div class="box">
-		<div class="preview {tone}">
+		<div class="preview {tone}" class:loading={preparing}>
 			{#if shown}
 				<img src={shown} alt="" />
 			{:else}
@@ -63,18 +82,18 @@
 		<div class="controls">
 			<label class="btn btn-ghost pick">
 				<input type="file" {name} {accept} onchange={pick} />
-				{current || preview ? 'Replace image' : 'Upload image'}
+				{preparing ? t().image.preparing : current || preview ? t().image.replace : t().image.upload}
 			</label>
 			{#if removable && current}
 				<label class="a-switch">
 					<input type="checkbox" name="{name}_remove" bind:checked={remove} />
-					Remove
+					{t().image.remove}
 				</label>
 			{/if}
 			{#if tooBig || error}
 				<p class="a-err">{tooBig ?? error}</p>
 			{:else}
-				<p class="a-hint">{hint ?? (svg ? 'JPG, PNG, WebP, AVIF or SVG.' : 'JPG, PNG, WebP or AVIF, up to 8 MB.')}</p>
+				<p class="a-hint">{hint ?? (svg ? t().image.hintSvg : t().image.hint)}</p>
 			{/if}
 		</div>
 	</div>
@@ -97,6 +116,10 @@
 		border-radius: 6px;
 		background: var(--input);
 		color: var(--fg-3);
+		transition: opacity 0.2s;
+	}
+	.preview.loading {
+		opacity: 0.4;
 	}
 	.preview.light {
 		background: #efeee9;

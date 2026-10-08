@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { L } from '#lib/content.ts';
+	import { t } from './i18n.ts';
 
 	// One field in both languages. Portuguese is the main language; English is
 	// optional and the site shows the Portuguese text when it is left empty.
@@ -25,6 +26,7 @@
 		{ code: 'en', tag: 'EN' }
 	] as const;
 	const error = $derived(errors?.[`${name}.pt`] ?? errors?.[`${name}.en`]);
+	const language = (code: 'pt' | 'en') => (code === 'pt' ? t().common.portuguese : t().common.english);
 </script>
 
 <div class="a-field" class:wide class:invalid={error}>
@@ -40,8 +42,8 @@
 						{rows}
 						{maxlength}
 						required={required && code === 'pt'}
-						aria-label="{label}, {code === 'pt' ? 'Portuguese' : 'English'}"
-						placeholder={code === 'en' ? 'Leave empty to show the Portuguese text' : placeholder}
+						aria-label="{label}, {language(code)}"
+						placeholder={code === 'en' ? t().common.enEmpty : placeholder}
 						class:invalid={errors?.[`${name}.${code}`]}
 						value={text(value[code])}
 					></textarea>
@@ -51,8 +53,8 @@
 						name="{name}.{code}"
 						{maxlength}
 						required={required && code === 'pt'}
-						aria-label="{label}, {code === 'pt' ? 'Portuguese' : 'English'}"
-						placeholder={code === 'en' ? 'Leave empty to show the Portuguese text' : placeholder}
+						aria-label="{label}, {language(code)}"
+						placeholder={code === 'en' ? t().common.enEmpty : placeholder}
 						class:invalid={errors?.[`${name}.${code}`]}
 						value={text(value[code])}
 					/>

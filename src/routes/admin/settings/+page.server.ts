@@ -1,12 +1,13 @@
 import type { Actions, PageServerLoad } from './$types';
 import { ZONES } from '#lib/content.ts';
-import { getContent, update, listBackups, restoreBackup } from '#lib/server/store.ts';
+import { getContent, update } from '#lib/server/store.ts';
 import { FormReader } from '#lib/server/form.ts';
+import { msg } from '#lib/server/lang.ts';
+import { revision } from '#lib/server/revision.ts';
 
 export const load: PageServerLoad = async () => {
 	const { settings } = await getContent();
-	const backups = (await listBackups()).slice(0, 12).map((b) => ({ name: b.name, saved: b.saved.toISOString() }));
-	return { settings, backups };
+	return { settings, rev: revision(settings) };
 };
 
 export const actions: Actions = {
@@ -34,16 +35,12 @@ export const actions: Actions = {
 			}))
 		};
 		if (!f.ok) return f.fail();
+		const conflict = await f.conflict((await getContent()).settings, 'settings');
+		if (conflict) return conflict;
 
 		await update((draft) => {
 			draft.settings = settings;
 		});
-		return { message: 'Settings saved' };
-	},
-
-	restore: async ({ request }) => {
-		const name = String((await request.formData()).get('backup'));
-		await restoreBackup(name);
-		return { message: 'Earlier version restored' };
+		return { message: msg().settings.saved };
 	}
 };

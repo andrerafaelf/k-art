@@ -4,6 +4,8 @@ import { slugify, type Alumnus } from '#lib/content.ts';
 import { getContent, update, newId } from '#lib/server/store.ts';
 import { FormReader } from '#lib/server/form.ts';
 import { readImage } from '#lib/server/images.ts';
+import { msg } from '#lib/server/lang.ts';
+import { revision } from '#lib/server/revision.ts';
 
 const blank = (year: number): Alumnus => ({
 	id: '',
@@ -23,7 +25,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const { alumni, settings } = await getContent();
 	const a = params.id === 'new' ? blank(settings.seasonYear) : alumni.find((x) => x.id === params.id);
 	if (!a) error(404, 'Driver not found');
-	return { a, isNew: params.id === 'new' };
+	return { a, isNew: params.id === 'new', rev: params.id === 'new' ? undefined : revision(a) };
 };
 
 export const actions: Actions = {
@@ -32,6 +34,7 @@ export const actions: Actions = {
 		const content = await getContent();
 		const existing = content.alumni.find((x) => x.id === params.id);
 		if (params.id !== 'new' && !existing) error(404, 'Driver not found');
+		const m = msg();
 
 		const year = new Date().getFullYear();
 		const fields = {
@@ -51,9 +54,11 @@ export const actions: Actions = {
 			titles: f.lines('titles', { maxLines: 8, max: 140 }),
 			now: f.l('now', { max: 80 })
 		};
-		if (fields.to < fields.from) f.error('to', 'Can’t be before the first season');
-		if (fields.record.podiums < fields.record.wins) f.error('podiums', 'Every win is also a podium, so this can’t be lower than wins');
+		if (fields.to < fields.from) f.error('to', m.alumnus.toBeforeFrom);
+		if (fields.record.podiums < fields.record.wins) f.error('podiums', m.errors.podiums);
 		if (!f.ok) return f.fail();
+		const conflict = await f.conflict(existing, 'alumni', existing?.id);
+		if (conflict) return conflict;
 
 		const photo = await readImage(f, 'photo', existing?.photo);
 		if (!f.ok) return f.fail();
@@ -69,14 +74,14 @@ export const actions: Actions = {
 			else draft.alumni.push(a);
 		});
 
-		if (!existing) redirect(303, `/admin/hall?saved=${encodeURIComponent('Added to the Hall of Fame')}`);
-		return { message: 'Saved' };
+		if (!existing) redirect(303, `/admin/hall?saved=${encodeURIComponent(m.alumnus.added)}`);
+		return { message: m.alumnus.saved };
 	},
 
 	delete: async ({ params }) => {
 		await update((draft) => {
 			draft.alumni = draft.alumni.filter((x) => x.id !== params.id);
 		});
-		redirect(303, `/admin/hall?saved=${encodeURIComponent('Removed from the Hall of Fame')}`);
+		redirect(303, `/admin/hall?saved=${encodeURIComponent(msg().alumnus.removed)}`);
 	}
 };

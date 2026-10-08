@@ -1,21 +1,19 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Icon from '#lib/admin/Icon.svelte';
+	import { t } from '#lib/admin/i18n.ts';
 
 	let { data } = $props();
 </script>
 
 <header class="a-head">
 	<div>
-		<p class="a-crumb">K'ART Racing Team</p>
-		<h1 class="a-title">Drivers</h1>
-		<p class="a-lede">
-			The line-up, in the order it appears on the site. Career records are summed into the team
-			stats on the homepage.
-		</p>
+		<p class="a-crumb">{t().common.team}</p>
+		<h1 class="a-title">{t().nav.drivers}</h1>
+		<p class="a-lede">{t().drivers.lede}</p>
 	</div>
 	<div class="a-actions">
-		<a class="btn" href="/admin/drivers/new"><Icon name="plus" /> Add driver</a>
+		<a class="btn" href="/admin/drivers/new"><Icon name="plus" /> {t().drivers.add}</a>
 	</div>
 </header>
 
@@ -29,14 +27,12 @@
 				{/if}
 				<span class="grow">
 					<a class="name" href="/admin/drivers/{p.id}">{p.first} {p.last}</a>
-					<span class="meta">
-						{p.category}, {p.age}, {p.record.wins} wins, {p.record.podiums} podiums, {p.record.poles} poles
-					</span>
+					<span class="meta">{t().drivers.meta(p.category, p.age, p.record.wins, p.record.podiums, p.record.poles)}</span>
 				</span>
 				<span class="tools">
 					<form method="post" action="?/move" use:enhance>
 						<input type="hidden" name="id" value={p.id} />
-						<button class="a-icon-btn" name="dir" value="up" disabled={i === 0} aria-label="Move {p.first} up">
+						<button class="a-icon-btn" name="dir" value="up" disabled={i === 0} aria-label={t().common.up(p.first)}>
 							<Icon name="up" />
 						</button>
 						<button
@@ -44,12 +40,12 @@
 							name="dir"
 							value="down"
 							disabled={i === data.pilots.length - 1}
-							aria-label="Move {p.first} down"
+							aria-label={t().common.down(p.first)}
 						>
 							<Icon name="down" />
 						</button>
 					</form>
-					<a class="a-icon-btn" href="/admin/drivers/{p.id}" aria-label="Edit {p.first} {p.last}">
+					<a class="a-icon-btn" href="/admin/drivers/{p.id}" aria-label={t().common.edit(`${p.first} ${p.last}`)}>
 						<Icon name="edit" />
 					</a>
 				</span>
@@ -58,7 +54,7 @@
 	</ul>
 {:else}
 	<div class="a-list a-empty">
-		<p>No drivers yet. The line-up section is hidden on the site until you add one.</p>
-		<a class="btn" href="/admin/drivers/new"><Icon name="plus" /> Add the first driver</a>
+		<p>{t().drivers.empty}</p>
+		<a class="btn" href="/admin/drivers/new"><Icon name="plus" /> {t().drivers.addFirst}</a>
 	</div>
 {/if}

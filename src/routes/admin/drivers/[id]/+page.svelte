@@ -4,13 +4,15 @@
 	import TextField from '#lib/admin/TextField.svelte';
 	import LangField from '#lib/admin/LangField.svelte';
 	import ImageField from '#lib/admin/ImageField.svelte';
+	import SaveBar from '#lib/admin/SaveBar.svelte';
 	import { keep, confirmFirst } from '#lib/admin/forms.ts';
+	import { t } from '#lib/admin/i18n.ts';
 
 	let { data, form } = $props();
 
 	const p = $derived(data.pilot);
 	const e = $derived((form?.errors ?? {}) as Record<string, string>);
-	const name = $derived(data.isNew ? 'New driver' : `${p.first} ${p.last}`);
+	const name = $derived(data.isNew ? t().driver.new : `${p.first} ${p.last}`);
 
 	// Live preview of the race plate
 	let number = $derived(p.number || '');
@@ -19,7 +21,7 @@
 
 <header class="a-head">
 	<div>
-		<a class="a-crumb" href="/admin/drivers"><Icon name="back" /> Drivers</a>
+		<a class="a-crumb" href="/admin/drivers"><Icon name="back" /> {t().nav.drivers}</a>
 		<h1 class="a-title">{name}</h1>
 	</div>
 	<span class="a-plate big {accent}" aria-hidden="true">{number || '?'}</span>
@@ -28,14 +30,14 @@
 <form method="post" action="?/save" enctype="multipart/form-data" use:enhance={keep} novalidate>
 	<div class="a-stack">
 		<section class="a-card">
-			<h2>Driver</h2>
-			<p class="a-desc">Name, race number and class, as shown on the driver card.</p>
+			<h2>{t().driver.card}</h2>
+			<p class="a-desc">{t().driver.cardDesc}</p>
 			<div class="a-fields">
-				<TextField name="first" label="First name" value={p.first} error={e.first} maxlength={40} required />
-				<TextField name="last" label="Surname" value={p.last} error={e.last} maxlength={40} required />
+				<TextField name="first" label={t().common.first} value={p.first} error={e.first} maxlength={40} required />
+				<TextField name="last" label={t().common.last} value={p.last} error={e.last} maxlength={40} required />
 				<TextField
 					name="number"
-					label="Race number"
+					label={t().common.number}
 					type="number"
 					min="0"
 					max="999"
@@ -46,26 +48,26 @@
 				/>
 				<TextField
 					name="category"
-					label="Class"
+					label={t().driver.category}
 					value={p.category}
 					error={e.category}
 					list="categories"
-					hint="For example Cadete, Júnior X30 or KZ2"
+					hint={t().driver.categoryHint}
 					required
 				/>
 				<datalist id="categories">
 					{#each data.categories as c}<option value={c}></option>{/each}
 				</datalist>
 				<div class="a-field wide">
-					<span class="a-label">Card colour</span>
+					<span class="a-label">{t().common.cardColour}</span>
 					<div class="a-choices">
 						<label class="a-choice">
 							<input type="radio" name="accent" value="lime" checked={p.accent === 'lime'} onchange={() => (accent = 'lime')} />
-							<span class="a-swatch" style:background="var(--lime)"></span> Lime
+							<span class="a-swatch" style:background="var(--lime)"></span> {t().common.lime}
 						</label>
 						<label class="a-choice">
 							<input type="radio" name="accent" value="cyan" checked={p.accent === 'cyan'} onchange={() => (accent = 'cyan')} />
-							<span class="a-swatch" style:background="var(--cyan)"></span> Cyan
+							<span class="a-swatch" style:background="var(--cyan)"></span> {t().common.cyan}
 						</label>
 					</div>
 				</div>
@@ -73,65 +75,52 @@
 		</section>
 
 		<section class="a-card">
-			<h2>Profile</h2>
+			<h2>{t().driver.profile}</h2>
 			<div class="a-fields">
-				<TextField name="age" label="Age" type="number" min="4" max="99" value={p.age || ''} error={e.age} required />
-				<TextField name="hometown" label="Hometown" value={p.hometown} error={e.hometown} optional />
-				<TextField name="since" label="Racing since" type="number" min="1950" value={p.since} error={e.since} required />
-				<TextField name="chassis" label="Chassis" value={p.chassis} error={e.chassis} optional />
-				<TextField name="engine" label="Engine" value={p.engine} error={e.engine} optional />
+				<TextField name="age" label={t().driver.age} type="number" min="4" max="99" value={p.age || ''} error={e.age} required />
+				<TextField name="hometown" label={t().driver.hometown} value={p.hometown} error={e.hometown} optional />
+				<TextField name="since" label={t().driver.since} type="number" min="1950" value={p.since} error={e.since} required />
+				<TextField name="chassis" label={t().driver.chassis} value={p.chassis} error={e.chassis} optional />
+				<TextField name="engine" label={t().driver.engine} value={p.engine} error={e.engine} optional />
 			</div>
 		</section>
 
 		<section class="a-card">
-			<h2>Career record</h2>
-			<p class="a-desc">
-				Totals for the driver's whole career, including results from before joining the team. These
-				are added together for the team stats on the homepage. Season results are entered separately,
-				in the calendar.
-			</p>
+			<h2>{t().driver.record}</h2>
+			<p class="a-desc">{t().driver.recordDesc}</p>
 			<div class="a-fields record">
-				<TextField name="starts" label="Starts" type="number" min="0" value={p.record.starts} error={e.starts} />
-				<TextField name="wins" label="Wins" type="number" min="0" value={p.record.wins} error={e.wins} />
-				<TextField name="podiums" label="Podiums" type="number" min="0" value={p.record.podiums} error={e.podiums} />
-				<TextField name="poles" label="Pole positions" type="number" min="0" value={p.record.poles} error={e.poles} />
+				<TextField name="starts" label={t().common.starts} type="number" min="0" value={p.record.starts} error={e.starts} />
+				<TextField name="wins" label={t().common.wins} type="number" min="0" value={p.record.wins} error={e.wins} />
+				<TextField name="podiums" label={t().common.podiums} type="number" min="0" value={p.record.podiums} error={e.podiums} />
+				<TextField name="poles" label={t().common.poles} type="number" min="0" value={p.record.poles} error={e.poles} />
 			</div>
 		</section>
 
 		<section class="a-card">
-			<h2>Words</h2>
-			<p class="a-desc">Shown in the driver's profile. Write the Portuguese first; English is optional.</p>
+			<h2>{t().driver.words}</h2>
+			<p class="a-desc">{t().driver.wordsDesc}</p>
 			<div class="a-fields">
 				<LangField
 					name="best"
-					label="Best result"
+					label={t().driver.best}
 					value={p.best}
 					errors={e}
 					maxlength={120}
 					placeholder="P2, Campeonato de Portugal 2025"
 					wide
 				/>
-				<LangField name="quote" label="Quote" value={p.quote} errors={e} maxlength={200} rows={2} wide />
+				<LangField name="quote" label={t().driver.quote} value={p.quote} errors={e} maxlength={200} rows={2} wide />
 			</div>
 		</section>
 
 		<section class="a-card">
-			<h2>Photo</h2>
-			<p class="a-desc">
-				A portrait, ideally upright and at least 1200 pixels tall. It replaces the big number on the
-				driver card.
-			</p>
-			<ImageField name="photo" label="Portrait" current={p.photo} error={e.photo} />
+			<h2>{t().common.photo}</h2>
+			<p class="a-desc">{t().driver.photoDesc}</p>
+			<ImageField name="photo" label={t().common.portrait} current={p.photo} error={e.photo} />
 		</section>
 	</div>
 
-	<div class="a-savebar">
-		<span class="a-help">Changes go live on the site as soon as you save.</span>
-		<div class="a-actions">
-			<a class="btn btn-ghost" href="/admin/drivers">Cancel</a>
-			<button class="btn">{data.isNew ? 'Add driver' : 'Save changes'}</button>
-		</div>
-	</div>
+	<SaveBar cancel="/admin/drivers" label={data.isNew ? t().driver.create : undefined} rev={data.rev} />
 </form>
 
 {#if !data.isNew}
@@ -139,26 +128,26 @@
 		class="retire a-card"
 		method="post"
 		action="?/retire"
-		use:enhance={confirmFirst(`Move ${p.first} ${p.last} to the Hall of Fame? They leave the line-up and get a page among the former drivers.`)}
+		use:enhance={confirmFirst(t().driver.retireConfirm(`${p.first} ${p.last}`))}
 	>
 		<div>
-			<h2>Move to the Hall of Fame</h2>
-			<p class="a-desc">For drivers leaving the team. Their number, photo and record go with them, and you can edit the details after.</p>
+			<h2>{t().driver.retire}</h2>
+			<p class="a-desc">{t().driver.retireDesc}</p>
 		</div>
-		<button class="btn btn-ghost"><Icon name="trophy" /> Move {p.first}</button>
+		<button class="btn btn-ghost"><Icon name="trophy" /> {t().driver.retireBtn(p.first)}</button>
 	</form>
 
 	<form
 		class="a-danger a-card tight"
 		method="post"
 		action="?/delete"
-		use:enhance={confirmFirst(`Remove ${p.first} ${p.last} from the team? Their past results stay in the calendar.`)}
+		use:enhance={confirmFirst(t().driver.removeConfirm(`${p.first} ${p.last}`))}
 	>
 		<div>
-			<h2>Remove driver</h2>
-			<p class="a-desc">Takes them off the site. Results they scored stay in the calendar under their name.</p>
+			<h2>{t().driver.remove}</h2>
+			<p class="a-desc">{t().driver.removeDesc}</p>
 		</div>
-		<button class="btn btn-danger"><Icon name="trash" /> Remove {p.first}</button>
+		<button class="btn btn-danger"><Icon name="trash" /> {t().driver.removeBtn(p.first)}</button>
 	</form>
 {/if}
 

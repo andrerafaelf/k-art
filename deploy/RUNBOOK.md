@@ -65,11 +65,30 @@ Order for the very first deploy:
 | `VPS_USER` | SSH user, `deploy` |
 | `VPS_SSH_KEY` | Private key of `github-actions-k-art`, K'ART's own entry in the deploy user's `authorized_keys` |
 | `VPS_PORT` | Optional SSH port, defaults to `22` |
-| `ADMIN_USER` | Sign-in for `/admin` |
-| `ADMIN_PASSWORD` | Password for `/admin`, a long random string |
+| `ADMIN_USER` | Username of the first admin account (see below) |
+| `ADMIN_PASSWORD` | Its password, a long random string |
 
 The deploy writes the rest of `/etc/k-art.env` (port, data dir, upload limit,
 proxy headers) itself.
+
+## Admin accounts
+
+The first start with an empty `/opt/k-art/data/users.json` (or none) creates
+one account from `ADMIN_USER` and `ADMIN_PASSWORD`. From then on accounts are
+managed in the admin (My account), and the two secrets are ignored. Change
+that first password after signing in.
+
+If someone forgets their password, the other person sets a new one in My
+account. If nobody can sign in, recreate the first account from the secrets:
+
+```bash
+sudo systemctl stop k-art
+sudo mv /opt/k-art/data/users.json /opt/k-art/data/users.json.old
+sudo systemctl start k-art
+```
+
+Then sign in with `ADMIN_USER` / `ADMIN_PASSWORD` and add the other person
+again. Content, history and backups are untouched.
 
 ## Before launch: limit the site to some IPs
 
@@ -104,7 +123,8 @@ ln -sfn /opt/k-art/releases/<release> /opt/k-art/current
 sudo systemctl restart k-art
 ```
 
-To undo a content change, use the version history in the admin (Site settings).
+To undo a content change, use History in the admin: it shows who changed what,
+and can put the site back to how it was before any change.
 
 ## Restore the data from a backup
 

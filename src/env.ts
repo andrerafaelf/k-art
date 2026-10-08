@@ -5,15 +5,16 @@ const optional = (value: string | undefined) => value || undefined;
 export const variables = defineEnvVars({
 	ADMIN_USER: {
 		schema: optional,
-		description: 'Username for /admin. The admin stays locked until both ADMIN_USER and ADMIN_PASSWORD are set.'
+		description:
+			'Username for the first admin account, created on first start when no accounts exist yet. After that, accounts are managed in the admin.'
 	},
 	ADMIN_PASSWORD: {
 		schema: optional,
-		description: 'Password for /admin. Use a long random string in production.'
+		description: 'Password for the first admin account. Use a long random string, and change it after signing in.'
 	},
 	DATA_DIR: {
 		schema: (value) => value || 'data',
-		description: 'Folder for content.json, backups and uploaded images. Must survive redeploys.'
+		description: 'Folder for content, accounts, the change log, backups and uploaded images. Must survive redeploys.'
 	},
 	SITE_ALLOW_IPS: {
 		schema: optional,

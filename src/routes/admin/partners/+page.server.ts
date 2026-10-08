@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getContent, update } from '#lib/server/store.ts';
+import { msg } from '#lib/server/lang.ts';
 
 export const load: PageServerLoad = async () => {
 	const { partners } = await getContent();
@@ -19,6 +20,6 @@ export const actions: Actions = {
 			if (j < 0 || j >= draft.partners.length) return;
 			[draft.partners[i], draft.partners[j]] = [draft.partners[j], draft.partners[i]];
 		});
-		return { message: 'Order saved' };
+		return { message: msg().common.orderSaved };
 	}
 };

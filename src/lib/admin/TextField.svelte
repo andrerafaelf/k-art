@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
+	import { t } from './i18n.ts';
 
 	interface Props extends Omit<HTMLInputAttributes, 'value'> {
 		name: string;
@@ -18,7 +19,7 @@
 </script>
 
 <div class="a-field" class:wide class:invalid={error}>
-	<label class="a-label" for={id}>{label}{#if optional}<span class="opt">, optional</span>{/if}</label>
+	<label class="a-label" for={id}>{label}{#if optional}<span class="opt">, {t().common.optional}</span>{/if}</label>
 	{#if rows}
 		<textarea {id} {name} {rows} aria-invalid={!!error} {value} placeholder={rest.placeholder}></textarea>
 	{:else}

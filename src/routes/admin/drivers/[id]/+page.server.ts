@@ -4,6 +4,8 @@ import { slugify, type Alumnus, type Pilot } from '#lib/content.ts';
 import { getContent, update, newId } from '#lib/server/store.ts';
 import { FormReader } from '#lib/server/form.ts';
 import { readImage } from '#lib/server/images.ts';
+import { msg } from '#lib/server/lang.ts';
+import { revision } from '#lib/server/revision.ts';
 
 const blank = (): Pilot => ({
 	id: '',
@@ -29,6 +31,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	return {
 		pilot,
 		isNew: params.id === 'new',
+		rev: params.id === 'new' ? undefined : revision(pilot),
 		categories: [...new Set(pilots.map((p) => p.category))]
 	};
 };
@@ -39,6 +42,7 @@ export const actions: Actions = {
 		const content = await getContent();
 		const existing = content.pilots.find((p) => p.id === params.id);
 		if (params.id !== 'new' && !existing) error(404, 'Driver not found');
+		const m = msg();
 
 		const year = new Date().getFullYear();
 		const fields = {
@@ -63,12 +67,14 @@ export const actions: Actions = {
 		};
 
 		const clash = content.pilots.find((p) => p.number === fields.number && p.id !== existing?.id);
-		if (clash) f.error('number', `Number ${fields.number} is already used by ${clash.first} ${clash.last}`);
+		if (clash) f.error('number', m.driver.numberTaken(fields.number, `${clash.first} ${clash.last}`));
 		const r = fields.record;
-		if (r.podiums < r.wins) f.error('podiums', 'Every win is also a podium, so this can’t be lower than wins');
-		if (r.starts < r.podiums) f.error('starts', 'Can’t be lower than podiums');
-		if (r.starts < r.poles) f.error('starts', 'Can’t be lower than poles');
+		if (r.podiums < r.wins) f.error('podiums', m.errors.podiums);
+		if (r.starts < r.podiums) f.error('starts', m.driver.startsPodiums);
+		if (r.starts < r.poles) f.error('starts', m.driver.startsPoles);
 		if (!f.ok) return f.fail();
+		const conflict = await f.conflict(existing, 'pilots', existing?.id);
+		if (conflict) return conflict;
 
 		const photo = await readImage(f, 'photo', existing?.photo);
 		if (!f.ok) return f.fail();
@@ -88,15 +94,15 @@ export const actions: Actions = {
 			}
 		});
 
-		if (!existing) redirect(303, `/admin/drivers/${id}?saved=${encodeURIComponent('Driver added')}`);
-		return { message: 'Driver saved' };
+		if (!existing) redirect(303, `/admin/drivers/${id}?saved=${encodeURIComponent(m.driver.added)}`);
+		return { message: m.driver.saved };
 	},
 
 	delete: async ({ params }) => {
 		await update((draft) => {
 			draft.pilots = draft.pilots.filter((p) => p.id !== params.id);
 		});
-		redirect(303, `/admin/drivers?saved=${encodeURIComponent('Driver removed')}`);
+		redirect(303, `/admin/drivers?saved=${encodeURIComponent(msg().driver.removed)}`);
 	},
 
 	/** Takes a driver out of the line-up and into the Hall of Fame */
@@ -125,6 +131,6 @@ export const actions: Actions = {
 			draft.alumni.push(alumnus);
 			draft.pilots = draft.pilots.filter((x) => x.id !== p.id);
 		});
-		redirect(303, `/admin/hall/drivers/${id}?saved=${encodeURIComponent('Moved to the Hall of Fame. Check the years and record.')}`);
+		redirect(303, `/admin/hall/drivers/${id}?saved=${encodeURIComponent(msg().driver.retired)}`);
 	}
 };

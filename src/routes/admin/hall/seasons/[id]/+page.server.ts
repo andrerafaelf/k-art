@@ -3,6 +3,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { seasonSummary, type SeasonArchive } from '#lib/content.ts';
 import { getContent, update, newId } from '#lib/server/store.ts';
 import { FormReader } from '#lib/server/form.ts';
+import { msg } from '#lib/server/lang.ts';
+import { revision } from '#lib/server/revision.ts';
 
 const blank = (year: number): SeasonArchive => ({
 	id: '',
@@ -19,7 +21,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	if (params.id !== 'new') {
 		const s = history.find((h) => h.id === params.id);
 		if (!s) error(404, 'Season not found');
-		return { s, isNew: false, fromCalendar: false };
+		return { s, isNew: false, fromCalendar: false, rev: revision(s) };
 	}
 
 	const s = blank(settings.seasonYear);
@@ -30,7 +32,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		s.stats = { rounds: season.length, wins: summary.wins, podiums: summary.podiums, poles: 0 };
 		s.lineup = pilots.map((p) => p.last).join(', ');
 	}
-	return { s, isNew: true, fromCalendar };
+	return { s, isNew: true, fromCalendar, rev: undefined };
 };
 
 export const actions: Actions = {
@@ -39,6 +41,7 @@ export const actions: Actions = {
 		const content = await getContent();
 		const existing = content.history.find((h) => h.id === params.id);
 		if (params.id !== 'new' && !existing) error(404, 'Season not found');
+		const m = msg();
 
 		const year = new Date().getFullYear();
 		const fields = {
@@ -54,11 +57,13 @@ export const actions: Actions = {
 			titles: f.lines('titles', { maxLines: 12, max: 140 }),
 			lineup: f.text('lineup', { max: 300 })
 		};
-		if (fields.stats.podiums < fields.stats.wins) f.error('podiums', 'Every win is also a podium, so this can’t be lower than wins');
+		if (fields.stats.podiums < fields.stats.wins) f.error('podiums', m.errors.podiums);
 		if (content.history.some((h) => h.year === fields.year && h.id !== existing?.id)) {
-			f.error('year', `${fields.year} is already in the Hall of Fame`);
+			f.error('year', m.archive.taken(fields.year));
 		}
 		if (!f.ok) return f.fail();
+		const conflict = await f.conflict(existing, 'history', existing?.id);
+		if (conflict) return conflict;
 
 		const id = existing?.id ?? `s${fields.year}-${newId()}`;
 		await update((draft) => {
@@ -68,14 +73,14 @@ export const actions: Actions = {
 			else draft.history.push(s);
 		});
 
-		if (!existing) redirect(303, `/admin/hall?saved=${encodeURIComponent(`${fields.year} added to the Hall of Fame`)}`);
-		return { message: 'Season saved' };
+		if (!existing) redirect(303, `/admin/hall?saved=${encodeURIComponent(m.archive.added(fields.year))}`);
+		return { message: m.archive.saved };
 	},
 
 	delete: async ({ params }) => {
 		await update((draft) => {
 			draft.history = draft.history.filter((h) => h.id !== params.id);
 		});
-		redirect(303, `/admin/hall?saved=${encodeURIComponent('Season removed')}`);
+		redirect(303, `/admin/hall?saved=${encodeURIComponent(msg().archive.removed)}`);
 	}
 };

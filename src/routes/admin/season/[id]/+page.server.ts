@@ -3,6 +3,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { numbered, type Result, type Round } from '#lib/content.ts';
 import { getContent, update, newId } from '#lib/server/store.ts';
 import { FormReader } from '#lib/server/form.ts';
+import { msg } from '#lib/server/lang.ts';
+import { revision } from '#lib/server/revision.ts';
 
 const blank = (): Round => ({
 	id: '',
@@ -20,6 +22,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	return {
 		round,
 		isNew: params.id === 'new',
+		rev: params.id === 'new' ? undefined : revision(season.find((x) => x.id === params.id)),
 		pilots: pilots.map((p) => ({ id: p.id, name: `${p.first} ${p.last}`, last: p.last, category: p.category })),
 		locations: [...new Set(season.map((r) => r.location))]
 	};
@@ -32,6 +35,7 @@ export const actions: Actions = {
 		const content = await getContent();
 		const existing = content.season.find((r) => r.id === params.id);
 		if (params.id !== 'new' && !existing) error(404, 'Round not found');
+		const m = msg().round;
 
 		const fields = {
 			date: f.date('date'),
@@ -47,17 +51,19 @@ export const actions: Actions = {
 		drivers.forEach((pilotId, i) => {
 			const pos = Number(positions[i]);
 			if (!pilotId && !positions[i]) return;
-			if (!pilotId) return f.error(`result_${i}`, 'Pick a driver');
-			if (!Number.isInteger(pos) || pos < 1 || pos > 99) return f.error(`result_${i}`, 'Position must be 1 to 99');
-			if (results.some((r) => r.pilotId === pilotId)) return f.error(`result_${i}`, 'This driver is already listed');
+			if (!pilotId) return f.error(`result_${i}`, m.pick);
+			if (!Number.isInteger(pos) || pos < 1 || pos > 99) return f.error(`result_${i}`, m.pos);
+			if (results.some((r) => r.pilotId === pilotId)) return f.error(`result_${i}`, m.dup);
 			const pilot = content.pilots.find((p) => p.id === pilotId);
 			const before = existing?.results.find((r) => r.pilotId === pilotId);
 			results.push({ pilotId, name: pilot?.last ?? before?.name ?? '?', pos });
 		});
 		if (results.length && new Date(fields.date).getTime() > Date.now()) {
-			f.error('date', 'This round hasn’t happened yet, so it can’t have results');
+			f.error('date', m.future);
 		}
 		if (!f.ok) return f.fail();
+		const conflict = await f.conflict(existing, 'season', existing?.id);
+		if (conflict) return conflict;
 
 		const id = existing?.id ?? newId();
 		await update((draft) => {
@@ -67,14 +73,14 @@ export const actions: Actions = {
 			else draft.season.push(round);
 		});
 
-		if (!existing) redirect(303, `/admin/season/${id}?saved=${encodeURIComponent('Round added')}`);
-		return { message: 'Round saved' };
+		if (!existing) redirect(303, `/admin/season/${id}?saved=${encodeURIComponent(m.added)}`);
+		return { message: m.saved };
 	},
 
 	delete: async ({ params }) => {
 		await update((draft) => {
 			draft.season = draft.season.filter((r) => r.id !== params.id);
 		});
-		redirect(303, `/admin/season?saved=${encodeURIComponent('Round removed')}`);
+		redirect(303, `/admin/season?saved=${encodeURIComponent(msg().round.removed)}`);
 	}
 };

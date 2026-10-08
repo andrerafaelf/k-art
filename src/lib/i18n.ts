@@ -142,13 +142,28 @@ const en = {
 		pending: 'Result to follow',
 		upcoming: 'Upcoming'
 	},
+	calendar: {
+		label: 'Add the races to your calendar',
+		short: 'Race calendar',
+		apple: 'Apple / Outlook',
+		google: 'Google',
+		file: '.ics',
+		fileTitle: 'Download the calendar file',
+		description: "Race calendar of K'ART Racing Team, the karting team from Madeira.",
+		event: (location: string, r: number) => `K'ART · ${location}, round ${r}`,
+		results: 'Results'
+	},
 	news: {
 		eyebrow: 'News',
 		title: ['From the', 'paddock'],
 		intro: 'Race reports, results and team news.',
 		all: 'All news',
 		read: 'Read the story',
-		empty: 'No news yet. Check back after the next race.'
+		empty: 'No news yet. Check back after the next race.',
+		draft: 'Preview. This post is a draft, so only people signed in to the admin can see it.',
+		scheduled: (date: string) =>
+			`Preview. This post appears on the site on ${date}. Until then, only people signed in to the admin can see it.`,
+		edit: 'Edit in the admin'
 	},
 	madeira: {
 		eyebrow: 'Home',
@@ -192,7 +207,7 @@ const en = {
 		follow: 'Follow',
 		instagram: (h: string) => `Instagram, @${h}`
 	},
-	footer: { top: 'Back to top' }
+	footer: { top: 'Back to top', credit: 'Site by' }
 };
 
 export type Messages = typeof en;
@@ -323,13 +338,28 @@ const pt: Messages = {
 		pending: 'Resultado em breve',
 		upcoming: 'Por disputar'
 	},
+	calendar: {
+		label: 'Adicione as provas ao seu calendário',
+		short: 'Calendário de provas',
+		apple: 'Apple / Outlook',
+		google: 'Google',
+		file: '.ics',
+		fileTitle: 'Descarregar o ficheiro do calendário',
+		description: "Calendário de provas da K'ART Racing Team, a equipa de karting da Madeira.",
+		event: (location, r) => `K'ART · ${location}, ${r}.ª prova`,
+		results: 'Resultados'
+	},
 	news: {
 		eyebrow: 'Notícias',
 		title: ['Direto do', 'paddock'],
 		intro: 'Crónicas de corrida, resultados e novidades da equipa.',
 		all: 'Todas as notícias',
 		read: 'Ler a notícia',
-		empty: 'Ainda não há notícias. Volte depois da próxima prova.'
+		empty: 'Ainda não há notícias. Volte depois da próxima prova.',
+		draft: 'Pré-visualização. Esta notícia é um rascunho, por isso só é visível para quem tem sessão iniciada no admin.',
+		scheduled: (date) =>
+			`Pré-visualização. Esta notícia aparece no site a ${date}. Até lá, só é visível para quem tem sessão iniciada no admin.`,
+		edit: 'Editar no admin'
 	},
 	madeira: {
 		eyebrow: 'Casa',
@@ -373,7 +403,7 @@ const pt: Messages = {
 		follow: 'Siga-nos',
 		instagram: (h) => `Instagram, @${h}`
 	},
-	footer: { top: 'Voltar ao topo' }
+	footer: { top: 'Voltar ao topo', credit: 'Site por' }
 };
 
 export const messages: Record<Lang, Messages> = { pt, en };
@@ -410,6 +440,18 @@ export const newsPath = (lang: Lang, slug?: string) =>
 
 /** The Hall of Fame keeps its English name in both languages: /hall-of-fame and /en/hall-of-fame. */
 export const hallPath = (lang: Lang) => localize('/hall-of-fame', lang);
+
+/** The race calendar feed is /calendario.ics in Portuguese and /en/calendar.ics in English. */
+export const calendarPath = (lang: Lang) => localize(lang === 'pt' ? '/calendario.ics' : '/calendar.ics', lang);
+
+/**
+ * Ways to add the race calendar: a webcal subscription for Apple Calendar and
+ * Outlook, Google Calendar's subscribe page, and the file itself.
+ */
+export function calendarLinks(host: string, lang: Lang) {
+	const webcal = `webcal://${host}${calendarPath(lang)}`;
+	return { webcal, google: `https://www.google.com/calendar/render?cid=${webcal}`, file: calendarPath(lang) };
+}
 
 /** The same page in the other language: / and /en, /noticias/x and /en/news/x. */
 export function alternatePath(pathname: string, to: Lang) {

@@ -1,5 +1,5 @@
 import type { LayoutServerLoad } from './$types';
-import type { Lang } from '#lib/content.ts';
+import { isLive, type Lang } from '#lib/content.ts';
 import { getContent } from '#lib/server/store.ts';
 
 export const load: LayoutServerLoad = async ({ params, depends }) => {
@@ -15,6 +15,6 @@ export const load: LayoutServerLoad = async ({ params, depends }) => {
 		partners,
 		alumni,
 		history,
-		hasNews: posts.some((p) => p.published)
+		hasNews: posts.some((p) => isLive(p))
 	};
 };
