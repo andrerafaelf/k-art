@@ -104,12 +104,15 @@ jobs:
           ADMIN_USER: ${{ secrets.ADMIN_USER }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           SITE_ALLOW_IPS: ${{ vars.SITE_ALLOW_IPS }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ env.VPS_PORT }}
-          envs: ADMIN_USER,ADMIN_PASSWORD,SITE_ALLOW_IPS
+          envs: ADMIN_USER,ADMIN_PASSWORD,SITE_ALLOW_IPS,RESEND_API_KEY,TURNSTILE_SITE_KEY,TURNSTILE_SECRET_KEY
           script: |
             set -e
             cd ${{ env.APP_DIR }}

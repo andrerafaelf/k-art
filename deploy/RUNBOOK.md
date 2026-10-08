@@ -45,6 +45,9 @@ DNS (Cloudflare):
 | A | `@` | VPS IPv4 |
 | A | `www` | VPS IPv4 |
 
+Email records (Cloudflare Email Routing and Resend) are set up by those two
+services, see [Email](#email).
+
 The cert is issued with DNS-01 when `/root/.secrets/cloudflare.ini` holds a
 Cloudflare token that can edit the `k-artracing.com` zone. Otherwise it falls
 back to HTTP-01, which needs both records unproxied (grey cloud) for the first
@@ -67,9 +70,45 @@ Order for the very first deploy:
 | `VPS_PORT` | Optional SSH port, defaults to `22` |
 | `ADMIN_USER` | Username of the first admin account (see below) |
 | `ADMIN_PASSWORD` | Its password, a long random string |
+| `RESEND_API_KEY` | Resend key for the contact form, the same account as Vexara and the portfolio |
+| `TURNSTILE_SECRET_KEY` | Secret key of the K'ART Turnstile widget |
+
+And one repo variable (Settings > Secrets and variables > Actions > Variables),
+because it is public: `TURNSTILE_SITE_KEY`, the widget's site key.
 
 The deploy writes the rest of `/etc/k-art.env` (port, data dir, upload limit,
-proxy headers) itself.
+proxy headers) itself. Without the three contact form values the site still
+runs and the deploy warns, but the form answers that the message did not go
+through and points people to the email address.
+
+## Email
+
+```text
+visitor --form--> k-art.service --Resend--> geral@k-artracing.com
+                                                 |
+                              Cloudflare Email Routing (receive only)
+                                                 v
+                                            team inbox
+```
+
+- **Receiving.** Cloudflare Email Routing on the `k-artracing.com` zone
+  forwards `geral@k-artracing.com` to the team inbox (Email > Email Routing >
+  Routing rules). The destination has to be verified once, from a link
+  Cloudflare emails to it. Routing owns the apex `MX` records and the apex SPF
+  `TXT` (`include:_spf.mx.cloudflare.net`).
+- **Sending.** `k-artracing.com` is a domain in the shared Resend account
+  (region eu-west-1). Its records live under `resend._domainkey` (DKIM) and
+  `send` (`MX` + SPF `TXT`), so they never clash with Email Routing's.
+- **The form** (`src/lib/server/contact.ts`) sends from `site@k-artracing.com`
+  to `geral@k-artracing.com` with reply-to set to the visitor, so replying in
+  the team inbox answers them directly. Override with `CONTACT_FROM` /
+  `CONTACT_TO` in `/etc/k-art.env`. It checks Cloudflare Turnstile and allows
+  5 messages an hour per address and 20 an hour (60 a day) overall, to protect
+  the Resend quota the other sites share.
+
+Check the form is configured: `journalctl -u k-art | grep contact` shows
+`[contact] ... is not set` after a restart, once the home page is first opened,
+if a key is missing. Then one line per message sent, never the message itself.
 
 ## Admin accounts
 

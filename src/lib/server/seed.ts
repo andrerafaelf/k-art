@@ -191,7 +191,7 @@ const alumni: Alumnus[] = [
 export const seed = (): Content => ({
 	settings: {
 		seasonYear: 2026,
-		email: 'geral@k-art.pt',
+		email: 'geral@k-artracing.com',
 		instagram: 'kart.racingteam',
 		location: 'Faial, Madeira, Portugal',
 		heroEyebrow: { pt: 'Equipa de karting, Madeira, Portugal', en: 'Karting team, Madeira, Portugal' },

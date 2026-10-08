@@ -205,7 +205,34 @@ const en = {
 		drivers: 'Drivers',
 		press: 'Partners and press',
 		follow: 'Follow',
-		instagram: (h: string) => `Instagram, @${h}`
+		instagram: (h: string) => `Instagram, @${h}`,
+		direct: 'Or write to us',
+		form: {
+			name: 'Name',
+			email: 'Email',
+			topic: 'About',
+			optional: 'Optional',
+			topics: { drivers: 'Racing with us', partners: 'Partnerships', press: 'Press', other: 'Something else' },
+			message: 'Message',
+			/** Shown inside the empty fields */
+			hints: { name: 'Your name', email: 'you@example.com', message: 'Tell us what you have in mind' },
+			honeypot: 'Leave this empty',
+			send: 'Send message',
+			sending: 'Sending',
+			received: 'Message received',
+			thanks: (name: string) => `Thanks, ${name}.`,
+			reply: (email: string) => `We'll reply to ${email} soon.`,
+			another: 'Send another message'
+		},
+		errors: {
+			name: 'Tell us your name.',
+			email: 'Check your email address, we need it to reply.',
+			short: 'Write a little more, at least a sentence.',
+			long: 'That is too long. Keep it under 4000 characters.',
+			bot: "We couldn't confirm you're not a robot. Try again, or email us at",
+			busy: 'Too many messages from this connection. Try again later, or email us at',
+			failed: "The message didn't go through. Try again, or email us at"
+		}
 	},
 	footer: { top: 'Back to top', credit: 'Site by' }
 };
@@ -401,7 +428,33 @@ const pt: Messages = {
 		drivers: 'Pilotos',
 		press: 'Parceiros e imprensa',
 		follow: 'Siga-nos',
-		instagram: (h) => `Instagram, @${h}`
+		instagram: (h) => `Instagram, @${h}`,
+		direct: 'Ou escreva-nos',
+		form: {
+			name: 'Nome',
+			email: 'Email',
+			topic: 'Assunto',
+			optional: 'Opcional',
+			topics: { drivers: 'Correr connosco', partners: 'Parcerias', press: 'Imprensa', other: 'Outro assunto' },
+			message: 'Mensagem',
+			hints: { name: 'O seu nome', email: 'nome@exemplo.pt', message: 'Conte-nos o que tem em mente' },
+			honeypot: 'Deixe em branco',
+			send: 'Enviar mensagem',
+			sending: 'A enviar',
+			received: 'Mensagem recebida',
+			thanks: (name) => `Obrigado, ${name}.`,
+			reply: (email) => `Vamos responder para ${email} em breve.`,
+			another: 'Enviar outra mensagem'
+		},
+		errors: {
+			name: 'Indique o seu nome.',
+			email: 'Confirme o seu email, precisamos dele para responder.',
+			short: 'Escreva um pouco mais, pelo menos uma frase.',
+			long: 'A mensagem é demasiado longa. Use menos de 4000 caracteres.',
+			bot: 'Não conseguimos confirmar que não é um robô. Tente outra vez, ou escreva para',
+			busy: 'Demasiadas mensagens a partir desta ligação. Tente mais tarde, ou escreva para',
+			failed: 'A mensagem não seguiu. Tente outra vez, ou escreva para'
+		}
 	},
 	footer: { top: 'Voltar ao topo', credit: 'Site por' }
 };

@@ -14,7 +14,7 @@
 	import Footer from '#lib/components/Footer.svelte';
 	import { useI18n, siteLinks, alternatePath } from '#lib/i18n.ts';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
 	const i18n = useI18n();
 	const links = $derived(siteLinks(i18n.t, i18n.lang, { home: true, news: data.latest.length > 0 }));
@@ -64,6 +64,6 @@
 	{/if}
 	<Island index={sector('madeira')} />
 	<Partners settings={data.settings} partners={data.partners} karts={data.pilots.length} index={sector('partners')} />
-	<Contact settings={data.settings} index={sector('contact')} />
+	<Contact settings={data.settings} result={form?.contact} index={sector('contact')} />
 	<Footer settings={data.settings} links={links.filter((l) => l.id !== 'contact')} />
 </main>

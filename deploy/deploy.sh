@@ -98,10 +98,11 @@ find "$APP_DIR/releases" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
   | xargs -r rm -rf
 
 # ─── Service ──────────────────────────────────────────────────────────────────
-# ADMIN_USER, ADMIN_PASSWORD and SITE_ALLOW_IPS come from CI; on a manual run
-# without them the existing $ENV_FILE is kept. The proxy headers are what
-# vx-nginx sends, without them saving in the admin fails SvelteKit's cross-site
-# POST check. SITE_ALLOW_IPS, when set, limits the site to those addresses.
+# ADMIN_USER, ADMIN_PASSWORD, SITE_ALLOW_IPS and the contact form keys
+# (RESEND_API_KEY, TURNSTILE_*) come from CI; on a manual run without them the
+# existing $ENV_FILE is kept. The proxy headers are what vx-nginx sends,
+# without them saving in the admin fails SvelteKit's cross-site POST check.
+# SITE_ALLOW_IPS, when set, limits the site to those addresses.
 if [ -n "${ADMIN_USER:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
   printf '%s\n' \
     "NODE_ENV=production" \
@@ -115,9 +116,16 @@ if [ -n "${ADMIN_USER:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
     "ADMIN_USER=$ADMIN_USER" \
     "ADMIN_PASSWORD=$ADMIN_PASSWORD" \
     "SITE_ALLOW_IPS=${SITE_ALLOW_IPS:-}" \
+    "RESEND_API_KEY=${RESEND_API_KEY:-}" \
+    "TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY:-}" \
+    "TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY:-}" \
     | sudo tee "$ENV_FILE" > /dev/null
   sudo chown root:"$SERVICE_USER" "$ENV_FILE"
   sudo chmod 0640 "$ENV_FILE"
+  # The site still runs without them, but the contact form cannot send
+  for key in RESEND_API_KEY TURNSTILE_SITE_KEY TURNSTILE_SECRET_KEY; do
+    [ -n "${!key:-}" ] || echo "[deploy] WARN: $key is not set, the contact form cannot send messages"
+  done
 elif ! sudo test -f "$ENV_FILE"; then
   echo "[deploy] FATAL: ADMIN_USER / ADMIN_PASSWORD not set and $ENV_FILE missing" >&2
   exit 1
