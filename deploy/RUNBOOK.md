@@ -63,7 +63,7 @@ Order for the very first deploy:
 | --- | --- |
 | `VPS_HOST` | VPS IP address or hostname |
 | `VPS_USER` | SSH user, `deploy` |
-| `VPS_SSH_KEY` | Private SSH key for the deploy user |
+| `VPS_SSH_KEY` | Private key of `github-actions-k-art`, K'ART's own entry in the deploy user's `authorized_keys` |
 | `VPS_PORT` | Optional SSH port, defaults to `22` |
 | `ADMIN_USER` | Sign-in for `/admin` |
 | `ADMIN_PASSWORD` | Password for `/admin`, a long random string |
