@@ -5,7 +5,7 @@
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
-	let { pilots, year }: { pilots: Pilot[]; year: number } = $props();
+	let { pilots, year, index: sector }: { pilots: Pilot[]; year: number; index: string } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.drivers);
@@ -25,7 +25,7 @@
 
 <section id="drivers" class="drivers">
 	<div class="wrap">
-		<SectionHead index="S2" eyebrow={t.eyebrow(year)} lines={t.title} accent={1}>
+		<SectionHead index={sector} eyebrow={t.eyebrow(year)} lines={t.title} accent={1}>
 			<p>{t.intro(pilots.length, classes)}</p>
 		</SectionHead>
 
@@ -192,9 +192,9 @@
 	.no {
 		position: absolute;
 		z-index: -1;
-		top: -0.04em;
-		right: -0.04em;
-		font-size: clamp(15rem, 26vw, 22rem);
+		top: -0.09em;
+		right: -0.08em;
+		font-size: clamp(12.5rem, 22vw, 18.5rem);
 		font-stretch: 62%;
 		font-weight: 900;
 		letter-spacing: -0.04em;
@@ -225,13 +225,13 @@
 			filter 0.9s var(--ease-out),
 			scale 1.4s var(--ease-out);
 	}
-	/* Photo cards: on hover the portrait drops to black and white and the number cuts in,
-	   printed over it in the accent so the photo still reads through */
+	/* Photo cards: on hover the number cuts in over the portrait, screened so the photo
+	   still reads through */
 	.card:has(img) .no {
 		color: var(--accent);
 		-webkit-text-stroke: 0;
 		background: none;
-		mix-blend-mode: multiply;
+		mix-blend-mode: screen;
 		translate: 0.04em 0;
 		clip-path: polygon(0 -0.2em, 0 -0.2em, -0.25em 1em, -0.25em 1em);
 		transition:
@@ -246,7 +246,7 @@
 	.card:hover img,
 	.card:focus-visible img {
 		scale: 1.04;
-		filter: grayscale(1) brightness(0.9) contrast(1.05);
+		filter: brightness(0.82);
 	}
 
 	.top {

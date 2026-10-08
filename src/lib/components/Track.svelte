@@ -1,10 +1,14 @@
 <script lang="ts">
-	import { VIEW, LAP, LAP_LENGTH, CLOCKWISE, COORDS, RACER } from '#lib/faial.ts';
+	import { VIEW, LAP, CLOCKWISE, COORDS, RACER } from '#lib/faial.ts';
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.madeira.track);
+
+	// The official lap length, set by hand. It lives here rather than in faial.ts so that
+	// regenerating the map can never overwrite it with a length measured off the drawing.
+	const LAP_LENGTH = 1040;
 
 	const [vx, vy, vw, vh] = VIEW;
 	// Scale bar and north arrow go in the two empty corners of the drawing
@@ -29,7 +33,7 @@
 		<p class="place rv" style:--d="140ms">{t.place}</p>
 
 		<dl class="rv" style:--d="200ms">
-			<div><dt>{t.length}</dt><dd class="mono">≈ {LAP_LENGTH} m</dd></div>
+			<div><dt>{t.length}</dt><dd class="mono">{LAP_LENGTH} m</dd></div>
 			<div><dt>{t.direction}</dt><dd>{CLOCKWISE ? t.clockwise : t.anticlockwise}</dd></div>
 			<div class="wide"><dt>{t.coords}</dt><dd class="mono">{coords}</dd></div>
 		</dl>

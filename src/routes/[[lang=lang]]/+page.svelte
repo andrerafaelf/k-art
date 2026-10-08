@@ -18,6 +18,21 @@
 
 	const i18n = useI18n();
 	const links = $derived(siteLinks(i18n.t, i18n.lang, { home: true, news: data.latest.length > 0 }));
+
+	// Each section is a sector of the lap, numbered in the order they appear
+	const sectors = $derived(
+		[
+			'team',
+			data.pilots.length ? 'drivers' : '',
+			data.season.length ? 'season' : '',
+			'hall',
+			data.latest.length ? 'news' : '',
+			'madeira',
+			'partners',
+			'contact'
+		].filter(Boolean)
+	);
+	const sector = (id: string) => `S${sectors.indexOf(id) + 1}`;
 </script>
 
 <svelte:head>
@@ -31,24 +46,24 @@
 	<meta property="og:image:height" content="630" />
 </svelte:head>
 
-<Nav settings={data.settings} {links} altHref={alternatePath(page.url.pathname, i18n.t.lang.other)} />
+<Nav settings={data.settings} {links} {sectors} altHref={alternatePath(page.url.pathname, i18n.t.lang.other)} />
 
 <main>
 	<Hero pilots={data.pilots} season={data.season} settings={data.settings} />
 	<Kerb />
-	<Team pilots={data.pilots} season={data.season} year={data.settings.seasonYear} />
+	<Team pilots={data.pilots} season={data.season} year={data.settings.seasonYear} index={sector('team')} />
 	{#if data.pilots.length}
-		<Pilots pilots={data.pilots} year={data.settings.seasonYear} />
+		<Pilots pilots={data.pilots} year={data.settings.seasonYear} index={sector('drivers')} />
 	{/if}
 	{#if data.season.length}
-		<Season season={data.season} settings={data.settings} />
+		<Season season={data.season} settings={data.settings} index={sector('season')} />
 	{/if}
-	<HallTeaser history={data.history} alumni={data.alumni} index="S4" />
+	<HallTeaser history={data.history} alumni={data.alumni} index={sector('hall')} />
 	{#if data.latest.length}
-		<News posts={data.latest} />
+		<News posts={data.latest} index={sector('news')} />
 	{/if}
-	<Island />
-	<Partners settings={data.settings} partners={data.partners} karts={data.pilots.length} />
-	<Contact settings={data.settings} />
+	<Island index={sector('madeira')} />
+	<Partners settings={data.settings} partners={data.partners} karts={data.pilots.length} index={sector('partners')} />
+	<Contact settings={data.settings} index={sector('contact')} />
 	<Footer settings={data.settings} links={links.filter((l) => l.id !== 'contact')} />
 </main>

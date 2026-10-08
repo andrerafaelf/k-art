@@ -5,7 +5,7 @@
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
-	let { settings, partners, karts }: { settings: Settings; partners: Partner[]; karts: number } = $props();
+	let { settings, partners, karts, index }: { settings: Settings; partners: Partner[]; karts: number; index: string } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.partners);
@@ -33,7 +33,7 @@
 			</div>
 		{/if}
 
-		<SectionHead index="S7" eyebrow={t.eyebrow} lines={t.title} accent={1}>
+		<SectionHead {index} eyebrow={t.eyebrow} lines={t.title} accent={1}>
 			<p>{tr(settings.partnersIntro, i18n.lang)} {t.positions(karts)}</p>
 		</SectionHead>
 

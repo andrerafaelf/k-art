@@ -1,11 +1,12 @@
 <script lang="ts">
 	import SectionHead from './SectionHead.svelte';
+	import CalendarLinks from './CalendarLinks.svelte';
 	import { numbered, roundEnd, nextRound, seasonSummary, bestResult, longDate, monthShort, tr } from '#lib/content.ts';
 	import type { Round, Settings } from '#lib/content.ts';
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
-	let { season, settings }: { season: Round[]; settings: Settings } = $props();
+	let { season, settings, index }: { season: Round[]; settings: Settings; index: string } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.season);
@@ -34,13 +35,16 @@
 
 <section id="season" class="season">
 	<div class="wrap">
-		<SectionHead index="S3" eyebrow={t.eyebrow(settings.seasonYear)} lines={t.title} accent={1}>
+		<SectionHead {index} eyebrow={t.eyebrow(settings.seasonYear)} lines={t.title} accent={1}>
 			<p>
 				{tr(settings.seasonIntro, i18n.lang)}
 				<strong>
 					{summary.raced ? t.soFar(summary.wins, summary.podiums, summary.raced) : t.notStarted}
 				</strong>
 			</p>
+			<div class="subscribe">
+				<CalendarLinks label={i18n.t.calendar.label} />
+			</div>
 		</SectionHead>
 
 		{#if next}
@@ -107,6 +111,9 @@
 	.season :global(.intro strong) {
 		color: var(--fg);
 		font-weight: 600;
+	}
+	.subscribe {
+		margin-top: 1.75rem;
 	}
 
 	/* ---------- next race ---------- */

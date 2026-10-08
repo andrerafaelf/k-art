@@ -5,6 +5,8 @@
 	import { BOX, COAST, CONTOURS, PLACES } from '#lib/madeira.ts';
 	import Track from './Track.svelte';
 
+	let { index }: { index: string } = $props();
+
 	const i18n = useI18n();
 	const t = $derived(i18n.t.madeira);
 
@@ -20,7 +22,7 @@
 
 <section id="madeira" class="island">
 	<div class="wrap">
-		<SectionHead index="S6" eyebrow={t.eyebrow} lines={t.title} accent={1}>
+		<SectionHead {index} eyebrow={t.eyebrow} lines={t.title} accent={1}>
 			<p>{t.intro}</p>
 		</SectionHead>
 

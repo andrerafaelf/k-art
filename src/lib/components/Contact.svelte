@@ -4,7 +4,7 @@
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
-	let { settings }: { settings: Settings } = $props();
+	let { settings, index }: { settings: Settings; index: string } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.contact);
@@ -12,7 +12,7 @@
 
 <section id="contact" class="contact">
 	<div class="wrap" use:inview>
-		<p class="eyebrow rv"><b>S8</b> · {t.eyebrow}</p>
+		<p class="eyebrow rv"><b>{index}</b> · {t.eyebrow}</p>
 		<h2 class="display">
 			{#each t.title as line, i}
 				<span class="line"><span style:--d="{80 + i * 90}ms">{line}</span></span>

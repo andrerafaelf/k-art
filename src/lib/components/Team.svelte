@@ -3,7 +3,7 @@
 	import { teamRecord, seasonSummary, type Pilot, type Round } from '#lib/content.ts';
 	import { useI18n } from '#lib/i18n.ts';
 
-	let { pilots, season, year }: { pilots: Pilot[]; season: Round[]; year: number } = $props();
+	let { pilots, season, year, index }: { pilots: Pilot[]; season: Round[]; year: number; index: string } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.team);
@@ -28,7 +28,7 @@
 <section id="team" class="team">
 	<div class="wrap">
 		<div class="intro" use:inview>
-			<p class="eyebrow rv"><b>S1</b> · {t.eyebrow}</p>
+			<p class="eyebrow rv"><b>{index}</b> · {t.eyebrow}</p>
 			<p class="statement rv" style:--d="100ms">
 				{t.statement}
 				<span>{t.statementMuted}</span>

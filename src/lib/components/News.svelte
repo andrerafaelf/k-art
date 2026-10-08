@@ -6,7 +6,7 @@
 	import { useI18n, newsPath } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
-	let { posts }: { posts: Omit<Post, 'body'>[] } = $props();
+	let { posts, index }: { posts: Omit<Post, 'body'>[]; index: string } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.news);
@@ -14,7 +14,7 @@
 
 <section id="news" class="news">
 	<div class="wrap">
-		<SectionHead index="S5" eyebrow={t.eyebrow} lines={t.title} accent={1}>
+		<SectionHead {index} eyebrow={t.eyebrow} lines={t.title} accent={1}>
 			<p>{t.intro}</p>
 			<a class="all" href={newsPath(i18n.lang)}>{t.all} <Arrow /></a>
 		</SectionHead>

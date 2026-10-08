@@ -27,6 +27,8 @@
 	--gutter: clamp(1.25rem, 4vw, 3.5rem);
 	--max: 1520px;
 	--nav-h: 4.5rem;
+	/* The header once the page has scrolled */
+	--nav-compact: 3.5rem;
 	--section: clamp(6rem, 12vw, 11rem);
 
 	color-scheme: dark;
@@ -52,7 +54,7 @@
 
 html {
 	scroll-behavior: smooth;
-	scroll-padding-top: var(--nav-h);
+	scroll-padding-top: var(--nav-compact);
 	-webkit-text-size-adjust: 100%;
 	text-rendering: optimizeLegibility;
 }

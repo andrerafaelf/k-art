@@ -6,5 +6,7 @@ export const params = defineParams({
 	/** The news section is /noticias in Portuguese and /en/news in English */
 	news: (param) => (param === 'noticias' || param === 'news' ? param : undefined),
 	/** The Hall of Fame is /hall-of-fame in both languages; the old /hall-da-fama redirects there */
-	hall: (param) => (param === 'hall-da-fama' || param === 'hall-of-fame' ? param : undefined)
+	hall: (param) => (param === 'hall-da-fama' || param === 'hall-of-fame' ? param : undefined),
+	/** The race calendar feed is /calendario.ics in Portuguese and /en/calendar.ics in English */
+	calendar: (param) => (param === 'calendario.ics' || param === 'calendar.ics' ? param : undefined)
 });

@@ -9,58 +9,68 @@
 		links: { id: string; href: string; label: string }[];
 		/** Same page in the other language */
 		altHref: string;
+		/** Ids of the sections on the page, in order, drawn as sectors of the lap along the header */
+		sectors?: string[];
 	}
 
-	let { settings, links, altHref }: Props = $props();
+	let { settings, links, altHref, sectors = [] }: Props = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t);
 
 	let open = $state(false);
 	let solid = $state(false);
-	let hidden = $state(false);
 	let current = $state('');
+	let progress = $state<number[]>([]);
 
-	// Solid once scrolled, tucks away while scrolling down, comes back on the way up
+	// Once a frame while scrolling: the header turns solid and compact, each
+	// sector fills as it is read and the nav marks the section being read. The
+	// reading line runs from the top of the window at the start of the page to
+	// the bottom at the end, so the last sector always completes.
 	$effect(() => {
-		let last = scrollY;
-		const onScroll = () => {
+		const find = (ids: string[]) => ids.map((id) => document.getElementById(id)).filter((el) => el !== null);
+		const laps = find(sectors);
+		const marks = find(links.map((l) => l.id));
+		let frame = 0;
+
+		const measure = () => {
+			frame = 0;
 			const y = scrollY;
+			const room = document.documentElement.scrollHeight - innerHeight;
+			const line = room > 0 ? innerHeight * Math.min(y / room, 1) : 0;
 			solid = y > 40;
-			if (Math.abs(y - last) > 6) {
-				hidden = y > last && y > 400;
-				last = y;
+			progress = laps.map((el) => {
+				const { top, height } = el.getBoundingClientRect();
+				return Math.min(Math.max((line - top) / height, 0), 1);
+			});
+			let id = '';
+			let last = -Infinity;
+			for (const el of marks) {
+				const { top } = el.getBoundingClientRect();
+				if (top <= line && top > last) [id, last] = [el.id, top];
 			}
+			current = id;
 		};
-		onScroll();
-		addEventListener('scroll', onScroll, { passive: true });
-		return () => removeEventListener('scroll', onScroll);
-	});
+		const queue = () => (frame ||= requestAnimationFrame(measure));
 
-	// Highlight the section currently in view
-	$effect(() => {
-		const io = new IntersectionObserver(
-			(entries) => {
-				for (const e of entries) if (e.isIntersecting) current = e.target.id;
-			},
-			{ rootMargin: '-45% 0px -50% 0px' }
-		);
-		for (const { id } of links) {
-			const el = document.getElementById(id);
-			if (el) io.observe(el);
-		}
-		return () => io.disconnect();
+		measure();
+		addEventListener('scroll', queue, { passive: true });
+		addEventListener('resize', queue);
+		return () => {
+			cancelAnimationFrame(frame);
+			removeEventListener('scroll', queue);
+			removeEventListener('resize', queue);
+		};
 	});
 
 	$effect(() => {
-		if (open) hidden = false;
 		document.documentElement.style.overflow = open ? 'hidden' : '';
 	});
 </script>
 
 <svelte:window onkeydown={(e) => e.key === 'Escape' && (open = false)} />
 
-<header class:solid class:hidden={hidden && !open} class:open>
+<header class:solid class:open class:timed={sectors.length > 0}>
 	<div class="bar wrap">
 		<a href={localize('/', i18n.lang)} class="brand" aria-label={t.nav.home} onclick={() => (open = false)}>
 			<Logo />
@@ -84,6 +94,14 @@
 			<span class="bars" aria-hidden="true"><i></i><i></i></span>
 		</button>
 	</div>
+
+	{#if sectors.length}
+		<div class="sectors" aria-hidden="true">
+			{#each sectors as id, i (id)}
+				<i style:--p={progress[i] ?? 0}></i>
+			{/each}
+		</div>
+	{/if}
 </header>
 
 <div id="menu" class="sheet" class:open inert={!open}>
@@ -108,7 +126,6 @@
 		z-index: 60;
 		padding-top: env(safe-area-inset-top, 0px);
 		transition:
-			transform 0.6s var(--ease-out),
 			background-color 0.4s,
 			backdrop-filter 0.4s;
 	}
@@ -118,24 +135,59 @@
 		-webkit-backdrop-filter: blur(18px) saturate(160%);
 		box-shadow: 0 1px 0 var(--hair);
 	}
+	/* The sector bar takes the place of the hairline */
+	header.timed,
 	header.open {
-		background: var(--bg);
 		box-shadow: none;
 	}
-	header.hidden {
-		transform: translateY(-100%);
+	header.open {
+		background: var(--bg);
 	}
 
+	/* Full height over the hero, compact once the page moves */
 	.bar {
 		display: flex;
 		align-items: center;
 		gap: 2rem;
 		height: var(--nav-h);
+		transition: height 0.5s var(--ease-out);
+	}
+	.solid .bar {
+		height: var(--nav-compact);
 	}
 	/* The full lockup, as in the footer; wide enough for RACING TEAM to read */
 	.brand {
 		width: 9.5rem;
 		flex-shrink: 0;
+		transition: width 0.5s var(--ease-out);
+	}
+
+	/* Sectors of the lap, one per section, filling in lime as the page is read */
+	.sectors {
+		position: absolute;
+		inset: auto 0 0;
+		display: flex;
+		gap: 3px;
+		height: 3px;
+		opacity: 0;
+		transition: opacity 0.4s;
+	}
+	.solid:not(.open) .sectors {
+		opacity: 1;
+	}
+	.sectors i {
+		position: relative;
+		flex: 1;
+		overflow: hidden;
+		background: rgb(255 255 255 / 0.1);
+	}
+	.sectors i::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--lime);
+		transform: scaleX(var(--p));
+		transform-origin: left;
 	}
 
 	.desk {
@@ -269,6 +321,9 @@
 	@media (min-width: 1000px) {
 		.brand {
 			width: 11.5rem;
+		}
+		.solid .brand {
+			width: 10.5rem;
 		}
 		.desk {
 			display: flex;
