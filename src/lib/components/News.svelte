@@ -1,10 +1,11 @@
 <script lang="ts">
-	import SectionHead from './SectionHead.svelte';
+	import TeaserHead from './TeaserHead.svelte';
 	import PostCard from './PostCard.svelte';
-	import Arrow from './Arrow.svelte';
 	import type { Post } from '#lib/content.ts';
 	import { useI18n, newsPath } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
+
+	// The latest posts on the home page
 
 	let { posts, index }: { posts: Omit<Post, 'body'>[]; index: string } = $props();
 
@@ -12,12 +13,9 @@
 	const t = $derived(i18n.t.news);
 </script>
 
-<section id="news" class="news">
+<section id="news" class="news" data-sector>
 	<div class="wrap">
-		<SectionHead {index} eyebrow={t.eyebrow} lines={t.title} accent={1}>
-			<p>{t.intro}</p>
-			<a class="all" href={newsPath(i18n.lang)}>{t.all} <Arrow /></a>
-		</SectionHead>
+		<TeaserHead {index} eyebrow={t.eyebrow} lines={t.title} href={newsPath(i18n.lang)} link={t.all} />
 
 		<ul class="posts" use:inview>
 			{#each posts as post, i (post.id)}
@@ -30,18 +28,7 @@
 <style>
 	.news {
 		padding-block: var(--section);
-	}
-	.all {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.6rem;
-		margin-top: 1.25rem;
-		font-weight: 600;
-		color: var(--fg);
-	}
-	.all :global(svg) {
-		width: 0.9rem;
-		color: var(--lime);
+		border-top: 1px solid var(--hair);
 	}
 	.posts {
 		display: grid;

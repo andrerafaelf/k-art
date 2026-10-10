@@ -65,7 +65,7 @@ admin is in European Portuguese by default; each person can switch it to English
 - **Hall of Fame**: past seasons (headline, story, numbers, titles, line-up) and former drivers
   (years with the team, record, titles, where they race now). "Archive the season" fills a season in
   from the calendar, and "Move to the Hall of Fame" on a driver takes them out of the line-up and
-  into the former drivers. Shown on the homepage and at `/hall-of-fame` (`/en/hall-of-fame` in English).
+  into the former drivers. Shown at `/hall-of-fame` (`/en/hall-of-fame` in English).
 - **News**: posts with a cover photo, published or kept as drafts. The three latest appear on the
   homepage; all of them at `/noticias` and `/en/news`. The text editor has buttons for subheadings,
   lists, quotes, bold, italic and links, and a preview. Underneath it writes `## headings`,
@@ -111,11 +111,14 @@ Images:
 ## Brand assets
 
 - `src/lib/brand.ts`: the official logo as vector paths, taken from `K-ART_LOGO25.pdf`. Use the
-  `Logo` component, which supports the official colourways: the K in lime (`accent="lime"`) or
-  blue (`accent="blue"`) with the rest in the text colour, or everything in one colour
-  (`accent="mono"`, for example black on lime).
-- Brand colours in `src/app.css`: lime `#D6F906` and blue `#0478FB` from the logo, sky blue
-  `#21BBED` and number-plate yellow `#FEDA00` from the 2026 livery.
+  `Logo` component, which supports the official colourways: the team's full colour with a lime K
+  and blue ART (`accent="full"`, the site header and footer), a lime K with the rest in the text
+  colour (`accent="lime"`), or everything in one colour (`accent="mono"`, for example black on lime).
+- Brand colours in `src/app.css`: the team blue `#44B8F3` (suits, karts, the ART of the logo),
+  lime `#D6F906` and number-plate yellow `#FEDA00`. Blue marks identity (logo, headline accents,
+  kerb, the page you are on); lime marks what is happening (buttons, the next race, wins, focus).
+- Type sizes come from the scale at the top of `src/app.css` (`--t-hero`, `--t-page`,
+  `--t-section` and so on), so headings and the text under them stay in proportion.
 - `src/lib/madeira.ts`: the map of Madeira, generated from the OpenStreetMap coastline (ODbL)
   and NASA SRTM elevation, with contour lines every 150 m.
 - `src/lib/faial.ts`: the Kartódromo do Faial track map, drawn from the OpenStreetMap survey of the
@@ -126,7 +129,9 @@ Images:
 ## Structure
 
 ```
-src/routes/[[lang=lang]]/   Public site: home, Hall of Fame, /noticias and /en/news
+src/routes/[[lang=lang]]/   Public site. Each page has an address per language, listed in PAGES
+                            in lib/i18n.ts: /equipa, /pilotos, /temporada, /noticias,
+                            /hall-of-fame, /parceiros, /contacto, and /en/team, /en/drivers...
 src/routes/admin/           Admin pages and their form actions
 src/routes/uploads/         Serves uploaded images
 src/hooks.server.ts         Sessions and the /admin sign-in check, page language
@@ -137,7 +142,7 @@ src/lib/server/auth.ts      Admin accounts, passwords and sessions
 src/lib/server/log.ts       The change log (who changed what)
 src/lib/admin/i18n.ts       Admin interface text in Portuguese and English
 src/lib/server/seed.ts      Starting content for a fresh install
-src/lib/components/         Site sections
+src/lib/components/         Site sections; the home page uses short versions that link to each page
 src/lib/admin/              Admin styles and form components
 src/env.ts                  Environment variables
 ```

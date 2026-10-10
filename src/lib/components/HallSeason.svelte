@@ -107,7 +107,7 @@
 	}
 	h3 {
 		margin-top: 2.25rem;
-		font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+		font-size: var(--t-card);
 		font-style: italic;
 		font-stretch: 125%;
 		font-weight: 900;
@@ -180,20 +180,20 @@
 
 	/* Full width on the Hall of Fame page */
 	.full .year {
-		font-size: clamp(9rem, 22vw, 20rem);
+		font-size: clamp(8rem, 16vw, 14rem);
 	}
 	.full .body {
 		padding: clamp(1.75rem, 4vw, 3rem);
 	}
 	.full h3 {
-		font-size: clamp(2.2rem, 5vw, 4.25rem);
+		font-size: var(--t-section);
 	}
 	.full .stats {
 		gap: 0.25rem clamp(1.5rem, 4vw, 3.5rem);
 		margin-top: 2rem;
 	}
 	.full dd {
-		font-size: clamp(2rem, 3.6vw, 3rem);
+		font-size: var(--t-figure);
 	}
 	.full .titles {
 		max-width: 44rem;

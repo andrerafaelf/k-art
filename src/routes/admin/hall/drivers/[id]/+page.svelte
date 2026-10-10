@@ -50,7 +50,7 @@
 						</label>
 						<label class="a-choice">
 							<input type="radio" name="accent" value="cyan" checked={a.accent === 'cyan'} onchange={() => (accent = 'cyan')} />
-							<span class="a-swatch" style:background="var(--cyan)"></span> {t().common.cyan}
+							<span class="a-swatch" style:background="var(--blue)"></span> {t().common.cyan}
 						</label>
 					</div>
 				</div>

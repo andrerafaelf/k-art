@@ -520,7 +520,7 @@
 	}
 	.done h3 {
 		margin-top: 0.6rem;
-		font-size: clamp(2.75rem, 6vw, 5.5rem);
+		font-size: var(--t-section);
 	}
 	.done h3:focus {
 		outline: none;

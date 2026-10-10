@@ -5,7 +5,7 @@
 	import { BOX, COAST, CONTOURS, PLACES } from '#lib/madeira.ts';
 	import Track from './Track.svelte';
 
-	let { index }: { index: string } = $props();
+	let { index }: { index?: string } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.madeira);
@@ -95,18 +95,18 @@
 		overflow: visible;
 	}
 	.land {
-		fill: rgb(33 187 237 / 0.06);
+		fill: rgb(68 184 243 / 0.06);
 	}
 	.coast {
 		fill: none;
-		stroke: var(--cyan);
+		stroke: var(--blue);
 		stroke-width: 1.6;
 		stroke-linejoin: round;
 		stroke-dasharray: 1.02 1.02;
 	}
 	.contours path {
 		fill: none;
-		stroke: rgb(33 187 237 / calc(0.22 + var(--i) * 0.05));
+		stroke: rgb(68 184 243 / calc(0.22 + var(--i) * 0.05));
 		stroke-width: 0.8;
 		stroke-linejoin: round;
 		stroke-dasharray: 1.02 1.02;
@@ -188,7 +188,7 @@
 		border-left: 1px solid var(--hair);
 	}
 	dt {
-		font-size: clamp(3rem, 6vw, 5rem);
+		font-size: var(--t-figure);
 	}
 	dt small {
 		margin-left: 0.2rem;
@@ -237,7 +237,7 @@
 			border-left: 0;
 		}
 		dt {
-			font-size: 3.75rem;
+			font-size: var(--t-figure);
 		}
 		dd {
 			margin: 0;

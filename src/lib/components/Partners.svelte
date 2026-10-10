@@ -1,39 +1,22 @@
 <script lang="ts">
 	import SectionHead from './SectionHead.svelte';
 	import Arrow from './Arrow.svelte';
+	import PartnerLogos from './PartnerLogos.svelte';
 	import { tr, type Partner, type Settings } from '#lib/content.ts';
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
-	let { settings, partners, karts, index }: { settings: Settings; partners: Partner[]; karts: number; index: string } = $props();
+	// The partnerships page: the pitch, the four positions on the kart, then the partners we have
+
+	let { settings, partners, karts }: { settings: Settings; partners: Partner[]; karts: number } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.partners);
-
 </script>
 
 <section id="partners" class="partners">
 	<div class="wrap">
-		{#if partners.length}
-			<div class="ours" use:inview>
-				<p class="eyebrow rv">{t.ours}</p>
-				<ul class="logos">
-					{#each partners as p, i (p.id)}
-						<li class="rv {p.tone}" style:--d="{i * 60}ms">
-							{#if p.url}
-								<a href={p.url} target="_blank" rel="noreferrer" title={p.name}>
-									<img src={p.logo} alt={p.name} loading="lazy" />
-								</a>
-							{:else}
-								<img src={p.logo} alt={p.name} loading="lazy" />
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			</div>
-		{/if}
-
-		<SectionHead {index} eyebrow={t.eyebrow} lines={t.title} accent={1}>
+		<SectionHead level={1} eyebrow={t.eyebrow} lines={t.title} accent={1}>
 			<p>{tr(settings.partnersIntro, i18n.lang)} {t.positions(karts)}</p>
 		</SectionHead>
 
@@ -54,58 +37,24 @@
 				{t.deck} <Arrow />
 			</a>
 		</div>
+
+		{#if partners.length}
+			<div class="ours" use:inview>
+				<p class="eyebrow rv">{t.ours}</p>
+				<PartnerLogos {partners} />
+			</div>
+		{/if}
 	</div>
 </section>
 
 <style>
 	.partners {
-		padding-block: var(--section);
-		background: var(--bg-1);
-		border-top: 1px solid var(--hair);
+		padding-block: var(--page-top) var(--section);
 	}
 
 	/* Current partners */
 	.ours {
-		margin-bottom: clamp(5rem, 10vw, 9rem);
-	}
-	.logos {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
-		gap: 1px;
-		margin: 1.75rem 0 0;
-		padding: 0;
-		list-style: none;
-		background: var(--hair);
-		border: 1px solid var(--hair);
-	}
-	.logos li {
-		display: grid;
-		place-items: center;
-		aspect-ratio: 16 / 9;
-		padding: 1.5rem 1.75rem;
-		background: var(--bg-1);
-	}
-	.logos li.light {
-		background: #efeee9;
-	}
-	.logos a {
-		display: grid;
-		place-items: center;
-		width: 100%;
-		height: 100%;
-	}
-	.logos img {
-		max-width: 100%;
-		max-height: 3.25rem;
-		object-fit: contain;
-		opacity: 0.85;
-		transition:
-			opacity 0.3s,
-			scale 0.5s var(--ease-out);
-	}
-	.logos li:hover img {
-		opacity: 1;
-		scale: 1.04;
+		margin-top: clamp(4rem, 8vw, 7rem);
 	}
 
 	/* ---------- positions ---------- */
@@ -171,7 +120,7 @@
 	}
 	h3 {
 		margin-top: 0.5rem;
-		font-size: clamp(1.5rem, 2.2vw, 2rem);
+		font-size: var(--t-card);
 		font-style: italic;
 		font-stretch: 125%;
 		font-weight: 900;

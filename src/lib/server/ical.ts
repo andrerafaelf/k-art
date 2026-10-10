@@ -1,5 +1,5 @@
 import { numbered, tr, type Content, type Lang } from '#lib/content.ts';
-import { messages, localize } from '#lib/i18n.ts';
+import { messages, pagePath } from '#lib/i18n.ts';
 
 // The race calendar as an iCalendar feed (RFC 5545). Each round is an all-day
 // event over the race weekend, so anyone subscribed sees every date the admin
@@ -39,7 +39,7 @@ const stamp = (iso: string) => new Date(iso).toISOString().replace(/[-:]|\.\d+/g
 export function calendar({ season }: Content, lang: Lang, origin: string) {
 	const t = messages[lang].calendar;
 	const { host } = new URL(origin);
-	const link = `${origin}${localize('/', lang)}#season`;
+	const link = `${origin}${pagePath('season', lang)}`;
 	// A published feed is stamped with the time it was generated
 	const now = stamp(new Date().toISOString());
 

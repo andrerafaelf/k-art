@@ -8,24 +8,26 @@
 		index?: string;
 		/** Title, one entry per line */
 		lines: string[];
-		/** Index of a line to set in lime */
+		/** Index of a line to set in the team blue */
 		accent?: number;
+		/** 1 when this is the page's own heading */
+		level?: 1 | 2;
 		children?: Snippet;
 	}
 
-	let { eyebrow, index, lines, accent, children }: Props = $props();
+	let { eyebrow, index, lines, accent, level = 2, children }: Props = $props();
 </script>
 
 <header class="head" use:inview>
 	<div>
 		<p class="eyebrow rv">{#if index}<b>{index}</b> ·{/if} {eyebrow}</p>
-		<h2 class="display h2">
+		<svelte:element this={level === 1 ? 'h1' : 'h2'} class="display {level === 1 ? 't-page' : 't-section'}">
 			{#each lines as line, i}
 				<span class="line"
 					><span class:accent={i === accent} style:--d="{60 + i * 90}ms">{line}</span></span
 				>
 			{/each}
-		</h2>
+		</svelte:element>
 	</div>
 	{#if children}
 		<div class="intro rv" style:--d="260ms">{@render children()}</div>
@@ -39,11 +41,8 @@
 		align-items: end;
 		margin-bottom: clamp(3rem, 6vw, 5.5rem);
 	}
-	h2 {
+	.display {
 		margin-top: 1.6rem;
-	}
-	.accent {
-		color: var(--lime);
 	}
 	.intro {
 		max-width: 30rem;

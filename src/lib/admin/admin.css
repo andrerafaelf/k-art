@@ -745,7 +745,7 @@
 	line-height: 1;
 }
 .a-plate.cyan {
-	background: var(--cyan);
+	background: var(--blue);
 }
 .a-thumb {
 	flex-shrink: 0;

@@ -94,7 +94,7 @@
 	.s2 {
 		right: 10%;
 		width: 4%;
-		background: var(--cyan);
+		background: var(--blue);
 	}
 
 	.text {
@@ -120,7 +120,7 @@
 		text-wrap: balance;
 	}
 	.feature .title {
-		font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+		font-size: var(--t-section);
 	}
 	.excerpt {
 		margin-top: 0.75rem;

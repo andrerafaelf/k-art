@@ -1,11 +1,15 @@
 <script lang="ts">
 	import SectionHead from './SectionHead.svelte';
+	import DriverCard from './DriverCard.svelte';
 	import Arrow from './Arrow.svelte';
 	import { tr, type Pilot } from '#lib/content.ts';
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
-	let { pilots, year, index: sector }: { pilots: Pilot[]; year: number; index: string } = $props();
+	// The drivers page. A profile opens over the grid, and /pilotos#<driver id>
+	// opens straight onto that driver (the cards on the home page link there).
+
+	let { pilots, year }: { pilots: Pilot[]; year: number } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.drivers);
@@ -21,44 +25,37 @@
 		index = (i + pilots.length) % pilots.length;
 		if (!dialog?.open) dialog?.showModal();
 	}
+
+	$effect(() => {
+		const open = () => {
+			const i = pilots.findIndex((p) => p.id === decodeURIComponent(location.hash.slice(1)));
+			if (i >= 0) show(i);
+		};
+		open();
+		addEventListener('hashchange', open);
+		return () => removeEventListener('hashchange', open);
+	});
 </script>
 
 <section id="drivers" class="drivers">
 	<div class="wrap">
-		<SectionHead index={sector} eyebrow={t.eyebrow(year)} lines={t.title} accent={1}>
-			<p>{t.intro(pilots.length, classes)}</p>
+		<SectionHead level={1} eyebrow={t.eyebrow(year)} lines={t.title} accent={1}>
+			{#if pilots.length}
+				<p>{t.intro(pilots.length, classes)}</p>
+			{/if}
 		</SectionHead>
 
-		<ul class="grid" use:inview>
-			{#each pilots as p, i (p.id)}
-				<li class="rv" style:--d="{(i % 3) * 90}ms">
-					<button
-						class="card {p.accent}"
-						onclick={() => show(i)}
-						aria-haspopup="dialog"
-						aria-label={t.open(`${p.first} ${p.last}`, p.category, p.number)}
-					>
-						<span class="no num" aria-hidden="true">{p.number}</span>
-						{#if p.photo}
-							<img src={p.photo} alt="" loading="lazy" />
-						{/if}
-						<span class="top">
-							<span class="cat">{p.category}</span>
-						</span>
-						<span class="who">
-							<span class="first">{p.first}</span>
-							<span class="last">{p.last}</span>
-						</span>
-						<span class="meta">
-							<span><b class="num">{p.record.wins}</b>{t.wins}</span>
-							<span><b class="num">{p.record.podiums}</b>{t.podiums}</span>
-							<span><b class="num">{p.record.poles}</b>{t.poles}</span>
-							<span class="go"><Arrow /></span>
-						</span>
-					</button>
-				</li>
-			{/each}
-		</ul>
+		{#if pilots.length}
+			<ul class="grid" use:inview>
+				{#each pilots as p, i (p.id)}
+					<li id={p.id} class="rv" style:--d="{(i % 3) * 90}ms">
+						<DriverCard {p} onclick={() => show(i)} />
+					</li>
+				{/each}
+			</ul>
+		{:else}
+			<p class="empty">{t.empty}</p>
+		{/if}
 	</div>
 </section>
 
@@ -129,9 +126,11 @@
 
 <style>
 	.drivers {
-		padding-block: var(--section);
-		background: var(--bg-1);
-		border-block: 1px solid var(--hair);
+		padding-block: var(--page-top) var(--section);
+	}
+	.empty {
+		padding-block: 2rem 4rem;
+		color: var(--fg-2);
 	}
 
 	/* Phones: a swipeable row of cards. Wider screens: a grid. */
@@ -154,176 +153,11 @@
 	}
 	.grid li {
 		scroll-snap-align: start;
+		/* Clear of the header when the browser scrolls to #<driver id> */
+		scroll-margin-top: calc(var(--nav-compact) + 2rem);
 	}
-	.grid .card {
+	.grid :global(.card) {
 		border: 1px solid var(--hair);
-	}
-
-	/* ---------- card ---------- */
-	.card {
-		--accent: var(--lime);
-		position: relative;
-		isolation: isolate;
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-		aspect-ratio: 4 / 4.3;
-		min-height: 24rem;
-		padding: 1.5rem;
-		overflow: hidden;
-		text-align: left;
-		background: var(--bg-1);
-		transition: background 0.6s var(--ease-out);
-	}
-	.card.cyan {
-		--accent: var(--cyan);
-	}
-	.card:has(img)::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: -2;
-		background: linear-gradient(to top, rgb(14 15 17 / 0.95) 25%, transparent 70%);
-	}
-	.card:hover {
-		background: var(--bg-2);
-	}
-
-	.no {
-		position: absolute;
-		z-index: -1;
-		top: -0.09em;
-		right: -0.08em;
-		font-size: clamp(12.5rem, 22vw, 18.5rem);
-		font-stretch: 62%;
-		font-weight: 900;
-		letter-spacing: -0.04em;
-		line-height: 0.78;
-		color: transparent;
-		-webkit-text-stroke: 1.5px var(--accent);
-		/* Fills from the bottom up on hover */
-		background: linear-gradient(var(--accent), var(--accent)) 0 100% / 100% 0% no-repeat;
-		-webkit-background-clip: text;
-		background-clip: text;
-		transition:
-			background-size 0.8s var(--ease-out),
-			translate 0.9s var(--ease-out);
-	}
-	.card:hover .no,
-	.card:focus-visible .no {
-		background-size: 100% 100%;
-		translate: -0.02em 0.02em;
-	}
-	.card img {
-		position: absolute;
-		inset: 0;
-		z-index: -3;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		transition:
-			filter 0.9s var(--ease-out),
-			scale 1.4s var(--ease-out);
-	}
-	/* Photo cards: on hover the number cuts in over the portrait, screened so the photo
-	   still reads through */
-	.card:has(img) .no {
-		color: var(--accent);
-		-webkit-text-stroke: 0;
-		background: none;
-		mix-blend-mode: screen;
-		translate: 0.04em 0;
-		clip-path: polygon(0 -0.2em, 0 -0.2em, -0.25em 1em, -0.25em 1em);
-		transition:
-			clip-path 0.8s var(--ease-out) 0.06s,
-			translate 1s var(--ease-out);
-	}
-	.card:has(img):hover .no,
-	.card:has(img):focus-visible .no {
-		translate: 0 0;
-		clip-path: polygon(0 -0.2em, calc(100% + 0.5em) -0.2em, calc(100% + 0.25em) 1em, -0.25em 1em);
-	}
-	.card:hover img,
-	.card:focus-visible img {
-		scale: 1.04;
-		filter: brightness(0.82);
-	}
-
-	.top {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-	.cat {
-		padding: 0.4rem 0.6rem;
-		background: rgb(8 9 10 / 0.75);
-		backdrop-filter: blur(8px);
-		font-size: 0.75rem;
-		font-weight: 600;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-	}
-	.go {
-		margin-left: auto;
-		align-self: center;
-		display: grid;
-		place-items: center;
-		width: 2.5rem;
-		height: 2.5rem;
-		border-radius: 50%;
-		background: var(--bg);
-		color: var(--fg);
-		transition:
-			background 0.4s var(--ease-out),
-			color 0.4s;
-	}
-	.go :global(svg) {
-		width: 0.9rem;
-		transition: rotate 0.5s var(--ease-out);
-	}
-	.card:hover .go {
-		background: var(--accent);
-		color: var(--black);
-	}
-	.card:hover .go :global(svg) {
-		rotate: -45deg;
-	}
-
-	.who {
-		display: flex;
-		flex-direction: column;
-		margin-top: auto;
-	}
-	.first {
-		font-size: 1.0625rem;
-		color: var(--fg-2);
-	}
-	.last {
-		font-size: clamp(2rem, 3vw, 2.6rem);
-		font-weight: 800;
-		font-style: italic;
-		font-stretch: 125%;
-		letter-spacing: -0.03em;
-		line-height: 0.95;
-		text-transform: uppercase;
-	}
-	.meta {
-		display: flex;
-		gap: 1.5rem;
-		margin-top: 1.25rem;
-		padding-top: 1rem;
-		border-top: 1px solid var(--hair-2);
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--fg-3);
-	}
-	.meta b {
-		display: block;
-		margin-bottom: 0.3rem;
-		font-size: 1.75rem;
-		color: var(--fg);
-		letter-spacing: 0;
 	}
 
 	/* ---------- profile sheet ---------- */
@@ -343,7 +177,7 @@
 		overflow: hidden;
 	}
 	dialog.cyan {
-		--accent: var(--cyan);
+		--accent: var(--blue);
 	}
 	dialog[open] {
 		animation: sheet-in 0.7s var(--ease-out);
@@ -448,9 +282,10 @@
 		position: relative;
 	}
 	.plate .cat {
-		padding: 0;
-		background: none;
-		backdrop-filter: none;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
 	}
 	h3 {
 		display: flex;
@@ -464,6 +299,12 @@
 	}
 	h3 .last {
 		font-size: clamp(2.75rem, 9vw, 4rem);
+		font-weight: 800;
+		font-style: italic;
+		font-stretch: 125%;
+		letter-spacing: -0.03em;
+		line-height: 0.95;
+		text-transform: uppercase;
 	}
 
 	.body {
@@ -494,7 +335,7 @@
 		border-left: 1px solid var(--hair);
 	}
 	.record dd {
-		font-size: 3rem;
+		font-size: var(--t-figure);
 	}
 	.record dt,
 	.specs dt {
@@ -571,7 +412,7 @@
 			background: var(--hair);
 			border: 1px solid var(--hair);
 		}
-		.grid .card {
+		.grid :global(.card) {
 			border: 0;
 		}
 	}
@@ -579,7 +420,7 @@
 		.grid {
 			grid-template-columns: repeat(3, minmax(0, 1fr));
 		}
-		.card {
+		.grid :global(.card) {
 			padding: 1.75rem;
 		}
 	}

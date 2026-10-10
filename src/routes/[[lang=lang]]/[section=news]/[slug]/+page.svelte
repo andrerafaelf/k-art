@@ -1,18 +1,15 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Nav from '#lib/components/Nav.svelte';
-	import Footer from '#lib/components/Footer.svelte';
 	import PostCard from '#lib/components/PostCard.svelte';
 	import Arrow from '#lib/components/Arrow.svelte';
 	import { tr, longDate } from '#lib/content.ts';
-	import { useI18n, siteLinks, alternatePath, newsPath } from '#lib/i18n.ts';
+	import { useI18n, newsPath } from '#lib/i18n.ts';
 	import { render } from '#lib/markdown.ts';
 	import '#lib/prose.css';
 
 	let { data } = $props();
 
 	const i18n = useI18n();
-	const links = $derived(siteLinks(i18n.t, i18n.lang, { home: false, news: true }));
 	const title = $derived(tr(data.post.title, i18n.lang));
 	const excerpt = $derived(tr(data.post.excerpt, i18n.lang));
 	const html = $derived(render(tr(data.post.body, i18n.lang)));
@@ -27,8 +24,6 @@
 	<meta property="og:image" content="{page.url.origin}{data.post.cover ?? '/og.png'}" />
 	{#if data.preview}<meta name="robots" content="noindex, nofollow" />{/if}
 </svelte:head>
-
-<Nav settings={data.settings} {links} altHref={alternatePath(page.url.pathname, i18n.t.lang.other)} />
 
 <main>
 	<article>
@@ -66,8 +61,6 @@
 		</aside>
 	{/if}
 </main>
-
-<Footer settings={data.settings} links={links.filter((l) => l.id !== 'contact')} />
 
 <!-- Only for people signed in to the admin -->
 {#if data.edit}
@@ -117,7 +110,7 @@
 	}
 	h1 {
 		margin-top: 1.25rem;
-		font-size: clamp(2.25rem, 5.4vw, 4.75rem);
+		font-size: var(--t-page);
 		font-weight: 800;
 		font-stretch: 115%;
 		letter-spacing: -0.035em;

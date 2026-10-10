@@ -1,8 +1,15 @@
+<script module lang="ts">
+	// The start sequence plays on the first visit to the home page. Coming back to
+	// it later in the same visit shows it settled, without the lights.
+	let played = false;
+</script>
+
 <script lang="ts">
+	import { browser } from '$app/env';
 	import Arrow from './Arrow.svelte';
 	import { numbered, nextRound, shortDate, tr, code3 } from '#lib/content.ts';
 	import type { Pilot, Round, Settings } from '#lib/content.ts';
-	import { useI18n } from '#lib/i18n.ts';
+	import { useI18n, pagePath } from '#lib/i18n.ts';
 
 	interface Props {
 		pilots: Pilot[];
@@ -15,6 +22,11 @@
 	const i18n = useI18n();
 	const t = $derived(i18n.t);
 
+	const still = browser && played;
+	$effect(() => {
+		played = true;
+	});
+
 	let now = $state(Date.now());
 	$effect(() => {
 		now = Date.now();
@@ -26,8 +38,8 @@
 	const next = $derived(nextRound(rounds, now));
 	const lines = $derived(tr(settings.heroLines, i18n.lang).filter((l) => l.trim()));
 
-	// Timing tower: the line-up ranked by career wins. Rows start in reverse
-	// order on the grid and overtake into place when the lights go out.
+	// Timing tower: the line-up ranked by career wins. The rows fill in one by
+	// one, top down, when the lights go out.
 	const ranked = $derived(
 		[...pilots].sort((a, b) => b.record.wins - a.record.wins || b.record.podiums - a.record.podiums)
 	);
@@ -41,7 +53,7 @@
 
 </script>
 
-<section id="top" class="hero">
+<section id="top" class="hero" class:still>
 	<div class="wrap content">
 		<div class="copy">
 			<div class="start">
@@ -66,15 +78,19 @@
 			<div class="below fade" style:--d="1.4s">
 				<p class="lead">{tr(settings.heroLead, i18n.lang)}</p>
 				<div class="actions">
-					<a class="btn" href="#drivers">{t.hero.meet} <Arrow /></a>
-					<a class="btn btn-ghost" href="#season">{t.hero.season(settings.seasonYear)}</a>
+					{#if pilots.length}
+						<a class="btn" href={pagePath('drivers', i18n.lang)}>{t.hero.meet} <Arrow /></a>
+					{/if}
+					{#if season.length}
+						<a class="btn btn-ghost" href={pagePath('season', i18n.lang)}>{t.hero.season(settings.seasonYear)}</a>
+					{/if}
 				</div>
 			</div>
 		</div>
 
 		<aside class="pitwall fade" style:--d="0.3s">
 			{#if next && countdown}
-				<a class="next striped" href="#season">
+				<a class="next striped" href={pagePath('season', i18n.lang)}>
 					<span class="label mono">
 						<b></b>{t.hero.lightsIn}
 						<span class="where">{next.location} · {shortDate(next.date, i18n.lang)}</span>
@@ -104,7 +120,6 @@
 								<li
 									class="row {p.accent}"
 									class:p1={i === 0}
-									style:--shift={ranked.length - 1 - i - i}
 									style:--i={i}
 									role="row"
 								>
@@ -144,7 +159,7 @@
 		right: -15%;
 		width: 70vw;
 		aspect-ratio: 1;
-		background: radial-gradient(closest-side, rgb(33 187 237 / 0.12), transparent 70%);
+		background: radial-gradient(closest-side, rgb(68 184 243 / 0.12), transparent 70%);
 		pointer-events: none;
 	}
 
@@ -213,12 +228,9 @@
 		animation: rise 1.1s var(--ease-out) both;
 		animation-delay: var(--d);
 	}
-	h1 .accent {
-		color: var(--lime);
-	}
 	@keyframes rise {
 		from {
-			translate: -0.4em 108%;
+			translate: -0.4em 140%;
 			skew: -12deg 0deg;
 		}
 	}
@@ -362,11 +374,11 @@
 		height: var(--row);
 		padding: 0 1.25rem 0 0.75rem;
 		border-bottom: 1px solid var(--hair);
-		animation: overtake 1.3s var(--ease-io) both;
-		animation-delay: calc(var(--go) + 0.15s + var(--i) * 60ms);
+		animation: fill 0.8s var(--ease-out) both;
+		animation-delay: calc(var(--go) + 0.1s + var(--i) * 90ms);
 	}
 	.row.cyan {
-		--accent: var(--cyan);
+		--accent: var(--blue);
 	}
 	/* Team colour bar */
 	.row::before {
@@ -386,12 +398,17 @@
 		background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.12), transparent);
 		translate: -100% 0;
 		animation: sweep 0.9s var(--ease-out) both;
-		animation-delay: calc(var(--go) + 1.3s + var(--i) * 60ms);
+		animation-delay: calc(var(--go) + 0.5s + var(--i) * 90ms);
 		pointer-events: none;
 	}
-	@keyframes overtake {
+	/* Wiped in from the left, like a timing screen filling in */
+	@keyframes fill {
 		from {
-			translate: 0 calc(var(--shift) * 100%);
+			clip-path: inset(0 100% 0 0);
+			translate: -0.75rem 0;
+		}
+		to {
+			clip-path: inset(0);
 		}
 	}
 	@keyframes sweep {
@@ -479,8 +496,16 @@
 			padding-block: 2rem;
 		}
 		h1 {
-			font-size: clamp(3.75rem, 5.1vw, 6.75rem);
+			font-size: var(--t-hero);
 		}
+	}
+
+	.still .pod i,
+	.still .fade,
+	.still h1 .line > span,
+	.still .row,
+	.still .row::after {
+		animation: none;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

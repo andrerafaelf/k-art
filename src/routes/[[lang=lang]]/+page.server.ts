@@ -1,7 +1,6 @@
-import type { Actions, PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types';
 import { isLive } from '#lib/content.ts';
 import { getContent } from '#lib/server/store.ts';
-import { contact } from '#lib/server/contact.ts';
 
 export const load: PageServerLoad = async () => {
 	const { posts } = await getContent();
@@ -13,5 +12,3 @@ export const load: PageServerLoad = async () => {
 			.map(({ body: _, ...summary }) => summary)
 	};
 };
-
-export const actions = { contact } satisfies Actions;

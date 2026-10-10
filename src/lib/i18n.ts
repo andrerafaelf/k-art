@@ -35,7 +35,7 @@ const en = {
 		cta: 'Get in touch',
 		open: 'Open menu',
 		close: 'Close menu',
-		home: "K'ART Racing Team, back to top"
+		home: "K'ART Racing Team, home page"
 	},
 	hero: {
 		meet: 'Meet the drivers',
@@ -81,6 +81,7 @@ const en = {
 	},
 	team: {
 		eyebrow: 'The team',
+		title: ['A team', 'from Madeira'],
 		statement: 'A new team from an island with a single kart track.',
 		statementMuted: 'So we prepare harder, travel further and arrive at every round expecting to win.',
 		wins: 'Race wins',
@@ -89,6 +90,10 @@ const en = {
 		podiumsNote: (starts: number) => `From ${starts} starts between them`,
 		poles: 'Pole positions',
 		polesNote: 'Qualifying is where weekends are won',
+		more: 'Meet the team',
+		metaTitle: "The team, K'ART Racing Team",
+		metaDescription:
+			'A new karting team based at the Kartódromo do Faial, on Madeira. The workshop, the logistics, the academy and the home track.',
 		seasonPodiums: (y: number) => `${y} podiums`,
 		seasonAll: 'A team driver on the podium at every round so far',
 		seasonSome: 'Rounds with a team driver on the podium',
@@ -125,7 +130,11 @@ const en = {
 		chassis: 'Chassis',
 		engine: 'Engine',
 		prev: 'Previous',
-		next: 'Next'
+		next: 'Next',
+		all: 'All drivers',
+		empty: 'The line-up for the new season is announced soon.',
+		metaTitle: (y: number) => `Drivers ${y}, K'ART Racing Team`,
+		metaDescription: "The K'ART Racing Team line-up: classes, race numbers, records and each driver's kart."
 	},
 	season: {
 		eyebrow: (y: number) => `Season ${y}`,
@@ -140,7 +149,11 @@ const en = {
 		roundSuffix: '',
 		nextUp: 'Next up',
 		pending: 'Result to follow',
-		upcoming: 'Upcoming'
+		upcoming: 'Upcoming',
+		all: 'Full calendar',
+		empty: 'The calendar for the new season is announced soon.',
+		metaTitle: (y: number) => `Season ${y}, K'ART Racing Team`,
+		metaDescription: "Race calendar and results of K'ART Racing Team, with a countdown to the next race."
 	},
 	calendar: {
 		label: 'Add the races to your calendar',
@@ -197,7 +210,10 @@ const en = {
 			`Four positions on every kart, and ${spellEn(n)} ${n === 1 ? 'kart' : 'karts'} on the grid every weekend.`,
 		deck: 'Request the partner deck',
 		subject: "Partnership, K'ART Racing Team",
-		ours: 'Our partners'
+		ours: 'Our partners',
+		more: 'See the positions on the kart',
+		metaTitle: "Partnerships, K'ART Racing Team",
+		metaDescription: "The four sponsorship positions on every K'ART Racing Team kart, and the partners already racing with us."
 	},
 	contact: {
 		eyebrow: 'Contact',
@@ -207,6 +223,9 @@ const en = {
 		follow: 'Follow',
 		instagram: (h: string) => `Instagram, @${h}`,
 		direct: 'Or write to us',
+		band: "Racing with us, partnerships or press. Write to us and we'll get back to you.",
+		metaTitle: "Contact, K'ART Racing Team",
+		metaDescription: "Get in touch with K'ART Racing Team about racing with us, partnerships or press.",
 		form: {
 			name: 'Name',
 			email: 'Email',
@@ -258,7 +277,7 @@ const pt: Messages = {
 		cta: 'Fale connosco',
 		open: 'Abrir menu',
 		close: 'Fechar menu',
-		home: "K'ART Racing Team, voltar ao topo"
+		home: "K'ART Racing Team, página inicial"
 	},
 	hero: {
 		meet: 'Conheça os pilotos',
@@ -304,6 +323,7 @@ const pt: Messages = {
 	},
 	team: {
 		eyebrow: 'A equipa',
+		title: ['Uma equipa', 'da Madeira'],
 		statement: 'Uma equipa nova, de uma ilha com uma única pista de karting.',
 		statementMuted: 'Por isso preparamo-nos mais, viajamos mais longe e chegamos a cada prova para ganhar.',
 		wins: 'Vitórias',
@@ -312,6 +332,10 @@ const pt: Messages = {
 		podiumsNote: (starts) => `Em ${starts} corridas no total`,
 		poles: 'Pole positions',
 		polesNote: 'É na qualificação que se ganham os fins de semana',
+		more: 'Conheça a equipa',
+		metaTitle: "A equipa, K'ART Racing Team",
+		metaDescription:
+			'Uma equipa de karting nova, sediada no Kartódromo do Faial, na Madeira. A oficina, a logística, a academia e a pista da casa.',
 		seasonPodiums: (y) => `Pódios em ${y}`,
 		seasonAll: 'Um piloto da equipa no pódio em todas as provas até agora',
 		seasonSome: 'Provas com um piloto da equipa no pódio',
@@ -348,7 +372,11 @@ const pt: Messages = {
 		chassis: 'Chassis',
 		engine: 'Motor',
 		prev: 'Anterior',
-		next: 'Seguinte'
+		next: 'Seguinte',
+		all: 'Todos os pilotos',
+		empty: 'O plantel da nova temporada é anunciado em breve.',
+		metaTitle: (y) => `Pilotos ${y}, K'ART Racing Team`,
+		metaDescription: "O plantel da K'ART Racing Team: categorias, números, palmarés e o kart de cada piloto."
 	},
 	season: {
 		eyebrow: (y) => `Temporada ${y}`,
@@ -363,7 +391,11 @@ const pt: Messages = {
 		roundSuffix: '.ª',
 		nextUp: 'A seguir',
 		pending: 'Resultado em breve',
-		upcoming: 'Por disputar'
+		upcoming: 'Por disputar',
+		all: 'Calendário completo',
+		empty: 'O calendário da nova temporada é anunciado em breve.',
+		metaTitle: (y) => `Temporada ${y}, K'ART Racing Team`,
+		metaDescription: "Calendário de provas e resultados da K'ART Racing Team, com contagem decrescente para a próxima corrida."
 	},
 	calendar: {
 		label: 'Adicione as provas ao seu calendário',
@@ -420,7 +452,10 @@ const pt: Messages = {
 			`Quatro posições em cada kart, e ${spellPt(n)} ${n === 1 ? 'kart' : 'karts'} na grelha em cada fim de semana.`,
 		deck: 'Pedir o dossiê de patrocínio',
 		subject: "Patrocínio, K'ART Racing Team",
-		ours: 'Os nossos parceiros'
+		ours: 'Os nossos parceiros',
+		more: 'Ver as posições no kart',
+		metaTitle: "Patrocínios, K'ART Racing Team",
+		metaDescription: "As quatro posições de patrocínio em cada kart da K'ART Racing Team e os parceiros que já correm connosco."
 	},
 	contact: {
 		eyebrow: 'Contacto',
@@ -430,6 +465,9 @@ const pt: Messages = {
 		follow: 'Siga-nos',
 		instagram: (h) => `Instagram, @${h}`,
 		direct: 'Ou escreva-nos',
+		band: 'Correr connosco, parcerias ou imprensa. Escreva-nos e respondemos em breve.',
+		metaTitle: "Contacto, K'ART Racing Team",
+		metaDescription: "Fale com a K'ART Racing Team sobre correr connosco, patrocínios ou imprensa.",
 		form: {
 			name: 'Nome',
 			email: 'Email',
@@ -487,12 +525,39 @@ export const useI18n = () => getContext<I18n>(KEY);
 /** Prefixes a site path with /en for English. */
 export const localize = (path: string, lang: Lang) => (lang === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path);
 
-/** The news section is /noticias in Portuguese and /en/news in English. */
-export const newsPath = (lang: Lang, slug?: string) =>
-	localize(`/${lang === 'pt' ? 'noticias' : 'news'}${slug ? `/${slug}` : ''}`, lang);
+/**
+ * The pages of the site and their address in each language: /pilotos in
+ * Portuguese is /en/drivers in English. The Hall of Fame keeps its English name
+ * in both. Each one is matched by a param matcher of the same name (params.ts).
+ */
+export const PAGES = {
+	team: { pt: 'equipa', en: 'team' },
+	drivers: { pt: 'pilotos', en: 'drivers' },
+	season: { pt: 'temporada', en: 'season' },
+	news: { pt: 'noticias', en: 'news' },
+	hall: { pt: 'hall-of-fame', en: 'hall-of-fame' },
+	partners: { pt: 'parceiros', en: 'partners' },
+	contact: { pt: 'contacto', en: 'contact' }
+} as const;
 
-/** The Hall of Fame keeps its English name in both languages: /hall-of-fame and /en/hall-of-fame. */
-export const hallPath = (lang: Lang) => localize('/hall-of-fame', lang);
+export type PageId = keyof typeof PAGES;
+const PAGE_IDS = Object.keys(PAGES) as PageId[];
+
+export const pagePath = (id: PageId, lang: Lang) => localize(`/${PAGES[id][lang]}`, lang);
+
+export const newsPath = (lang: Lang, slug?: string) => pagePath('news', lang) + (slug ? `/${slug}` : '');
+
+export const hallPath = (lang: Lang) => pagePath('hall', lang);
+
+const langOf = (pathname: string): Lang => (/^\/en(\/|$)/.test(pathname) ? 'en' : 'pt');
+const segments = (pathname: string) => pathname.replace(/^\/en(?=\/|$)/, '').split('/').filter(Boolean);
+
+/** Which page a path belongs to: /noticias/some-post is in news. Undefined on the home page. */
+export function pageOf(pathname: string): PageId | undefined {
+	const lang = langOf(pathname);
+	const [first] = segments(pathname);
+	return PAGE_IDS.find((id) => PAGES[id][lang] === first);
+}
 
 /** The race calendar feed is /calendario.ics in Portuguese and /en/calendar.ics in English. */
 export const calendarPath = (lang: Lang) => localize(lang === 'pt' ? '/calendario.ics' : '/calendar.ics', lang);
@@ -506,25 +571,16 @@ export function calendarLinks(host: string, lang: Lang) {
 	return { webcal, google: `https://www.google.com/calendar/render?cid=${webcal}`, file: calendarPath(lang) };
 }
 
-/** The same page in the other language: / and /en, /noticias/x and /en/news/x. */
+/** The same page in the other language: / and /en, /pilotos and /en/drivers, /noticias/x and /en/news/x. */
 export function alternatePath(pathname: string, to: Lang) {
-	if (to === 'en') {
-		if (pathname.startsWith('/en')) return pathname;
-		if (pathname === '/') return '/en';
-		return `/en${pathname.replace(/^\/noticias(?=\/|$)/, '/news')}`;
-	}
-	const rest = pathname.replace(/^\/en(?=\/|$)/, '') || '/';
-	return rest.replace(/^\/news(?=\/|$)/, '/noticias');
+	const id = pageOf(pathname);
+	const [first, ...rest] = segments(pathname);
+	if (!first) return localize('/', to);
+	return localize(`/${[id ? PAGES[id][to] : first, ...rest].join('/')}`, to);
 }
 
-/** Section links for the nav and footer. On the home page they are plain anchors. */
-export function siteLinks(t: Messages, lang: Lang, { home, news }: { home: boolean; news: boolean }) {
-	const base = home ? '' : localize('/', lang);
-	type Id = 'team' | 'drivers' | 'season' | 'hall' | 'news' | 'partners' | 'contact';
-	const ids: Id[] = ['team', 'drivers', 'season', 'hall', ...(news ? ['news' as const] : []), 'partners', 'contact'];
-	return ids.map((id) => ({
-		id,
-		label: t.nav[id],
-		href: id === 'hall' ? hallPath(lang) : id === 'news' && !home ? newsPath(lang) : `${base}#${id}`
-	}));
+/** Links to the pages, for the header and footer. Pages with nothing on them yet are left out. */
+export function siteLinks(t: Messages, lang: Lang, has: { drivers: boolean; season: boolean; news: boolean }) {
+	const ids = PAGE_IDS.filter((id) => (id === 'drivers' || id === 'season' || id === 'news' ? has[id] : true));
+	return ids.map((id) => ({ id, label: t.nav[id], href: pagePath(id, lang) }));
 }

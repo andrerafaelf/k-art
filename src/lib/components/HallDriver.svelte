@@ -63,7 +63,7 @@
 		transition: box-shadow 0.4s;
 	}
 	.plaque.cyan {
-		--accent: var(--cyan);
+		--accent: var(--blue);
 	}
 	.plaque:hover {
 		box-shadow: inset 0 0 0 1px var(--accent);
@@ -122,7 +122,7 @@
 		color: var(--fg-2);
 	}
 	.last {
-		font-size: clamp(1.75rem, 2.6vw, 2.25rem);
+		font-size: var(--t-card);
 		font-style: italic;
 		font-stretch: 125%;
 		font-weight: 900;

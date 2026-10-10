@@ -6,7 +6,9 @@
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
-	let { season, settings, index }: { season: Round[]; settings: Settings; index: string } = $props();
+	// The season page: countdown to the next race, then every round with its results
+
+	let { season, settings }: { season: Round[]; settings: Settings } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.season);
@@ -35,16 +37,20 @@
 
 <section id="season" class="season">
 	<div class="wrap">
-		<SectionHead {index} eyebrow={t.eyebrow(settings.seasonYear)} lines={t.title} accent={1}>
-			<p>
-				{tr(settings.seasonIntro, i18n.lang)}
-				<strong>
-					{summary.raced ? t.soFar(summary.wins, summary.podiums, summary.raced) : t.notStarted}
-				</strong>
-			</p>
-			<div class="subscribe">
-				<CalendarLinks label={i18n.t.calendar.label} />
-			</div>
+		<SectionHead level={1} eyebrow={t.eyebrow(settings.seasonYear)} lines={t.title} accent={1}>
+			{#if season.length}
+				<p>
+					{tr(settings.seasonIntro, i18n.lang)}
+					<strong>
+						{summary.raced ? t.soFar(summary.wins, summary.podiums, summary.raced) : t.notStarted}
+					</strong>
+				</p>
+				<div class="subscribe">
+					<CalendarLinks label={i18n.t.calendar.label} />
+				</div>
+			{:else}
+				<p>{t.empty}</p>
+			{/if}
 		</SectionHead>
 
 		{#if next}
@@ -67,46 +73,48 @@
 			</div>
 		{/if}
 
-		<ol class="board" use:inview>
-			{#each rounds as r, i (r.id)}
-				{@const past = roundEnd(r) <= now}
-				{@const isNext = r === next}
-				{@const best = bestResult(r)}
-				<li class="row rv" class:past class:is-next={isNext} style:--d="{i * 60}ms">
-					<span class="rd num"><small>{t.roundPrefix}</small>{r.round}<small>{t.roundSuffix}</small></span>
-					<span class="date">
-						<span class="num">{day(r.date)}</span>
-						<span>{monthShort(r.date, i18n.lang)}</span>
-					</span>
-					<span class="venue">
-						<span class="v">{r.location}</span>
-						<span class="loc">{tr(r.venue, i18n.lang)}</span>
-					</span>
-					<span class="series">{tr(r.series, i18n.lang)}</span>
-					<span class="res">
-						{#if best}
-							<span class="pos num" class:win={best.pos === 1}>P{best.pos}</span>
-							<span class="drv">{best.name}</span>
-							{#if r.results.length > 1}
-								<span class="more">+{r.results.length - 1}</span>
+		{#if rounds.length}
+			<ol class="board" use:inview>
+				{#each rounds as r, i (r.id)}
+					{@const past = roundEnd(r) <= now}
+					{@const isNext = r === next}
+					{@const best = bestResult(r)}
+					<li class="row rv" class:past class:is-next={isNext} style:--d="{i * 60}ms">
+						<span class="rd num"><small>{t.roundPrefix}</small>{r.round}<small>{t.roundSuffix}</small></span>
+						<span class="date">
+							<span class="num">{day(r.date)}</span>
+							<span>{monthShort(r.date, i18n.lang)}</span>
+						</span>
+						<span class="venue">
+							<span class="v">{r.location}</span>
+							<span class="loc">{tr(r.venue, i18n.lang)}</span>
+						</span>
+						<span class="series">{tr(r.series, i18n.lang)}</span>
+						<span class="res">
+							{#if best}
+								<span class="pos num" class:win={best.pos === 1}>P{best.pos}</span>
+								<span class="drv">{best.name}</span>
+								{#if r.results.length > 1}
+									<span class="more">+{r.results.length - 1}</span>
+								{/if}
+							{:else if isNext}
+								<span class="tag-next">{t.nextUp}</span>
+							{:else if past}
+								<span class="muted">{t.pending}</span>
+							{:else}
+								<span class="muted">{t.upcoming}</span>
 							{/if}
-						{:else if isNext}
-							<span class="tag-next">{t.nextUp}</span>
-						{:else if past}
-							<span class="muted">{t.pending}</span>
-						{:else}
-							<span class="muted">{t.upcoming}</span>
-						{/if}
-					</span>
-				</li>
-			{/each}
-		</ol>
+						</span>
+					</li>
+				{/each}
+			</ol>
+		{/if}
 	</div>
 </section>
 
 <style>
 	.season {
-		padding-block: var(--section);
+		padding-block: var(--page-top) var(--section);
 	}
 	.season :global(.intro strong) {
 		color: var(--fg);
@@ -120,8 +128,8 @@
 	.next {
 		display: grid;
 		gap: 2rem;
-		padding: clamp(1.5rem, 3vw, 2.5rem);
-		margin-bottom: clamp(3rem, 6vw, 5rem);
+		padding: clamp(1.5rem, 2.5vw, 2rem);
+		margin-bottom: clamp(2.5rem, 5vw, 4rem);
 		background: radial-gradient(80% 140% at 100% 0%, rgb(214 249 6 / 0.08), transparent 60%), var(--bg-1);
 		box-shadow: inset 0 0 0 1px var(--hair-2);
 	}
@@ -132,8 +140,8 @@
 		background: var(--lime);
 	}
 	h3 {
-		margin-top: 1.25rem;
-		font-size: clamp(2.5rem, 5vw, 4.25rem);
+		margin-top: 1rem;
+		font-size: var(--t-section);
 		font-style: italic;
 		font-weight: 900;
 		font-stretch: 125%;
@@ -162,7 +170,7 @@
 		font-style: normal;
 		font-stretch: 100%;
 		font-weight: 600;
-		font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+		font-size: var(--t-figure);
 		color: var(--lime);
 	}
 	.clock small {
@@ -190,7 +198,7 @@
 			'rd date series';
 		gap: 0.35rem 1rem;
 		align-items: center;
-		padding: 1.25rem 0;
+		padding: 1rem 0;
 		border-bottom: 1px solid var(--hair-2);
 	}
 	.row::before {
@@ -207,7 +215,7 @@
 	}
 	.rd {
 		grid-area: rd;
-		font-size: 2.5rem;
+		font-size: 2rem;
 	}
 	.rd small {
 		font-size: 0.45em;
@@ -233,7 +241,7 @@
 	}
 	.v {
 		display: block;
-		font-size: clamp(1.25rem, 2.2vw, 2rem);
+		font-size: var(--t-card);
 		font-style: italic;
 		font-weight: 900;
 		font-stretch: 125%;
@@ -334,16 +342,16 @@
 			align-items: end;
 		}
 		.clock div {
-			min-width: 7.5rem;
-			padding-inline: 1.25rem;
+			min-width: 6rem;
+			padding-inline: 1.1rem;
 		}
 		.row {
-			grid-template-columns: 6rem 7rem minmax(0, 1fr) 11rem 13rem;
+			grid-template-columns: 5rem 6rem minmax(0, 1fr) 11rem 13rem;
 			grid-template-areas: 'rd date venue series res';
-			padding: 1.6rem 0;
+			padding: 1.1rem 0;
 		}
 		.rd {
-			font-size: 3.25rem;
+			font-size: 2.25rem;
 		}
 		.date {
 			flex-direction: column;
@@ -353,7 +361,7 @@
 			text-transform: uppercase;
 		}
 		.date .num {
-			font-size: 2rem;
+			font-size: 1.5rem;
 			font-stretch: 70%;
 			font-weight: 800;
 			letter-spacing: 0;

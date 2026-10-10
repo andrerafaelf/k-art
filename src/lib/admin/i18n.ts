@@ -55,7 +55,7 @@ const en = {
 		enEmpty: 'Leave empty to show the Portuguese text',
 		cardColour: 'Card colour',
 		lime: 'Lime',
-		cyan: 'Cyan',
+		cyan: 'Team blue',
 		first: 'First name',
 		last: 'Surname',
 		number: 'Race number',
@@ -151,7 +151,7 @@ const en = {
 		add: 'Add driver',
 		meta: (category: string, age: number, wins: number, podiums: number, poles: number) =>
 			`${category}, ${age} years old, ${plural(wins, 'win', 'wins')}, ${plural(podiums, 'podium', 'podiums')}, ${plural(poles, 'pole', 'poles')}`,
-		empty: 'No drivers yet. The line-up section is hidden on the site until you add one.',
+		empty: 'No drivers yet. The Drivers page stays out of the site menu until you add one.',
 		addFirst: 'Add the first driver'
 	},
 	driver: {
@@ -200,7 +200,7 @@ const en = {
 		upcoming: 'Upcoming',
 		foot: 'The season year and calendar introduction are in',
 		footLink: 'site settings',
-		empty: 'No rounds yet. The calendar section is hidden on the site until you add one.',
+		empty: 'No rounds yet. The Season page stays out of the site menu until you add one.',
 		addFirst: 'Add the first round'
 	},
 	round: {
@@ -311,7 +311,7 @@ const en = {
 		scheduled: 'Scheduled',
 		scheduledFor: (date: string) => `Appears on the site on ${date}`,
 		preview: 'Preview on the site',
-		empty: 'No posts yet. The news section appears on the site once the first one is published.',
+		empty: 'No posts yet. The News page appears in the site menu once the first one is published.',
 		addFirst: 'Write the first post'
 	},
 	post: {
@@ -378,7 +378,7 @@ const en = {
 	settings: {
 		lede: 'Contact details and the main texts on the homepage.',
 		contact: 'Contact',
-		contactDesc: 'Used in the contact section, the footer and the partner deck button.',
+		contactDesc: 'Used on the contact page, the home page, the footer and the partner deck button.',
 		email: 'Email',
 		instagram: 'Instagram',
 		instagramHint: 'The handle, without the @',
@@ -388,7 +388,7 @@ const en = {
 		heroDesc: 'The first thing visitors see.',
 		eyebrow: 'Small line above the title',
 		heroLines: 'Title',
-		heroLinesHint: 'One line per row, up to 16 characters each. The last line is highlighted in lime.',
+		heroLinesHint: 'One line per row, up to 16 characters each. The last line is highlighted in the team blue.',
 		heroLead: 'Introduction',
 		season: 'Season',
 		seasonYear: 'Season year',
@@ -397,7 +397,7 @@ const en = {
 		seasonIntroHint: 'The wins and podiums so far are added after this automatically.',
 		sponsorship: 'Sponsorship',
 		sponsorshipDesc:
-			'The pitch in the partners section and the four positions on the kart. The number of karts is added automatically from the line-up.',
+			'The pitch on the partnerships page and the home page, and the four positions on the kart. The number of karts is added automatically from the line-up.',
 		partnersIntro: 'Introduction',
 		zones: { pods: 'Sidepods', nassau: 'Nassau panel', nose: 'Front fairing', bumper: 'Rear bumper' },
 		pkgName: 'Name',
@@ -643,7 +643,7 @@ const pt: AdminMessages = {
 		enEmpty: 'Deixe vazio para mostrar o texto em português',
 		cardColour: 'Cor do cartão',
 		lime: 'Lima',
-		cyan: 'Ciano',
+		cyan: 'Azul da equipa',
 		first: 'Nome',
 		last: 'Apelido',
 		number: 'Número de corrida',
@@ -746,7 +746,7 @@ const pt: AdminMessages = {
 		add: 'Adicionar piloto',
 		meta: (category, age, wins, podiums, poles) =>
 			`${category}, ${age} anos, ${plural(wins, 'vitória', 'vitórias')}, ${plural(podiums, 'pódio', 'pódios')}, ${plural(poles, 'pole', 'poles')}`,
-		empty: 'Ainda não há pilotos. A secção do plantel fica escondida no site até adicionar o primeiro.',
+		empty: 'Ainda não há pilotos. A página Pilotos fica fora do menu do site até adicionar o primeiro.',
 		addFirst: 'Adicionar o primeiro piloto'
 	},
 	driver: {
@@ -797,7 +797,7 @@ const pt: AdminMessages = {
 		upcoming: 'Por disputar',
 		foot: 'O ano da temporada e a introdução do calendário estão nas',
 		footLink: 'definições do site',
-		empty: 'Ainda não há provas. A secção do calendário fica escondida no site até adicionar a primeira.',
+		empty: 'Ainda não há provas. A página Temporada fica fora do menu do site até adicionar a primeira.',
 		addFirst: 'Adicionar a primeira prova'
 	},
 	round: {
@@ -909,7 +909,7 @@ const pt: AdminMessages = {
 		scheduled: 'Agendada',
 		scheduledFor: (date) => `Aparece no site a ${date}`,
 		preview: 'Pré-visualizar no site',
-		empty: 'Ainda não há notícias. A secção de notícias aparece no site quando a primeira for publicada.',
+		empty: 'Ainda não há notícias. A página Notícias aparece no menu do site quando a primeira for publicada.',
 		addFirst: 'Escrever a primeira notícia'
 	},
 	post: {
@@ -976,7 +976,7 @@ const pt: AdminMessages = {
 	settings: {
 		lede: 'Contactos e os principais textos da página inicial.',
 		contact: 'Contactos',
-		contactDesc: 'Usados na secção de contacto, no rodapé e no botão do dossiê de patrocínio.',
+		contactDesc: 'Usados na página de contacto, na página inicial, no rodapé e no botão do dossiê de patrocínio.',
 		email: 'Email',
 		instagram: 'Instagram',
 		instagramHint: 'O nome da conta, sem o @',
@@ -986,7 +986,7 @@ const pt: AdminMessages = {
 		heroDesc: 'A primeira coisa que os visitantes veem.',
 		eyebrow: 'Linha pequena por cima do título',
 		heroLines: 'Título',
-		heroLinesHint: 'Uma linha do título por linha, até 16 caracteres cada. A última aparece a verde-lima.',
+		heroLinesHint: 'Uma linha do título por linha, até 16 caracteres cada. A última aparece no azul da equipa.',
 		heroLead: 'Introdução',
 		season: 'Temporada',
 		seasonYear: 'Ano da temporada',
@@ -995,7 +995,7 @@ const pt: AdminMessages = {
 		seasonIntroHint: 'As vitórias e os pódios até agora são acrescentados automaticamente a seguir.',
 		sponsorship: 'Patrocínio',
 		sponsorshipDesc:
-			'A apresentação na secção de parceiros e as quatro posições no kart. O número de karts é acrescentado automaticamente a partir do plantel.',
+			'A apresentação na página de patrocínios e na página inicial, e as quatro posições no kart. O número de karts é acrescentado automaticamente a partir do plantel.',
 		partnersIntro: 'Introdução',
 		zones: { pods: 'Pontões laterais', nassau: 'Painel Nassau', nose: 'Carenagem frontal', bumper: 'Para-choques traseiro' },
 		pkgName: 'Nome',

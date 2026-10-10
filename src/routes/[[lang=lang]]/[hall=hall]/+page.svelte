@@ -1,20 +1,17 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Nav from '#lib/components/Nav.svelte';
-	import Footer from '#lib/components/Footer.svelte';
 	import Kerb from '#lib/components/Kerb.svelte';
 	import HallSeason from '#lib/components/HallSeason.svelte';
 	import HallDriver from '#lib/components/HallDriver.svelte';
 	import Trophy from '#lib/components/Trophy.svelte';
 	import { byYear, hallTotals } from '#lib/content.ts';
-	import { useI18n, siteLinks, alternatePath } from '#lib/i18n.ts';
+	import { useI18n } from '#lib/i18n.ts';
 	import { inview, countup } from '#lib/motion.ts';
 
 	let { data } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.hall);
-	const links = $derived(siteLinks(i18n.t, i18n.lang, { home: false, news: data.hasNews }));
 	const seasons = $derived(byYear(data.history));
 	const totals = $derived(hallTotals(data.history, data.alumni));
 	const counters = $derived([
@@ -33,8 +30,6 @@
 	<meta property="og:description" content={t.metaDescription} />
 	<meta property="og:image" content="{page.url.origin}/og.png" />
 </svelte:head>
-
-<Nav settings={data.settings} {links} altHref={alternatePath(page.url.pathname, i18n.t.lang.other)} />
 
 <main id="hall">
 	<header class="top">
@@ -96,8 +91,6 @@
 	{/if}
 </main>
 
-<Footer settings={data.settings} links={links.filter((l) => l.id !== 'contact')} />
-
 <style>
 	.top {
 		position: relative;
@@ -105,7 +98,7 @@
 		padding: calc(var(--nav-h) + clamp(3rem, 8vw, 6rem)) 0 clamp(3rem, 6vw, 4.5rem);
 		background:
 			radial-gradient(50% 70% at 85% 30%, rgb(214 249 6 / 0.1), transparent 70%),
-			radial-gradient(40% 60% at 100% 100%, rgb(33 187 237 / 0.08), transparent 70%),
+			radial-gradient(40% 60% at 100% 100%, rgb(68 184 243 / 0.08), transparent 70%),
 			var(--bg);
 	}
 	/* A huge trophy outline in the background */
@@ -129,18 +122,15 @@
 	}
 	h1 {
 		margin-top: 1.5rem;
-		font-size: clamp(3.5rem, 12vw, 10rem);
+		font-size: var(--t-page);
 	}
 	h1 .line > span {
 		animation: rise 1.1s var(--ease-out) both;
 		animation-delay: var(--d);
 	}
-	.accent {
-		color: var(--lime);
-	}
 	@keyframes rise {
 		from {
-			translate: -0.4em 108%;
+			translate: -0.4em 140%;
 		}
 	}
 	@keyframes fade {
@@ -181,7 +171,7 @@
 		color: var(--fg-3);
 	}
 	dd {
-		font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+		font-size: var(--t-figure);
 		font-weight: 600;
 		line-height: 1;
 	}

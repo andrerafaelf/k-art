@@ -1,9 +1,21 @@
 <script lang="ts">
+	import Arrow from './Arrow.svelte';
+	import SectionHead from './SectionHead.svelte';
 	import { inview, countup } from '#lib/motion.ts';
 	import { teamRecord, seasonSummary, type Pilot, type Round } from '#lib/content.ts';
-	import { useI18n } from '#lib/i18n.ts';
+	import { useI18n, pagePath } from '#lib/i18n.ts';
 
-	let { pilots, season, year, index }: { pilots: Pilot[]; season: Round[]; year: number; index: string } = $props();
+	interface Props {
+		pilots: Pilot[];
+		season: Round[];
+		year: number;
+		/** Sector on the home page, which shows the statement and numbers with a link to the team page */
+		index?: string;
+		/** The team page, with its own heading and the three pillars */
+		page?: boolean;
+	}
+
+	let { pilots, season, year, index, page = false }: Props = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.team);
@@ -25,15 +37,24 @@
 	});
 </script>
 
-<section id="team" class="team">
+<section id="team" class="team" class:page data-sector={index && ''}>
 	<div class="wrap">
-		<div class="intro" use:inview>
-			<p class="eyebrow rv"><b>{index}</b> · {t.eyebrow}</p>
-			<p class="statement rv" style:--d="100ms">
-				{t.statement}
-				<span>{t.statementMuted}</span>
-			</p>
-		</div>
+		{#if page}
+			<SectionHead level={1} eyebrow={t.eyebrow} lines={t.title} accent={1}>
+				<p>{t.statement} {t.statementMuted}</p>
+			</SectionHead>
+		{:else}
+			<div class="intro" use:inview>
+				<p class="eyebrow rv"><b>{index}</b> · {t.eyebrow}</p>
+				<div>
+					<p class="statement rv" style:--d="100ms">
+						{t.statement}
+						<span>{t.statementMuted}</span>
+					</p>
+					<a class="pagelink more rv" style:--d="200ms" href={pagePath('team', i18n.lang)}>{t.more} <Arrow /></a>
+				</div>
+			</div>
+		{/if}
 
 		<dl class="stats" use:inview>
 			{#each stats as s, i}
@@ -49,21 +70,29 @@
 			{/each}
 		</dl>
 
-		<div class="pillars" use:inview>
-			{#each t.pillars as p, i}
-				<article class="rv" style:--d="{i * 90}ms">
-					<span class="idx num">0{i + 1}</span>
-					<h3>{p.title}</h3>
-					<p>{p.body}</p>
-				</article>
-			{/each}
-		</div>
+		{#if page}
+			<div class="pillars" use:inview>
+				{#each t.pillars as p, i}
+					<article class="rv" style:--d="{i * 90}ms">
+						<span class="idx num">0{i + 1}</span>
+						<h2>{p.title}</h2>
+						<p>{p.body}</p>
+					</article>
+				{/each}
+			</div>
+		{/if}
 	</div>
 </section>
 
 <style>
 	.team {
 		padding-block: var(--section);
+	}
+	.team.page {
+		padding-top: var(--page-top);
+	}
+	.page .stats {
+		margin-top: 0;
 	}
 
 	.intro {
@@ -72,7 +101,7 @@
 	}
 	.statement {
 		max-width: 21em;
-		font-size: clamp(1.85rem, 3.9vw, 3.9rem);
+		font-size: var(--t-section);
 		font-weight: 600;
 		font-stretch: 108%;
 		line-height: 1.08;
@@ -82,11 +111,14 @@
 	.statement span {
 		color: var(--fg-3);
 	}
+	.more {
+		margin-top: 2rem;
+	}
 
 	.stats {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		margin-top: clamp(4rem, 9vw, 8rem);
+		margin-top: clamp(3rem, 6vw, 5.5rem);
 		border-top: 1px solid var(--hair-2);
 	}
 	.stat {
@@ -109,7 +141,7 @@
 	dd {
 		order: -1;
 		margin-bottom: 1rem;
-		font-size: clamp(4.5rem, 10vw, 9.5rem);
+		font-size: var(--t-stat);
 	}
 	.of {
 		color: var(--fg-3);
@@ -127,7 +159,7 @@
 	.pillars {
 		display: grid;
 		gap: 2.5rem;
-		margin-top: clamp(4rem, 9vw, 8rem);
+		margin-top: clamp(3.5rem, 7vw, 6rem);
 	}
 	article {
 		padding-top: 1.5rem;
@@ -135,11 +167,11 @@
 	}
 	.idx {
 		font-size: 1rem;
-		color: var(--lime);
+		color: var(--blue);
 	}
-	h3 {
+	h2 {
 		margin-top: clamp(1.25rem, 3vw, 2.5rem);
-		font-size: clamp(1.5rem, 2.2vw, 2rem);
+		font-size: var(--t-card);
 		font-weight: 800;
 		font-style: italic;
 		font-stretch: 125%;
@@ -158,6 +190,7 @@
 			grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
 		}
 		.eyebrow {
+			align-self: start;
 			padding-top: 0.9rem;
 		}
 		.stats {

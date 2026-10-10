@@ -1,36 +1,40 @@
 <script lang="ts">
+	import { afterNavigate } from '$app/navigation';
 	import Logo from './Logo.svelte';
 	import Arrow from './Arrow.svelte';
 	import type { Settings } from '#lib/content.ts';
-	import { useI18n, localize } from '#lib/i18n.ts';
+	import { useI18n, localize, type PageId } from '#lib/i18n.ts';
 
 	interface Props {
 		settings: Settings;
-		links: { id: string; href: string; label: string }[];
+		links: { id: PageId; href: string; label: string }[];
+		/** The page being read, marked in the nav */
+		current?: PageId;
 		/** Same page in the other language */
 		altHref: string;
-		/** Ids of the sections on the page, in order, drawn as sectors of the lap along the header */
-		sectors?: string[];
 	}
 
-	let { settings, links, altHref, sectors = [] }: Props = $props();
+	let { settings, links, current, altHref }: Props = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t);
 
 	let open = $state(false);
 	let solid = $state(false);
-	let current = $state('');
+	/** Sections marked with data-sector, drawn as sectors of the lap along the header */
+	let laps = $state<HTMLElement[]>([]);
 	let progress = $state<number[]>([]);
 
-	// Once a frame while scrolling: the header turns solid and compact, each
-	// sector fills as it is read and the nav marks the section being read. The
-	// reading line runs from the top of the window at the start of the page to
-	// the bottom at the end, so the last sector always completes.
+	afterNavigate(() => {
+		open = false;
+		laps = [...document.querySelectorAll<HTMLElement>('main [data-sector]')];
+	});
+
+	// Once a frame while scrolling: the header turns solid and compact and each
+	// sector fills as it is read. The reading line runs from the top of the window
+	// at the start of the page to the bottom at the end, so the last sector always completes.
 	$effect(() => {
-		const find = (ids: string[]) => ids.map((id) => document.getElementById(id)).filter((el) => el !== null);
-		const laps = find(sectors);
-		const marks = find(links.map((l) => l.id));
+		const sections = laps;
 		let frame = 0;
 
 		const measure = () => {
@@ -39,17 +43,10 @@
 			const room = document.documentElement.scrollHeight - innerHeight;
 			const line = room > 0 ? innerHeight * Math.min(y / room, 1) : 0;
 			solid = y > 40;
-			progress = laps.map((el) => {
+			progress = sections.map((el) => {
 				const { top, height } = el.getBoundingClientRect();
 				return Math.min(Math.max((line - top) / height, 0), 1);
 			});
-			let id = '';
-			let last = -Infinity;
-			for (const el of marks) {
-				const { top } = el.getBoundingClientRect();
-				if (top <= line && top > last) [id, last] = [el.id, top];
-			}
-			current = id;
 		};
 		const queue = () => (frame ||= requestAnimationFrame(measure));
 
@@ -70,15 +67,17 @@
 
 <svelte:window onkeydown={(e) => e.key === 'Escape' && (open = false)} />
 
-<header class:solid class:open class:timed={sectors.length > 0}>
+<header class:solid class:open class:timed={laps.length > 0}>
 	<div class="bar wrap">
 		<a href={localize('/', i18n.lang)} class="brand" aria-label={t.nav.home} onclick={() => (open = false)}>
-			<Logo />
+			<Logo accent="full" />
 		</a>
 
 		<nav aria-label="Main" class="desk">
-			{#each links.filter((l) => l.id !== 'contact') as link}
-				<a href={link.href} class:current={current === link.id}>{link.label}</a>
+			{#each links.filter((l) => l.id !== 'contact') as link (link.id)}
+				<a href={link.href} class:current={current === link.id} aria-current={current === link.id ? 'page' : undefined}
+					>{link.label}</a
+				>
 			{/each}
 		</nav>
 
@@ -95,9 +94,9 @@
 		</button>
 	</div>
 
-	{#if sectors.length}
+	{#if laps.length}
 		<div class="sectors" aria-hidden="true">
-			{#each sectors as id, i (id)}
+			{#each laps as _, i}
 				<i style:--p={progress[i] ?? 0}></i>
 			{/each}
 		</div>
@@ -106,8 +105,14 @@
 
 <div id="menu" class="sheet" class:open inert={!open}>
 	<nav aria-label="Mobile">
-		{#each links as link, i}
-			<a href={link.href} style:--i={i} onclick={() => (open = false)}>
+		{#each links as link, i (link.id)}
+			<a
+				href={link.href}
+				style:--i={i}
+				class:current={current === link.id}
+				aria-current={current === link.id ? 'page' : undefined}
+				onclick={() => (open = false)}
+			>
 				<span>{link.label}</span>
 				<Arrow />
 			</a>
@@ -120,23 +125,21 @@
 </div>
 
 <style>
+	/* A bar of its own, a step lighter than the page, with the page blurred
+	   behind it once it scrolls underneath */
 	header {
 		position: fixed;
 		inset: 0 0 auto;
 		z-index: 60;
 		padding-top: env(safe-area-inset-top, 0px);
-		transition:
-			background-color 0.4s,
-			backdrop-filter 0.4s;
-	}
-	header.solid {
-		background: rgb(8 9 10 / 0.72);
+		background: rgb(17 19 23 / 0.86);
 		backdrop-filter: blur(18px) saturate(160%);
 		-webkit-backdrop-filter: blur(18px) saturate(160%);
-		box-shadow: 0 1px 0 var(--hair);
+		box-shadow: 0 1px 0 var(--hair-2);
+		transition: background-color 0.4s;
 	}
-	/* The sector bar takes the place of the hairline */
-	header.timed,
+	/* Once the sector bar shows it takes the place of the hairline */
+	header.timed.solid,
 	header.open {
 		box-shadow: none;
 	}
@@ -310,6 +313,9 @@
 		width: 1.4rem;
 		color: var(--lime);
 	}
+	.sheet nav a.current {
+		color: var(--blue);
+	}
 	.sheet-foot {
 		display: flex;
 		justify-content: space-between;
@@ -345,7 +351,7 @@
 			right: 0.85rem;
 			bottom: 0.2rem;
 			height: 2px;
-			background: var(--lime);
+			background: var(--blue);
 			transform: scaleX(0);
 			transform-origin: right;
 			transition: transform 0.5s var(--ease-out);
@@ -354,9 +360,13 @@
 		.desk a.current {
 			color: var(--fg);
 		}
+		.desk a:hover::after,
 		.desk a.current::after {
 			transform: scaleX(1);
 			transform-origin: left;
+		}
+		.desk a:not(.current):hover::after {
+			opacity: 0.45;
 		}
 		.cta {
 			display: inline-flex;

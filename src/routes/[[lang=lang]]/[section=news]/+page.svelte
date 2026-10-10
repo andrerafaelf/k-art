@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Nav from '#lib/components/Nav.svelte';
-	import Footer from '#lib/components/Footer.svelte';
 	import PostCard from '#lib/components/PostCard.svelte';
-	import { useI18n, siteLinks, alternatePath } from '#lib/i18n.ts';
+	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
 	let { data } = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.news);
-	const links = $derived(siteLinks(i18n.t, i18n.lang, { home: false, news: true }));
 	const [first, ...rest] = $derived(data.posts);
 </script>
 
@@ -19,8 +16,6 @@
 	<meta name="description" content={t.intro} />
 	<meta property="og:image" content="{page.url.origin}/og.png" />
 </svelte:head>
-
-<Nav settings={data.settings} {links} altHref={alternatePath(page.url.pathname, i18n.t.lang.other)} />
 
 <main class="wrap">
 	<header class="head" use:inview>
@@ -49,11 +44,9 @@
 	{/if}
 </main>
 
-<Footer settings={data.settings} links={links.filter((l) => l.id !== 'contact')} />
-
 <style>
 	main {
-		padding-top: calc(var(--nav-h) + clamp(3rem, 8vw, 7rem));
+		padding-top: var(--page-top);
 		padding-bottom: var(--section);
 	}
 	.head {
@@ -61,10 +54,7 @@
 	}
 	h1 {
 		margin-top: 1.6rem;
-		font-size: clamp(3rem, 8vw, 7.5rem);
-	}
-	.accent {
-		color: var(--lime);
+		font-size: var(--t-page);
 	}
 	.lead {
 		max-width: 32rem;

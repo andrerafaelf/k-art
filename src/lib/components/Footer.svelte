@@ -14,7 +14,7 @@
 <footer>
 	<div class="wrap">
 		<div class="top">
-			<a href={localize('/', i18n.lang)} aria-label={i18n.t.nav.home}><Logo class="flogo" /></a>
+			<a href={localize('/', i18n.lang)} aria-label={i18n.t.nav.home}><Logo class="flogo" accent="full" /></a>
 			<div class="side">
 				<nav aria-label="Footer">
 					{#each links as l}

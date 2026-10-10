@@ -1,13 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { setI18n, alternatePath } from '#lib/i18n.ts';
+	import Nav from '#lib/components/Nav.svelte';
+	import Footer from '#lib/components/Footer.svelte';
+	import { setI18n, alternatePath, siteLinks, pageOf } from '#lib/i18n.ts';
 
 	let { data, children } = $props();
 
-	setI18n(() => data.lang);
+	const i18n = setI18n(() => data.lang);
 
 	const pt = $derived(page.url.origin + alternatePath(page.url.pathname, 'pt'));
 	const en = $derived(page.url.origin + alternatePath(page.url.pathname, 'en'));
+	const links = $derived(
+		siteLinks(i18n.t, i18n.lang, { drivers: data.pilots.length > 0, season: data.season.length > 0, news: data.hasNews })
+	);
 </script>
 
 <svelte:head>
@@ -19,4 +24,13 @@
 	<meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
+<Nav
+	settings={data.settings}
+	{links}
+	current={pageOf(page.url.pathname)}
+	altHref={alternatePath(page.url.pathname, i18n.t.lang.other)}
+/>
+
 {@render children()}
+
+<Footer settings={data.settings} {links} />

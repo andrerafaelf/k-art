@@ -16,6 +16,7 @@ export function tr<T>(value: L<T> | undefined, lang: Lang): T {
 	return filled(value[lang]) ? value[lang] : value[other];
 }
 
+/** Driver colour. 'cyan' is the team blue; the name is older than the colour and is kept so saved content stays valid */
 export type Accent = 'lime' | 'cyan';
 export type Zone = 'pods' | 'nassau' | 'nose' | 'bumper';
 

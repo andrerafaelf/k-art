@@ -190,7 +190,7 @@
 
 	h3 {
 		margin-top: 1.25rem;
-		font-size: clamp(2rem, 4vw, 3.5rem);
+		font-size: var(--t-section);
 		font-style: italic;
 		font-stretch: 125%;
 		font-weight: 900;

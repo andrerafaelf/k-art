@@ -99,7 +99,7 @@
 		color: var(--black);
 	}
 	.tone-1 {
-		background: var(--cyan);
+		background: var(--blue);
 		color: var(--black);
 	}
 	.tone-2 {
