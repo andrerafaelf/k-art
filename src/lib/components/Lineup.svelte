@@ -1,12 +1,13 @@
 <script lang="ts">
 	import TeaserHead from './TeaserHead.svelte';
 	import DriverCard from './DriverCard.svelte';
+	import DriverSheet from './DriverSheet.svelte';
 	import type { Pilot } from '#lib/content.ts';
 	import { useI18n, pagePath } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 	import { columns } from '#lib/grid.ts';
 
-	// The line-up on the home page. Each card opens the driver's profile on the drivers page.
+	// The drivers on the home page. Each card opens the driver's profile over the page.
 
 	let { pilots, year, index }: { pilots: Pilot[]; year: number; index: string } = $props();
 
@@ -14,6 +15,8 @@
 	const t = $derived(i18n.t.drivers);
 	const page = $derived(pagePath('drivers', i18n.lang));
 	const cols = $derived(columns(pilots.length));
+
+	let sheet: DriverSheet | undefined = $state();
 </script>
 
 <section id="drivers" class="lineup" data-sector>
@@ -23,12 +26,14 @@
 		<ul class="row" use:inview style:--n={cols}>
 			{#each pilots as p, i (p.id)}
 				<li class="rv" style:--d="{i * 70}ms">
-					<DriverCard {p} compact href="{page}#{p.id}" />
+					<DriverCard {p} compact onclick={() => sheet?.show(i)} />
 				</li>
 			{/each}
 		</ul>
 	</div>
 </section>
+
+<DriverSheet {pilots} bind:this={sheet} />
 
 <style>
 	.lineup {

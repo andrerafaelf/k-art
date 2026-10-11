@@ -5,18 +5,16 @@
 	import { countryName } from '#lib/flags.ts';
 	import { useI18n } from '#lib/i18n.ts';
 
-	// A driver on the grid: the race number outlined behind, the name and flag in front.
-	// A button that opens the profile on the drivers page, a link to it elsewhere.
+	// A driver on the grid: the race number outlined behind, the name and flag in
+	// front. A button that opens the driver's profile.
 	interface Props {
 		p: Pilot;
-		/** Link to the profile; without it the card is a button */
-		href?: string;
-		onclick?: () => void;
+		onclick: () => void;
 		/** Smaller, for the row on the home page */
 		compact?: boolean;
 	}
 
-	let { p, href, onclick, compact = false }: Props = $props();
+	let { p, onclick, compact = false }: Props = $props();
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.drivers);
@@ -24,7 +22,7 @@
 	const label = $derived(t.open(`${p.first} ${p.last}, ${country}`, p.category, p.number));
 </script>
 
-{#snippet inside()}
+<button {onclick} class="card {p.accent}" class:compact aria-haspopup="dialog" aria-label={label}>
 	<span class="no num" aria-hidden="true">{p.number}</span>
 	{#if p.photo}
 		<img src={p.photo} alt="" loading="lazy" />
@@ -40,13 +38,7 @@
 		<span class="from"><Flag code={p.country} />{country}</span>
 		<span class="go"><Arrow /></span>
 	</span>
-{/snippet}
-
-{#if href}
-	<a {href} class="card {p.accent}" class:compact aria-label={label}>{@render inside()}</a>
-{:else}
-	<button {onclick} class="card {p.accent}" class:compact aria-haspopup="dialog" aria-label={label}>{@render inside()}</button>
-{/if}
+</button>
 
 <style>
 	/* The number and surname are sized from the card's own width, so cards stay
