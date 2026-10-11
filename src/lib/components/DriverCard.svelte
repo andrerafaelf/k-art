@@ -49,8 +49,11 @@
 {/if}
 
 <style>
+	/* The number and surname are sized from the card's own width, so cards stay
+	   in proportion however many share a row and long names still fit */
 	.card {
 		--accent: var(--lime);
+		container-type: inline-size;
 		position: relative;
 		isolation: isolate;
 		display: flex;
@@ -83,7 +86,7 @@
 		z-index: -1;
 		top: -0.09em;
 		right: -0.08em;
-		font-size: clamp(12.5rem, 22vw, 18.5rem);
+		font-size: clamp(9rem, 75cqi, 18.5rem);
 		font-stretch: 62%;
 		font-weight: 900;
 		letter-spacing: -0.04em;
@@ -190,7 +193,7 @@
 		color: var(--fg-2);
 	}
 	.last {
-		font-size: clamp(2rem, 3vw, 2.6rem);
+		font-size: clamp(1.5rem, 11cqi, 2.6rem);
 		font-weight: 800;
 		font-style: italic;
 		font-stretch: 125%;
@@ -222,10 +225,8 @@
 	}
 
 	/* ---------- compact ---------- */
-	/* Shorter, with the number and name sized from the card's own width so long
-	   names still fit. The home page sets it wider than tall on large screens. */
+	/* Shorter; the home page sets it wider than tall on large screens */
 	.compact {
-		container-type: inline-size;
 		aspect-ratio: 3 / 4;
 		min-height: 18rem;
 		padding: 1.25rem;

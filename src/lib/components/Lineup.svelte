@@ -4,6 +4,7 @@
 	import type { Pilot } from '#lib/content.ts';
 	import { useI18n, pagePath } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
+	import { columns } from '#lib/grid.ts';
 
 	// The line-up on the home page. Each card opens the driver's profile on the drivers page.
 
@@ -12,8 +13,7 @@
 	const i18n = useI18n();
 	const t = $derived(i18n.t.drivers);
 	const page = $derived(pagePath('drivers', i18n.lang));
-	// Three to a row, or four when that leaves no driver on a row alone
-	const cols = $derived(pilots.length === 4 || pilots.length === 8 ? 4 : Math.min(pilots.length, 3));
+	const cols = $derived(columns(pilots.length));
 </script>
 
 <section id="drivers" class="lineup" data-sector>
@@ -66,12 +66,19 @@
 		.row {
 			grid-auto-flow: row;
 			grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+			/* A team of one or two doesn't get giant cards */
+			max-width: calc(var(--n) * 30rem);
 			gap: 1px;
 			margin: 0;
 			padding: 0;
 			overflow: visible;
-			background: var(--hair);
-			border: 1px solid var(--hair);
+			border-top: 1px solid var(--hair);
+			border-left: 1px solid var(--hair);
+		}
+		/* Hairlines drawn by each card on its right and bottom, with the grid's top
+		   and left edges, so a short last row leaves a clean gap, not a grey block */
+		.row > li {
+			box-shadow: 1px 1px 0 var(--hair);
 		}
 		.row :global(.card) {
 			aspect-ratio: 3 / 2;

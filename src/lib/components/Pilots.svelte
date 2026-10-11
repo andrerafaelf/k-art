@@ -7,6 +7,7 @@
 	import { countryName } from '#lib/flags.ts';
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
+	import { columns } from '#lib/grid.ts';
 
 	// The drivers page. A profile opens over the grid, and /pilotos#<driver id>
 	// opens straight onto that driver (the cards on the home page link there).
@@ -48,7 +49,7 @@
 		</SectionHead>
 
 		{#if pilots.length}
-			<ul class="grid" use:inview>
+			<ul class="grid" use:inview style:--n={columns(pilots.length)}>
 				{#each pilots as p, i (p.id)}
 					<li id={p.id} class="rv" style:--d="{(i % 3) * 90}ms">
 						<DriverCard {p} onclick={() => show(i)} />
@@ -395,16 +396,32 @@
 			margin: 0;
 			padding: 0;
 			overflow: visible;
-			background: var(--hair);
-			border: 1px solid var(--hair);
+			border-top: 1px solid var(--hair);
+			border-left: 1px solid var(--hair);
+		}
+		/* Hairlines drawn by each card on its right and bottom, with the grid's top
+		   and left edges, so a short last row leaves a clean gap, not a grey block */
+		.grid > li {
+			box-shadow: 1px 1px 0 var(--hair);
 		}
 		.grid :global(.card) {
 			border: 0;
 		}
 	}
+	/* Two to a row; an odd driver out gets a card the full width of the row */
+	@media (min-width: 700px) and (max-width: 1099px) {
+		.grid li:last-child:nth-child(odd) {
+			grid-column: 1 / -1;
+		}
+		.grid li:last-child:nth-child(odd) :global(.card) {
+			aspect-ratio: 8 / 4.3;
+		}
+	}
+	/* As many to a row as leaves no driver on the last row alone (lib/grid.ts) */
 	@media (min-width: 1100px) {
 		.grid {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+			grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+			max-width: calc(var(--n) * 30rem);
 		}
 		.grid :global(.card) {
 			padding: 1.75rem;

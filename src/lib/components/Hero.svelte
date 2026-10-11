@@ -43,6 +43,9 @@
 	// Timing tower: the line-up ranked by this season's results from the
 	// calendar, wins first, then podiums, then best finish; drivers level stay in
 	// line-up order. The rows fill in one by one, top down, when the lights go out.
+	// It shows the top eight, so a bigger team doesn't push the hero off the screen;
+	// the rest are a link away on the drivers page.
+	const TOWER = 8;
 	const ranked = $derived(
 		pilots
 			.map((p) => ({ ...p, season: driverSeason(season, p.id) }))
@@ -114,38 +117,45 @@
 			{/if}
 
 			{#if ranked.length}
-				<div class="tower striped" role="table" aria-label="{t.hero.tower(settings.seasonYear)}, {t.hero.towerSub}">
-					<div class="tower-head mono" role="row">
-						<span role="columnheader">{t.hero.tower(settings.seasonYear)}</span>
-						<span role="columnheader">{t.hero.towerSub}</span>
+				<div class="tower striped">
+					<div role="table" aria-label="{t.hero.tower(settings.seasonYear)}, {t.hero.towerSub}">
+						<div class="tower-head mono" role="row">
+							<span role="columnheader">{t.hero.tower(settings.seasonYear)}</span>
+							<span role="columnheader">{t.hero.towerSub}</span>
+						</div>
+						<div class="tower-body">
+							<ol class="pos mono" aria-hidden="true">
+								{#each ranked.slice(0, TOWER) as _, i}
+									<li class:p1={i === 0}>{i + 1}</li>
+								{/each}
+							</ol>
+							<ol class="rows">
+								{#each ranked.slice(0, TOWER) as p, i (p.id)}
+									<li
+										class="row {p.accent}"
+										class:p1={i === 0}
+										class:lead={i === 0 && p.season.wins > 0}
+										style:--i={i}
+										role="row"
+									>
+										<span class="plate num">{p.number}</span>
+										<span class="who" role="cell">
+											<Flag code={p.country} alt={countryName(p.country, i18n.lang)} />
+											<b>{code3(p.last)}</b>
+											<small class="mono">{p.first} {p.last}</small>
+										</span>
+										<span class="cat mono" role="cell">{p.category}</span>
+										<span class="wins mono" role="cell">{p.season.wins}</span>
+									</li>
+								{/each}
+							</ol>
+						</div>
 					</div>
-					<div class="tower-body" style:--n={ranked.length}>
-						<ol class="pos mono" aria-hidden="true">
-							{#each ranked as _, i}
-								<li class:p1={i === 0}>{i + 1}</li>
-							{/each}
-						</ol>
-						<ol class="rows">
-							{#each ranked as p, i (p.id)}
-								<li
-									class="row {p.accent}"
-									class:p1={i === 0}
-									class:lead={i === 0 && p.season.wins > 0}
-									style:--i={i}
-									role="row"
-								>
-									<span class="plate num">{p.number}</span>
-									<span class="who" role="cell">
-										<Flag code={p.country} alt={countryName(p.country, i18n.lang)} />
-										<b>{code3(p.last)}</b>
-										<small class="mono">{p.first} {p.last}</small>
-									</span>
-									<span class="cat mono" role="cell">{p.category}</span>
-									<span class="wins mono" role="cell">{p.season.wins}</span>
-								</li>
-							{/each}
-						</ol>
-					</div>
+					{#if ranked.length > TOWER}
+						<a class="tower-more mono" href={pagePath('drivers', i18n.lang)}>
+							{t.hero.towerMore(ranked.length - TOWER)} <Arrow />
+						</a>
+					{/if}
 				</div>
 			{/if}
 		</aside>
@@ -427,6 +437,26 @@
 		to {
 			translate: 100% 0;
 		}
+	}
+	/* Drivers beyond the top eight, a link to the drivers page */
+	.tower-more {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.8rem 1.25rem 0.85rem 3rem;
+		border-top: 1px solid var(--hair);
+		font-size: 0.68rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--fg-2);
+		transition: color 0.3s;
+	}
+	.tower-more:hover {
+		color: var(--fg);
+	}
+	.tower-more :global(svg) {
+		width: 0.85rem;
+		color: var(--lime);
 	}
 	.plate {
 		display: grid;
