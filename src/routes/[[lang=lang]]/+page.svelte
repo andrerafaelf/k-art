@@ -34,7 +34,7 @@
 <Meta title={i18n.t.meta.title} description={i18n.t.meta.description} />
 
 <main>
-	<Hero pilots={data.pilots} season={data.season} settings={data.settings} />
+	<Hero drivers={data.pilots.length > 0} season={data.season} settings={data.settings} />
 	<Kerb />
 	<Team pilots={data.pilots} season={data.season} year={data.settings.seasonYear} index={sector('team')} />
 	{#if data.pilots.length}

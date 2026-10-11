@@ -5,7 +5,7 @@ import { msg } from '#lib/server/lang.ts';
 import { checks } from '#lib/admin/checks.ts';
 import { isLive, numbered, nextRound, seasonSummary } from '#lib/content.ts';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
 	const content = await getContent();
 	const rounds = numbered(content.season);
 	return {
@@ -20,7 +20,7 @@ export const load: PageServerLoad = async () => {
 			scheduled: content.posts.filter((p) => p.published && !isLive(p)).length,
 			drafts: content.posts.filter((p) => !p.published).length
 		},
-		checks: checks(content, msg()),
+		checks: checks(content, msg(), locals.lang ?? 'pt'),
 		recent: (await historyRows()).rows.slice(0, 6)
 	};
 };

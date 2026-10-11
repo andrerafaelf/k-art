@@ -15,7 +15,7 @@
 
 <section id="news" class="news" data-sector>
 	<div class="wrap">
-		<TeaserHead {index} eyebrow={t.eyebrow} lines={t.title} href={newsPath(i18n.lang)} link={t.all} />
+		<TeaserHead {index} eyebrow={i18n.text('news.eyebrow')} lines={i18n.lines('news.title')} href={newsPath(i18n.lang)} link={t.all} />
 
 		<ul class="posts" use:inview>
 			{#each posts as post, i (post.id)}

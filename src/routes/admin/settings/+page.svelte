@@ -2,7 +2,6 @@
 	import { enhance } from '$app/forms';
 	import Icon from '#lib/admin/Icon.svelte';
 	import TextField from '#lib/admin/TextField.svelte';
-	import LangField from '#lib/admin/LangField.svelte';
 	import SaveBar from '#lib/admin/SaveBar.svelte';
 	import { keep } from '#lib/admin/forms.ts';
 	import { t } from '#lib/admin/i18n.ts';
@@ -48,25 +47,6 @@
 		</section>
 
 		<section class="a-card">
-			<h2>{t().settings.hero}</h2>
-			<p class="a-desc">{t().settings.heroDesc}</p>
-			<div class="a-fields">
-				<LangField name="heroEyebrow" label={t().settings.eyebrow} value={s.heroEyebrow} errors={e} required wide />
-				<LangField
-					name="heroLines"
-					label={t().settings.heroLines}
-					value={s.heroLines}
-					errors={e}
-					rows={4}
-					hint={t().settings.heroLinesHint}
-					required
-					wide
-				/>
-				<LangField name="heroLead" label={t().settings.heroLead} value={s.heroLead} errors={e} rows={3} required wide />
-			</div>
-		</section>
-
-		<section class="a-card">
 			<h2>{t().settings.season}</h2>
 			<div class="a-fields">
 				<TextField
@@ -78,42 +58,6 @@
 					hint={t().settings.seasonYearHint}
 					required
 				/>
-				<LangField
-					name="seasonIntro"
-					label={t().settings.seasonIntro}
-					value={s.seasonIntro}
-					errors={e}
-					rows={2}
-					hint={t().settings.seasonIntroHint}
-					required
-					wide
-				/>
-			</div>
-		</section>
-
-		<section class="a-card" id="packages">
-			<h2>{t().settings.sponsorship}</h2>
-			<p class="a-desc">{t().settings.sponsorshipDesc}</p>
-			<div class="a-fields">
-				<LangField name="partnersIntro" label={t().settings.partnersIntro} value={s.partnersIntro} errors={e} rows={2} required wide />
-			</div>
-			{#each s.packages as p, i (p.zone)}
-				<fieldset class="pkg">
-					<legend><span class="num">0{i + 1}</span> {t().settings.zones[p.zone]}</legend>
-					<div class="a-fields">
-						<LangField name="{p.zone}.title" label={t().settings.pkgName} value={p.title} errors={e} required />
-						<LangField name="{p.zone}.tier" label={t().settings.tier} value={p.tier} errors={e} required />
-						<LangField name="{p.zone}.body" label={t().settings.pkgBody} value={p.body} errors={e} rows={2} required wide />
-					</div>
-				</fieldset>
-			{/each}
-		</section>
-
-		<section class="a-card">
-			<h2>{t().settings.texts}</h2>
-			<div class="a-fields">
-				<LangField name="tryouts" label={t().settings.tryouts} value={s.tryouts} errors={e} rows={3} required wide />
-				<LangField name="press" label={t().settings.press} value={s.press} errors={e} rows={2} required wide />
 			</div>
 		</section>
 	</div>
@@ -122,38 +66,24 @@
 </form>
 
 <p class="a-help history">
+	<Icon name="texts" />
+	<span>{t().settings.textsNote} <a href="/admin/texts">{t().nav.texts}</a>.</span>
+</p>
+
+<p class="a-help history">
 	<Icon name="history" />
 	<span>{t().settings.historyNote} <a href="/admin/history">{t().settings.historyLink}</a>.</span>
 </p>
 
 <style>
-	.pkg {
-		margin: 1.5rem 0 0;
-		padding: 1.25rem 0 0;
-		border: 0;
-		border-top: 1px solid var(--hair);
-	}
-	legend {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		float: left;
-		width: 100%;
-		margin-bottom: 1rem;
-		padding: 0;
-		font-weight: 700;
-	}
-	legend .num {
-		color: var(--lime);
-	}
-	.pkg .a-fields {
-		clear: both;
-	}
 	.history {
 		display: flex;
 		align-items: center;
 		gap: 0.6rem;
 		margin-top: 2rem;
+	}
+	.history + .history {
+		margin-top: 0.75rem;
 	}
 	.history :global(svg) {
 		flex-shrink: 0;

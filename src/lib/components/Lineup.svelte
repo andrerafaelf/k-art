@@ -18,7 +18,7 @@
 
 <section id="drivers" class="lineup" data-sector>
 	<div class="wrap">
-		<TeaserHead {index} eyebrow={t.eyebrow(year)} lines={t.title} href={page} link={t.all} />
+		<TeaserHead {index} eyebrow="{i18n.text('drivers.eyebrow')} {year}" lines={i18n.lines('drivers.title')} href={page} link={t.all} />
 
 		<ul class="row" use:inview style:--n={cols}>
 			{#each pilots as p, i (p.id)}

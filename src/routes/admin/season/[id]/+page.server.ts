@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { numbered, type Result, type Round } from '#lib/content.ts';
+import { numbered, DEFAULT_RACE_DAYS, type Result, type Round } from '#lib/content.ts';
 import { getContent, update, newId } from '#lib/server/store.ts';
 import { FormReader } from '#lib/server/form.ts';
 import { msg } from '#lib/server/lang.ts';
@@ -11,6 +11,7 @@ const blank = (): Round => ({
 	location: '',
 	venue: { pt: '', en: '' },
 	date: '',
+	days: DEFAULT_RACE_DAYS,
 	series: { pt: '', en: '' },
 	results: []
 });
@@ -39,6 +40,7 @@ export const actions: Actions = {
 
 		const fields = {
 			date: f.date('date'),
+			days: f.int('days', { min: 1, max: 4 }),
 			location: f.text('location', { required: true, max: 40 }),
 			venue: f.l('venue', { required: true, max: 80 }),
 			series: f.l('series', { required: true, max: 60 })

@@ -4,7 +4,7 @@ import type { Content } from '#lib/content.ts';
 // it, so each entry says exactly what changed without the pages having to
 // describe their own edits.
 
-export type Kind = 'pilots' | 'season' | 'partners' | 'posts' | 'alumni' | 'history' | 'settings';
+export type Kind = 'pilots' | 'season' | 'partners' | 'posts' | 'alumni' | 'history' | 'settings' | 'texts';
 export type Op = 'add' | 'edit' | 'remove' | 'move' | 'publish' | 'unpublish';
 
 export interface Change {
@@ -124,6 +124,13 @@ export function diff(before: Content, after: Content): Change[] {
 		after.settings as unknown as Record<string, unknown>
 	);
 	if (fields.length) out.push({ kind: 'settings', op: 'edit', fields });
+
+	// Each text that changed, by its key in lib/texts.ts
+	const texts = changedKeys(
+		(before.texts ?? {}) as Record<string, unknown>,
+		(after.texts ?? {}) as Record<string, unknown>
+	);
+	if (texts.length) out.push({ kind: 'texts', op: 'edit', fields: texts });
 
 	return out;
 }

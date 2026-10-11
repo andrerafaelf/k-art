@@ -17,6 +17,7 @@
 		{ href: '/admin/hall', label: t().nav.hall, icon: 'trophy', count: 'hall' },
 		{ href: '/admin/news', label: t().nav.news, icon: 'news', count: 'news' },
 		{ href: '/admin/partners', label: t().nav.partners, icon: 'partners', count: 'partners' },
+		{ href: '/admin/texts', label: t().nav.texts, icon: 'texts' },
 		{ href: '/admin/settings', label: t().nav.settings, icon: 'settings' },
 		{ href: '/admin/history', label: t().nav.history, icon: 'history' }
 	]);

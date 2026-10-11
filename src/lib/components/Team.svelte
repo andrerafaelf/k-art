@@ -20,6 +20,13 @@
 	const i18n = useI18n();
 	const t = $derived(i18n.t.team);
 
+	const pillars = $derived(
+		([1, 2, 3] as const).map((n) => ({
+			title: i18n.text(`team.pillar${n}.title`),
+			body: i18n.text(`team.pillar${n}.body`)
+		}))
+	);
+
 	// This season so far, counted from the results entered in the calendar
 	const stats = $derived.by(() => {
 		const summary = seasonSummary(season);
@@ -45,16 +52,16 @@
 <section id="team" class="team" class:page data-sector={index && ''}>
 	<div class="wrap">
 		{#if page}
-			<SectionHead level={1} eyebrow={t.eyebrow} lines={t.title} accent={1}>
-				<p>{t.statement} {t.statementMuted}</p>
+			<SectionHead level={1} eyebrow={i18n.text('team.eyebrow')} lines={i18n.lines('team.title')} accent={-1}>
+				<p>{i18n.text('team.statement')} {i18n.text('team.statementMore')}</p>
 			</SectionHead>
 		{:else}
 			<div class="intro" use:inview>
-				<p class="eyebrow rv"><b>{index}</b> · {t.eyebrow}</p>
+				<p class="eyebrow rv"><b>{index}</b> · {i18n.text('team.eyebrow')}</p>
 				<div>
 					<p class="statement rv" style:--d="100ms">
-						{t.statement}
-						<span>{t.statementMuted}</span>
+						{i18n.text('team.statement')}
+						<span>{i18n.text('team.statementMore')}</span>
 					</p>
 					<a class="pagelink more rv" style:--d="200ms" href={pagePath('team', i18n.lang)}>{t.more} <Arrow /></a>
 				</div>
@@ -77,7 +84,7 @@
 
 		{#if page}
 			<div class="pillars" use:inview>
-				{#each t.pillars as p, i}
+				{#each pillars as p, i}
 					<article class="rv" style:--d="{i * 90}ms">
 						<span class="idx num">0{i + 1}</span>
 						<h2>{p.title}</h2>

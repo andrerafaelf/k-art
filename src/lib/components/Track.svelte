@@ -141,9 +141,9 @@
 
 <div class="track striped" use:inview>
 	<div class="info">
-		<p class="eyebrow rv">{t.eyebrow}</p>
+		<p class="eyebrow rv">{i18n.text('team.track.eyebrow')}</p>
 		<h3 class="rv" style:--d="80ms">Kartódromo do Faial</h3>
-		<p class="place rv" style:--d="140ms">{t.place}</p>
+		<p class="place rv" style:--d="140ms">{i18n.text('team.track.place')}</p>
 
 		<dl class="rv" style:--d="200ms">
 			<div><dt>{t.length}</dt><dd class="mono">{LAP_LENGTH} m</dd></div>

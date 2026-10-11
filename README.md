@@ -61,8 +61,10 @@ admin is in European Portuguese by default; each person can switch it to English
 - **Drivers**: add, edit, reorder and remove. Name, number, class, nationality (a searchable list
   of every country's flag, Portugal by default), profile and photo. The team numbers and the timing
   tower on the homepage count this season's results from the calendar.
-- **Calendar & results**: add rounds; they are numbered by date automatically. After a race weekend,
-  add each team driver's finishing position. Wins and podiums on the site are counted from these.
+- **Calendar & results**: add rounds; they are numbered by date automatically. Each round has a first
+  day and a length of one to four days (two by default), shown as a range like "31 out - 1 nov".
+  After a race weekend, add each team driver's finishing position. Wins and podiums on the site are
+  counted from these.
 - **Hall of Fame**: past seasons (headline, story, numbers, titles, line-up) and former drivers
   (years with the team, record, titles, where they race now). "Archive the season" fills a season in
   from the calendar, and "Move to the Hall of Fame" on a driver takes them out of the line-up and
@@ -74,8 +76,11 @@ admin is in European Portuguese by default; each person can switch it to English
   A published post with a future date waits until that day (Madeira time). Drafts and scheduled
   posts can be previewed on the real page by anyone signed in.
 - **Partners**: sponsor logos for the "Our partners" strip (SVG or transparent PNG).
-- **Site settings**: contact details, hero text, season year, calendar intro, sponsorship packages
-  and contact texts.
+- **Site texts**: every title, introduction and paragraph on the site, one form per page (home,
+  team, drivers, season, Hall of Fame, news, partners, contact), in Portuguese and English. The list
+  of texts, their limits and the text the site starts with are in `src/lib/texts.ts`. Numbers,
+  dates and counts stay automatic, and so do menus, buttons and form labels (`src/lib/i18n.ts`).
+- **Site settings**: contact details and the season year.
 - **History**: every change, who made it and when, down to which fields changed. Any change can be
   undone by going back to the version from just before it; going back is recorded too, so it can be
   undone as well. Sign-ins and account changes are under "Everything".

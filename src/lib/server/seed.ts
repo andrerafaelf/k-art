@@ -1,4 +1,5 @@
 import type { Alumnus, Content, L, Pilot, Round, SeasonArchive } from '#lib/content.ts';
+import { withStarts } from '#lib/texts.ts';
 
 // First-run content, written to content.json when no data file exists yet.
 // Names, numbers, results and dates are placeholders.
@@ -96,13 +97,13 @@ const home = same('Kartódromo do Faial');
 const result = (pilotId: string, name: string, pos: number) => [{ pilotId, name, pos }];
 
 const season: Round[] = [
-	{ id: 'r1', location: 'Palmela', venue: same('Kartódromo Internacional de Palmela'), date: '2026-03-14', series: same('CPK'), results: result('rodrigo-abreu', 'Abreu', 1) },
-	{ id: 'r2', location: 'Faial', venue: home, date: '2026-04-25', series: same('Regional'), results: result('duarte-nobrega', 'Nóbrega', 1) },
-	{ id: 'r3', location: 'Paredes', venue: same('Kartódromo de Baltar'), date: '2026-05-30', series: same('CPK'), results: result('leonor-teixeira', 'Teixeira', 2) },
-	{ id: 'r4', location: 'Portimão', venue: same('Kartódromo Internacional do Algarve'), date: '2026-07-11', series: same('CPK'), results: result('tomas-freitas', 'Freitas', 3) },
-	{ id: 'r5', location: 'Faial', venue: home, date: '2026-09-12', series: same('Regional'), results: result('beatriz-gouveia', 'Gouveia', 1) },
-	{ id: 'r6', location: 'Braga', venue: same('Kartódromo Internacional de Braga'), date: '2026-10-17', series: same('CPK'), results: [] },
-	{ id: 'r7', location: 'Faial', venue: home, date: '2026-11-21', series: { pt: 'Regional, prova final', en: 'Regional, final round' }, results: [] }
+	{ id: 'r1', location: 'Palmela', venue: same('Kartódromo Internacional de Palmela'), date: '2026-03-14', days: 2, series: same('CPK'), results: result('rodrigo-abreu', 'Abreu', 1) },
+	{ id: 'r2', location: 'Faial', venue: home, date: '2026-04-25', days: 2, series: same('Regional'), results: result('duarte-nobrega', 'Nóbrega', 1) },
+	{ id: 'r3', location: 'Paredes', venue: same('Kartódromo de Baltar'), date: '2026-05-30', days: 2, series: same('CPK'), results: result('leonor-teixeira', 'Teixeira', 2) },
+	{ id: 'r4', location: 'Portimão', venue: same('Kartódromo Internacional do Algarve'), date: '2026-07-11', days: 2, series: same('CPK'), results: result('tomas-freitas', 'Freitas', 3) },
+	{ id: 'r5', location: 'Faial', venue: home, date: '2026-09-12', days: 2, series: same('Regional'), results: result('beatriz-gouveia', 'Gouveia', 1) },
+	{ id: 'r6', location: 'Braga', venue: same('Kartódromo Internacional de Braga'), date: '2026-10-17', days: 2, series: same('CPK'), results: [] },
+	{ id: 'r7', location: 'Faial', venue: home, date: '2026-11-21', days: 2, series: { pt: 'Regional, prova final', en: 'Regional, final round' }, results: [] }
 ];
 
 const lines = (pt: string[], en: string[]): L<string[]> => ({ pt, en });
@@ -172,67 +173,7 @@ export const seed = (): Content => ({
 		seasonYear: 2026,
 		email: 'geral@k-artracing.com',
 		instagram: 'kart.racingteam',
-		location: 'Faial, Madeira, Portugal',
-		heroEyebrow: { pt: 'Equipa de karting, Madeira, Portugal', en: 'Karting team, Madeira, Portugal' },
-		heroLines: { pt: ['Do Atlântico', 'para o', 'pódio.'], en: ['From the', 'Atlantic', 'to the', 'front row.'] },
-		heroLead: {
-			pt: "A K'ART Racing Team é uma nova equipa de karting da Madeira, sediada no Kartódromo do Faial. Seis pilotos e um só objetivo em cada fim de semana de corrida: o lugar mais alto do pódio.",
-			en: "K'ART Racing Team is a new karting team from Madeira, based at the Kartódromo do Faial. Six drivers and one goal every race weekend: the top step."
-		},
-		seasonIntro: {
-			pt: 'Provas do Campeonato de Portugal de Karting e do Regional da Madeira.',
-			en: 'Rounds across the Portuguese championship and the Madeira regional series.'
-		},
-		partnersIntro: {
-			pt: 'Somos uma equipa jovem e em crescimento, a correr perante público e câmaras por todo o país.',
-			en: 'We are a young team on the way up, racing in front of crowds and cameras across Portugal.'
-		},
-		packages: [
-			{
-				zone: 'pods',
-				tier: { pt: 'Patrocinador principal', en: 'Title partner' },
-				title: { pt: 'Pontões laterais', en: 'Sidepods' },
-				body: {
-					pt: 'A maior superfície do kart, em todos os karts da equipa, com presença no equipamento e direito ao nome.',
-					en: 'The largest surface on the kart, on every kart in the team, plus team kit and naming rights.'
-				}
-			},
-			{
-				zone: 'nassau',
-				tier: same('Premium'),
-				title: { pt: 'Painel Nassau', en: 'Nassau panel' },
-				body: {
-					pt: 'O painel à frente do volante, exatamente para onde apontam todas as câmaras onboard.',
-					en: 'The panel in front of the steering wheel, right where every onboard camera points.'
-				}
-			},
-			{
-				zone: 'nose',
-				tier: { pt: 'Técnico', en: 'Technical' },
-				title: { pt: 'Carenagem frontal', en: 'Front fairing' },
-				body: {
-					pt: 'A primeira coisa a aparecer em cada fotografia da grelha e do pódio.',
-					en: 'First thing in frame on every grid photo and podium picture.'
-				}
-			},
-			{
-				zone: 'bumper',
-				tier: { pt: 'Apoio', en: 'Supporter' },
-				title: { pt: 'Para-choques traseiro', en: 'Rear bumper' },
-				body: {
-					pt: 'Visto por todos os que ultrapassamos. É precisamente essa a ideia.',
-					en: 'Seen by everyone we overtake. That is rather the point.'
-				}
-			}
-		],
-		tryouts: {
-			pt: 'Os testes de captação decorrem durante a pré-temporada, para pilotos a partir dos 8 anos, de estreantes a pilotos à procura de uma equipa que os leve mais longe.',
-			en: 'Tryouts run through the off-season for drivers aged 8 and up, from first-timers to racers looking for a team that can take them further.'
-		},
-		press: {
-			pt: 'Dossiês de patrocínio, kits de imprensa e fotografias da temporada disponíveis a pedido.',
-			en: 'Partner decks, press kits and season photography are available on request.'
-		}
+		location: 'Faial, Madeira, Portugal'
 	},
 	pilots: structuredClone(pilots),
 	season: structuredClone(season),
@@ -240,5 +181,6 @@ export const seed = (): Content => ({
 	posts: [],
 	alumni: structuredClone(alumni),
 	history: structuredClone(history),
+	texts: withStarts(undefined),
 	updatedAt: new Date(0).toISOString()
 });

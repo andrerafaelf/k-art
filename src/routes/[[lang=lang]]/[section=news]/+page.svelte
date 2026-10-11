@@ -8,24 +8,25 @@
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.news);
+	const title = $derived(i18n.lines('news.title'));
 	const [first, ...rest] = $derived(data.posts);
 </script>
 
 <svelte:head>
-	<title>{t.eyebrow}, K'ART Racing Team</title>
-	<meta name="description" content={t.intro} />
+	<title>{i18n.text('news.eyebrow')}, K'ART Racing Team</title>
+	<meta name="description" content={i18n.text('news.intro')} />
 	<meta property="og:image" content="{page.url.origin}/og.png" />
 </svelte:head>
 
 <main class="wrap">
 	<header class="head" use:inview>
-		<p class="eyebrow rv">{t.eyebrow}</p>
+		<p class="eyebrow rv">{i18n.text('news.eyebrow')}</p>
 		<h1 class="display">
-			{#each t.title as line, i}
-				<span class="line"><span class:accent={i === 1} style:--d="{60 + i * 90}ms">{line}</span></span>
+			{#each title as line, i}
+				<span class="line"><span class:accent={i === title.length - 1} style:--d="{60 + i * 90}ms">{line}</span></span>
 			{/each}
 		</h1>
-		<p class="lead rv" style:--d="240ms">{t.intro}</p>
+		<p class="lead rv" style:--d="240ms">{i18n.text('news.intro')}</p>
 	</header>
 
 	{#if first}
@@ -40,7 +41,7 @@
 			</ul>
 		{/if}
 	{:else}
-		<p class="empty">{t.empty}</p>
+		<p class="empty">{i18n.text('news.empty')}</p>
 	{/if}
 </main>
 

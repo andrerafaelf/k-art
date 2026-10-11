@@ -1,6 +1,8 @@
 // Content model shared by the public site and the admin, plus the helpers
 // that derive stats from it. Nothing here touches the server.
 
+import type { Texts } from './texts.ts';
+
 export type Lang = 'pt' | 'en';
 export const LANGS: Lang[] = ['pt', 'en'];
 
@@ -52,6 +54,8 @@ export interface Round {
 	venue: L;
 	/** ISO date of the first day of the race weekend */
 	date: string;
+	/** How many days the weekend lasts, from 1 to 4; usually 2 */
+	days: number;
 	series: L;
 	results: Result[];
 }
@@ -76,26 +80,12 @@ export interface Post {
 	published: boolean;
 }
 
-export interface Package {
-	zone: Zone;
-	tier: L;
-	title: L;
-	body: L;
-}
-
+/** Contact details and the season year; everything written on the pages is in Texts (lib/texts.ts) */
 export interface Settings {
 	seasonYear: number;
 	email: string;
 	instagram: string;
 	location: string;
-	heroEyebrow: L;
-	heroLines: L<string[]>;
-	heroLead: L;
-	seasonIntro: L;
-	partnersIntro: L;
-	packages: Package[];
-	tryouts: L;
-	press: L;
 }
 
 /** A former driver, in the Hall of Fame */
@@ -140,6 +130,8 @@ export interface Content {
 	posts: Post[];
 	alumni: Alumnus[];
 	history: SeasonArchive[];
+	/** What the pages say, edited in the admin's Site texts */
+	texts: Texts;
 	updatedAt: string;
 }
 
@@ -155,8 +147,21 @@ export interface NumberedRound extends Round {
 export const numbered = (season: Round[]): NumberedRound[] =>
 	[...season].sort((a, b) => a.date.localeCompare(b.date)).map((r, i) => ({ ...r, round: i + 1 }));
 
-/** Race weekends are treated as finished at the end of their start day + 1. */
-export const roundEnd = (r: Round) => new Date(r.date).getTime() + 2 * 86_400_000;
+export const RACE_DAYS = [1, 2, 3, 4] as const;
+/** Most race weekends are Saturday and Sunday */
+export const DEFAULT_RACE_DAYS = 2;
+
+const DAY = 86_400_000;
+
+/** Days the weekend lasts, kept between 1 and 4 */
+export const raceDays = (r: Pick<Round, 'days'>) => Math.min(Math.max(Math.round(r.days) || DEFAULT_RACE_DAYS, 1), 4);
+
+/** ISO date of the last day of the race weekend */
+export const lastDay = (r: Pick<Round, 'date' | 'days'>) =>
+	new Date(new Date(r.date).getTime() + (raceDays(r) - 1) * DAY).toISOString().slice(0, 10);
+
+/** A round is finished once its last day is over. */
+export const roundEnd = (r: Pick<Round, 'date' | 'days'>) => new Date(r.date).getTime() + raceDays(r) * DAY;
 
 export const nextRound = (season: NumberedRound[], now: number) => season.find((r) => roundEnd(r) > now);
 
@@ -191,14 +196,6 @@ export const driverSeason = (season: Round[], pilotId: string) => {
 	};
 };
 
-/** Three-letter timing-screen code: Nóbrega becomes NOB */
-export const code3 = (last: string) =>
-	last
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
-		.replace(/[^a-z]/gi, '')
-		.slice(0, 3)
-		.toUpperCase();
 
 // ---------- hall of fame ----------
 
@@ -257,6 +254,45 @@ export const monthShort = (iso: string, lang: Lang) => {
 
 /** "17 Oct" / "17 out" */
 export const shortDate = (iso: string, lang: Lang) => `${parts(iso).day} ${monthShort(iso, lang)}`;
+
+/** "17-18 Oct", "31 Oct - 1 Nov" / "17-18 out", "31 out - 1 nov"; one day as shortDate */
+export const shortRange = (r: Pick<Round, 'date' | 'days'>, lang: Lang) => {
+	if (raceDays(r) === 1) return shortDate(r.date, lang);
+	const end = lastDay(r);
+	const [a, b] = [parts(r.date), parts(end)];
+	return a.month === b.month ? `${a.day}-${b.day} ${monthShort(r.date, lang)}` : `${shortDate(r.date, lang)} - ${shortDate(end, lang)}`;
+};
+
+/** The days of the weekend, "17-18" or "31-01", and its month, "out" or "out-nov", for a calendar column */
+export const dayRange = (r: Pick<Round, 'date' | 'days'>, lang: Lang) => {
+	const end = lastDay(r);
+	const [a, b] = [parts(r.date), parts(end)];
+	const pad = (n: number) => String(n).padStart(2, '0');
+	if (raceDays(r) === 1) return { days: pad(a.day), month: monthShort(r.date, lang) };
+	return {
+		days: `${pad(a.day)}-${pad(b.day)}`,
+		month: a.month === b.month ? monthShort(r.date, lang) : `${monthShort(r.date, lang)}-${monthShort(end, lang)}`
+	};
+};
+
+/**
+ * The whole weekend in words: "sábado e domingo, 17 e 18 de outubro",
+ * "sexta-feira a domingo, 30 de outubro a 1 de novembro"; one day as longDate.
+ */
+export const longRange = (r: Pick<Round, 'date' | 'days'>, lang: Lang, { year = true, weekday = false } = {}) => {
+	const n = raceDays(r);
+	if (n === 1) return longDate(r.date, lang, { year, weekday });
+	const [a, b] = [parts(r.date), parts(lastDay(r))];
+	const and = n === 2 ? (lang === 'pt' ? ' e ' : ' and ') : lang === 'pt' ? ' a ' : ' to ';
+	const M = MONTHS[lang];
+	const of = lang === 'pt' ? ' de ' : ' ';
+	const days =
+		a.month === b.month
+			? `${a.day}${and}${b.day}${of}${M[a.month]}`
+			: `${a.day}${of}${M[a.month]}${and}${b.day}${of}${M[b.month]}`;
+	const wd = weekday ? `${WEEKDAYS[lang][a.weekday]}${and}${WEEKDAYS[lang][b.weekday]}, ` : '';
+	return `${wd}${days}${year ? `${of}${b.year}` : ''}`;
+};
 
 /** "17 October 2026" / "17 de outubro de 2026" */
 export const longDate = (iso: string, lang: Lang, { year = true, weekday = false } = {}) => {

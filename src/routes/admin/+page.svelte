@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Icon from '#lib/admin/Icon.svelte';
 	import Entry from '#lib/admin/Entry.svelte';
-	import { daysUntil, longDate } from '#lib/content.ts';
+	import { daysUntil, longRange } from '#lib/content.ts';
 	import { t, lang } from '#lib/admin/i18n.ts';
 
 	let { data } = $props();
@@ -25,7 +25,7 @@
 		<span class="k">{t().overview.next}</span>
 		{#if data.next}
 			<span class="v">{data.next.location}</span>
-			<span class="s">{longDate(data.next.date, lang())}, {t().overview.when(days)}</span>
+			<span class="s">{longRange(data.next, lang())}, {t().overview.when(days)}</span>
 			<span class="s">{t().overview.round(data.next.round, data.total)}</span>
 		{:else}
 			<span class="v">{t().overview.none}</span>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Arrow from './Arrow.svelte';
 	import PartnerLogos from './PartnerLogos.svelte';
-	import { tr, type Partner, type Settings } from '#lib/content.ts';
+	import type { Partner, Settings } from '#lib/content.ts';
 	import { useI18n, pagePath } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
@@ -13,21 +13,22 @@
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.partners);
+	const title = $derived(i18n.lines('partners.title'));
 </script>
 
 <section id="partners" class="band" data-sector>
 	<div class="wrap">
 		<div class="pitch" use:inview>
 			<div>
-				<p class="eyebrow rv"><b>{index}</b> · {t.eyebrow}</p>
+				<p class="eyebrow rv"><b>{index}</b> · {i18n.text('partners.eyebrow')}</p>
 				<h2 class="display">
-					{#each t.title as line, i}
-						<span class="line"><span class:accent={i === 1} style:--d="{60 + i * 90}ms">{line}</span></span>
+					{#each title as line, i}
+						<span class="line"><span class:accent={i === title.length - 1} style:--d="{60 + i * 90}ms">{line}</span></span>
 					{/each}
 				</h2>
 			</div>
 			<div class="side rv" style:--d="220ms">
-				<p>{tr(settings.partnersIntro, i18n.lang)} {t.positions(karts)}</p>
+				<p>{i18n.text('partners.intro')} {t.positions(karts)}</p>
 				<a class="btn" href={pagePath('partners', i18n.lang)}>{t.more} <Arrow /></a>
 			</div>
 		</div>

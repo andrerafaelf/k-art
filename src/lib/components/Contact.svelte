@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Arrow from './Arrow.svelte';
 	import ContactForm from './ContactForm.svelte';
-	import { tr, type Settings } from '#lib/content.ts';
+	import type { Settings } from '#lib/content.ts';
 	import type { ContactResult } from '#lib/contact.ts';
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
@@ -12,19 +12,20 @@
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.contact);
+	const title = $derived(i18n.lines('contact.title'));
 	// The address may only break after the @, never at the hyphen in the domain
 	const address = $derived(settings.email.split(/(?<=@)/));
 </script>
 
 <section class="contact">
 	<header class="wrap head" use:inview>
-		<p class="eyebrow rv">{t.eyebrow}</p>
+		<p class="eyebrow rv">{i18n.text('contact.eyebrow')}</p>
 		<h1 class="display">
-			{#each t.title as line, i}
-				<span class="line"><span class:accent={i === 1} style:--d="{80 + i * 90}ms">{line}</span></span>
+			{#each title as line, i}
+				<span class="line"><span class:accent={i === title.length - 1} style:--d="{80 + i * 90}ms">{line}</span></span>
 			{/each}
 		</h1>
-		<p class="lead rv" style:--d="240ms">{t.band}</p>
+		<p class="lead rv" style:--d="240ms">{i18n.text('contact.lead')}</p>
 	</header>
 
 	<!-- A form posted without JavaScript comes back here -->
@@ -46,11 +47,11 @@
 				</div>
 				<div class="rv" style:--d="380ms">
 					<h2>{t.drivers}</h2>
-					<p>{tr(settings.tryouts, i18n.lang)}</p>
+					<p>{i18n.text('contact.tryouts')}</p>
 				</div>
 				<div class="rv" style:--d="440ms">
 					<h2>{t.press}</h2>
-					<p>{tr(settings.press, i18n.lang)}</p>
+					<p>{i18n.text('contact.press')}</p>
 				</div>
 				<div class="rv" style:--d="500ms">
 					<h2>{t.follow}</h2>

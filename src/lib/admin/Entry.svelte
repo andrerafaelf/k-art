@@ -3,6 +3,7 @@
 	import type { Row } from '#lib/server/history.ts';
 	import type { Change } from './changes.ts';
 	import { t, lang, when } from './i18n.ts';
+	import { field, group, groupOf } from '#lib/texts.ts';
 
 	// One line of the change log, in plain words: "Ana edited the driver
 	// Tomás Freitas. Changed: photo, age".
@@ -10,7 +11,16 @@
 	let { row, compact = false }: { row: Row; compact?: boolean } = $props();
 
 	const m = $derived(t());
-	const fields = (c: Change) => c.fields?.map((f) => m.fields[c.kind]?.[f] ?? f).join(', ');
+	// A site text reads as its page, then its label: "Equipa: bloco 1, nome"
+	const textLabel = (key: string) => {
+		const f = field(key);
+		const g = group(groupOf(key) ?? '');
+		if (!f || !g) return key;
+		const l = lang();
+		return `${g.label[l]}: ${f.set ? `${f.set[l].toLowerCase()}, ` : ''}${f.label[l].toLowerCase()}`;
+	};
+	const fields = (c: Change) =>
+		c.fields?.map((f) => (c.kind === 'texts' ? textLabel(f) : (m.fields[c.kind]?.[f] ?? f))).join(', ');
 	const initial = $derived((row.by?.name ?? '?').trim().charAt(0).toUpperCase());
 	const shown = $derived(compact || row.restored ? row.changes.slice(0, 3) : row.changes);
 	const hidden = $derived(row.changes.length - shown.length);
@@ -22,8 +32,8 @@
 		{#if c.href}<a href={c.href}>{m.history.moved[c.kind]}</a>{:else}{m.history.moved[c.kind]}{/if}{#if row.count > 1}{' '}<span
 				class="times">({m.history.times(row.count)})</span
 			>{/if}
-	{:else if c.kind === 'settings'}
-		{m.history.verbs[c.op]}{' '}{#if c.href}<a href={c.href}>{m.history.nouns.settings}</a>{:else}{m.history.nouns.settings}{/if}
+	{:else if c.kind === 'settings' || c.kind === 'texts'}
+		{m.history.verbs[c.op]}{' '}{#if c.href}<a href={c.href}>{m.history.nouns[c.kind]}</a>{:else}{m.history.nouns[c.kind]}{/if}
 	{:else}
 		{`${m.history.verbs[c.op]} ${m.history.nouns[c.kind]}${c.kind === 'season' && c.date ? ` ${shortDate(c.date, lang())},` : ''} `}{#if c.href}<a
 				href={c.href}>{c.name}</a

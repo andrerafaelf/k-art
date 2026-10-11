@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
-import type { Content, Pilot } from '#lib/content.ts';
+import { raceDays, ZONES, type Content, type L, type Pilot, type Settings } from '#lib/content.ts';
+import { withStarts, type Texts } from '#lib/texts.ts';
 import { DEFAULT_COUNTRY } from '#lib/flags.ts';
 import { diff } from '#lib/admin/changes.ts';
 import { seed } from './seed.ts';
@@ -39,16 +40,46 @@ async function load(): Promise<Content> {
 /** Fills in anything missing, so older data files keep working as the model grows. */
 function normalize(raw: Partial<Content>): Content {
 	const base = seed();
+	const s = { ...base.settings, ...raw.settings };
 	return {
-		settings: { ...base.settings, ...raw.settings },
+		settings: { seasonYear: s.seasonYear, email: s.email, instagram: s.instagram, location: s.location },
 		pilots: (raw.pilots ?? []).map(driver),
-		season: raw.season ?? [],
+		// Rounds from before race lengths were added are two-day weekends
+		season: (raw.season ?? []).map((r) => ({ ...r, days: raceDays(r) })),
 		partners: raw.partners ?? [],
 		posts: raw.posts ?? [],
 		alumni: raw.alumni ?? base.alumni,
 		history: raw.history ?? base.history,
+		texts: withStarts({ ...movedTexts(raw.settings), ...raw.texts }),
 		updatedAt: raw.updatedAt ?? base.updatedAt
 	};
+}
+
+/**
+ * Until October 2026 the homepage, calendar, sponsorship and contact texts lived
+ * in the settings. They are carried over into the site texts when an older file
+ * or backup is read, so nothing written in the admin is lost.
+ */
+function movedTexts(old: Partial<Settings> | undefined): Texts {
+	const o = (old ?? {}) as Record<string, unknown>;
+	const texts: Record<string, unknown> = {
+		'home.eyebrow': o.heroEyebrow,
+		'home.title': o.heroLines,
+		'home.lead': o.heroLead,
+		'season.intro': o.seasonIntro,
+		'partners.intro': o.partnersIntro,
+		'contact.tryouts': o.tryouts,
+		'contact.press': o.press
+	};
+	const packages = (o.packages ?? []) as { zone: string; tier: L; title: L; body: L }[];
+	for (const zone of ZONES) {
+		const p = packages.find((x) => x.zone === zone);
+		if (!p) continue;
+		texts[`partners.${zone}.title`] = p.title;
+		texts[`partners.${zone}.tier`] = p.tier;
+		texts[`partners.${zone}.body`] = p.body;
+	}
+	return Object.fromEntries(Object.entries(texts).filter(([, v]) => v !== undefined)) as Texts;
 }
 
 /**

@@ -12,6 +12,7 @@
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.hall);
+	const title = $derived(i18n.lines('hall.title'));
 	const seasons = $derived(byYear(data.history));
 	const totals = $derived(hallTotals(data.history, data.alumni));
 	const counters = $derived([
@@ -35,13 +36,13 @@
 	<header class="top">
 		<div class="wrap">
 			<div class="cup" aria-hidden="true"><Trophy /></div>
-			<p class="eyebrow">{t.eyebrow}</p>
+			<p class="eyebrow">{i18n.text('hall.eyebrow')}</p>
 			<h1 class="display">
-				{#each t.title as line, i}
-					<span class="line"><span class:accent={i === 1} style:--d="{0.1 + i * 0.09}s">{line}</span></span>
+				{#each title as line, i}
+					<span class="line"><span class:accent={i === title.length - 1} style:--d="{0.1 + i * 0.09}s">{line}</span></span>
 				{/each}
 			</h1>
-			<p class="lead">{t.intro}</p>
+			<p class="lead">{i18n.text('hall.intro')}</p>
 
 			<dl class="totals">
 				{#each counters as c}
@@ -60,7 +61,7 @@
 		<div class="wrap">
 			<div class="block-head">
 				<p class="eyebrow"><b>{seasons.length}</b> · {t.seasons}</p>
-				<p class="sub">{t.seasonsIntro}</p>
+				<p class="sub">{i18n.text('hall.seasons')}</p>
 			</div>
 			{#if seasons.length}
 				<ol class="seasons" use:inview>
@@ -69,7 +70,7 @@
 					{/each}
 				</ol>
 			{:else}
-				<p class="empty">{t.empty}</p>
+				<p class="empty">{i18n.text('hall.empty')}</p>
 			{/if}
 		</div>
 	</section>
@@ -79,7 +80,7 @@
 			<div class="wrap">
 				<div class="block-head">
 					<p class="eyebrow"><b>{data.alumni.length}</b> · {t.drivers}</p>
-					<p class="sub">{t.driversIntro}</p>
+					<p class="sub">{i18n.text('hall.drivers')}</p>
 				</div>
 				<ul class="plaques" use:inview>
 					{#each data.alumni as a, i (a.id)}

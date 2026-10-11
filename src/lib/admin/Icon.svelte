@@ -5,6 +5,7 @@
 		season: 'M5 21V4M5 4h11l-2 4 2 4H5',
 		news: 'M5 4h11l3 3v13H5zM9 9h6M9 13h6M9 17h4',
 		partners: 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z',
+		texts: 'M5 7V5h14v2M12 5v14M9 19h6',
 		settings: 'M4 7h10M18 7h2M4 17h4M12 17h8M14 4v6M8 14v6',
 		plus: 'M12 5v14M5 12h14',
 		up: 'M6 15l6-6 6 6',

@@ -8,7 +8,7 @@
 		index?: string;
 		/** Title, one entry per line */
 		lines: string[];
-		/** Index of a line to set in the team blue */
+		/** Index of a line to set in the team blue; -1 for the last line */
 		accent?: number;
 		/** 1 when this is the page's own heading */
 		level?: 1 | 2;
@@ -24,7 +24,7 @@
 		<svelte:element this={level === 1 ? 'h1' : 'h2'} class="display {level === 1 ? 't-page' : 't-section'}">
 			{#each lines as line, i}
 				<span class="line"
-					><span class:accent={i === accent} style:--d="{60 + i * 90}ms">{line}</span></span
+					><span class:accent={i === (accent !== undefined && accent < 0 ? lines.length + accent : accent)} style:--d="{60 + i * 90}ms">{line}</span></span
 				>
 			{/each}
 		</svelte:element>

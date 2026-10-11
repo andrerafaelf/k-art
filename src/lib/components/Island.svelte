@@ -9,6 +9,13 @@
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.madeira);
+	const facts = $derived(
+		([1, 2, 3, 4] as const).map((n) => ({
+			v: i18n.text(`team.fact${n}.value`),
+			u: i18n.text(`team.fact${n}.unit`),
+			l: i18n.text(`team.fact${n}.body`)
+		}))
+	);
 
 	// Real coastline and height contours, see lib/madeira.ts
 	const [x0, y0, x1, y1] = BOX;
@@ -22,8 +29,8 @@
 
 <section id="madeira" class="island">
 	<div class="wrap">
-		<SectionHead {index} eyebrow={t.eyebrow} lines={t.title} accent={1}>
-			<p>{t.intro}</p>
+		<SectionHead {index} eyebrow={i18n.text('team.madeira.eyebrow')} lines={i18n.lines('team.madeira.title')} accent={-1}>
+			<p>{i18n.text('team.madeira.intro')}</p>
 		</SectionHead>
 
 		<div class="layout">
@@ -62,7 +69,7 @@
 			</figure>
 
 			<dl class="facts" use:inview>
-				{#each t.facts as f, i}
+				{#each facts as f, i}
 					<div class="rv" style:--d="{i * 80}ms">
 						<dt class="num">{f.v}<small>{f.u}</small></dt>
 						<dd>{f.l}</dd>

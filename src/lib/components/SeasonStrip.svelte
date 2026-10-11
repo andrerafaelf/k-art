@@ -1,6 +1,6 @@
 <script lang="ts">
 	import TeaserHead from './TeaserHead.svelte';
-	import { numbered, roundEnd, nextRound, seasonSummary, bestResult, shortDate } from '#lib/content.ts';
+	import { numbered, roundEnd, nextRound, seasonSummary, bestResult, shortRange } from '#lib/content.ts';
 	import type { Round } from '#lib/content.ts';
 	import { useI18n, pagePath } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
@@ -28,7 +28,7 @@
 
 <section id="season" class="strip" data-sector>
 	<div class="wrap">
-		<TeaserHead {index} eyebrow={t.eyebrow(year)} lines={t.title} href={pagePath('season', i18n.lang)} link={t.all}>
+		<TeaserHead {index} eyebrow="{i18n.text('season.eyebrow')} {year}" lines={i18n.lines('season.title')} href={pagePath('season', i18n.lang)} link={t.all}>
 			{summary.raced ? t.soFar(summary.wins, summary.podiums, summary.raced) : t.notStarted}
 		</TeaserHead>
 
@@ -40,7 +40,7 @@
 				<li class="rv" class:past class:next={isNext} style:--d="{i * 50}ms">
 					<span class="top mono">
 						<span>{t.roundPrefix}{r.round}{t.roundSuffix}</span>
-						<span>{shortDate(r.date, i18n.lang)}</span>
+						<span>{shortRange(r, i18n.lang)}</span>
 					</span>
 					<span class="v">{r.location}</span>
 					<span class="res">

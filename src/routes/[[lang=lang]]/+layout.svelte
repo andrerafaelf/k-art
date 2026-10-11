@@ -6,7 +6,10 @@
 
 	let { data, children } = $props();
 
-	const i18n = setI18n(() => data.lang);
+	const i18n = setI18n(
+		() => data.lang,
+		() => data.texts
+	);
 
 	const pt = $derived(page.url.origin + alternatePath(page.url.pathname, 'pt'));
 	const en = $derived(page.url.origin + alternatePath(page.url.pathname, 'en'));

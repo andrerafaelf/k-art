@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '#lib/admin/Icon.svelte';
-	import { roundEnd, nextRound, bestResult, longDate } from '#lib/content.ts';
+	import { roundEnd, nextRound, bestResult, longRange } from '#lib/content.ts';
 	import { t, lang } from '#lib/admin/i18n.ts';
 
 	let { data } = $props();
@@ -29,7 +29,7 @@
 				<span class="rd num">{r.round}</span>
 				<span class="grow">
 					<a class="name" href="/admin/season/{r.id}">{r.location}</a>
-					<span class="meta">{longDate(r.date, lang())}, {r.venue.pt}, {r.series.pt}</span>
+					<span class="meta">{longRange(r, lang())}, {r.venue.pt}, {r.series.pt}</span>
 				</span>
 				<span class="status">
 					{#if best}

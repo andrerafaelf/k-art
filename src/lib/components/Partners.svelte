@@ -2,7 +2,7 @@
 	import SectionHead from './SectionHead.svelte';
 	import Arrow from './Arrow.svelte';
 	import PartnerLogos from './PartnerLogos.svelte';
-	import { tr, type Partner, type Settings } from '#lib/content.ts';
+	import { ZONES, type Partner, type Settings } from '#lib/content.ts';
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
@@ -12,22 +12,31 @@
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.partners);
+	// The four positions on the kart, from the title partner down
+	const packages = $derived(
+		ZONES.map((zone) => ({
+			zone,
+			title: i18n.text(`partners.${zone}.title`),
+			tier: i18n.text(`partners.${zone}.tier`),
+			body: i18n.text(`partners.${zone}.body`)
+		}))
+	);
 </script>
 
 <section id="partners" class="partners">
 	<div class="wrap">
-		<SectionHead level={1} eyebrow={t.eyebrow} lines={t.title} accent={1}>
-			<p>{tr(settings.partnersIntro, i18n.lang)} {t.positions(karts)}</p>
+		<SectionHead level={1} eyebrow={i18n.text('partners.eyebrow')} lines={i18n.lines('partners.title')} accent={-1}>
+			<p>{i18n.text('partners.intro')} {t.positions(karts)}</p>
 		</SectionHead>
 
 		<!-- The four positions on the kart, ranked like a results chart: P1 is the title partner -->
 		<ol class="ladder" use:inview>
-			{#each settings.packages as p, i (p.zone)}
+			{#each packages as p, i (p.zone)}
 				<li class="step rv" class:p1={i === 0} style:--i={i} style:--d="{i * 90}ms">
 					<span class="pos num">P{i + 1}</span>
-					<span class="tier">{tr(p.tier, i18n.lang)}</span>
-					<h3>{tr(p.title, i18n.lang)}</h3>
-					<p>{tr(p.body, i18n.lang)}</p>
+					<span class="tier">{p.tier}</span>
+					<h3>{p.title}</h3>
+					<p>{p.body}</p>
 				</li>
 			{/each}
 		</ol>

@@ -15,15 +15,15 @@
 <section id="contact" class="band" data-sector>
 	<div class="wrap" use:inview>
 		<div>
-			<p class="eyebrow rv"><b>{index}</b> · {t.eyebrow}</p>
+			<p class="eyebrow rv"><b>{index}</b> · {i18n.text('contact.eyebrow')}</p>
 			<h2 class="display">
-				{#each t.title as line, i}
+				{#each i18n.lines('contact.title') as line, i}
 					<span class="line"><span style:--d="{80 + i * 90}ms">{line}</span></span>
 				{/each}
 			</h2>
 		</div>
 		<div class="side rv" style:--d="240ms">
-			<p>{t.band}</p>
+			<p>{i18n.text('contact.lead')}</p>
 			<div class="actions">
 				<a class="btn" href={pagePath('contact', i18n.lang)}>{i18n.t.nav.cta} <Arrow /></a>
 				<a class="ulink mail" href="mailto:{settings.email}">{settings.email}</a>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import SectionHead from './SectionHead.svelte';
 	import CalendarLinks from './CalendarLinks.svelte';
-	import { numbered, roundEnd, nextRound, seasonSummary, bestResult, longDate, monthShort, tr } from '#lib/content.ts';
+	import { numbered, roundEnd, nextRound, seasonSummary, bestResult, longRange, dayRange, tr } from '#lib/content.ts';
 	import type { Round, Settings } from '#lib/content.ts';
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
@@ -32,15 +32,19 @@
 	});
 
 	const pad = (n: number) => String(n).padStart(2, '0');
-	const day = (iso: string) => pad(new Date(iso).getUTCDate());
 </script>
 
 <section id="season" class="season">
 	<div class="wrap">
-		<SectionHead level={1} eyebrow={t.eyebrow(settings.seasonYear)} lines={t.title} accent={1}>
+		<SectionHead
+			level={1}
+			eyebrow="{i18n.text('season.eyebrow')} {settings.seasonYear}"
+			lines={i18n.lines('season.title')}
+			accent={-1}
+		>
 			{#if season.length}
 				<p>
-					{tr(settings.seasonIntro, i18n.lang)}
+					{i18n.text('season.intro')}
 					<strong>
 						{summary.raced ? t.soFar(summary.wins, summary.podiums, summary.raced) : t.notStarted}
 					</strong>
@@ -49,7 +53,7 @@
 					<CalendarLinks label={i18n.t.calendar.label} />
 				</div>
 			{:else}
-				<p>{t.empty}</p>
+				<p>{i18n.text('season.empty')}</p>
 			{/if}
 		</SectionHead>
 
@@ -59,7 +63,7 @@
 					<p class="eyebrow">{t.next(next.round, rounds.length)}</p>
 					<h3>{next.location}</h3>
 					<p class="where">
-						{tr(next.venue, i18n.lang)}, {longDate(next.date, i18n.lang, { year: false, weekday: true })}
+						{tr(next.venue, i18n.lang)}, {longRange(next, i18n.lang, { year: false, weekday: true })}
 					</p>
 				</div>
 				<div class="clock rv" style:--d="120ms" role="timer" aria-label={t.timer}>
@@ -79,11 +83,12 @@
 					{@const past = roundEnd(r) <= now}
 					{@const isNext = r === next}
 					{@const best = bestResult(r)}
+				{@const when = dayRange(r, i18n.lang)}
 					<li class="row rv" class:past class:is-next={isNext} style:--d="{i * 60}ms">
 						<span class="rd num"><small>{t.roundPrefix}</small>{r.round}<small>{t.roundSuffix}</small></span>
 						<span class="date">
-							<span class="num">{day(r.date)}</span>
-							<span>{monthShort(r.date, i18n.lang)}</span>
+							<span class="num">{when.days}</span>
+							<span>{when.month}</span>
 						</span>
 						<span class="venue">
 							<span class="v">{r.location}</span>

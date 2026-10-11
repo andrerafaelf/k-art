@@ -42,9 +42,9 @@
 
 <section id="drivers" class="drivers">
 	<div class="wrap">
-		<SectionHead level={1} eyebrow={t.eyebrow(year)} lines={t.title} accent={1}>
+		<SectionHead level={1} eyebrow="{i18n.text('drivers.eyebrow')} {year}" lines={i18n.lines('drivers.title')} accent={-1}>
 			{#if pilots.length}
-				<p>{t.intro(pilots.length, classes)}</p>
+				<p>{t.count(pilots.length, classes)} {i18n.text('drivers.intro')}</p>
 			{/if}
 		</SectionHead>
 
@@ -57,7 +57,7 @@
 				{/each}
 			</ul>
 		{:else}
-			<p class="empty">{t.empty}</p>
+			<p class="empty">{i18n.text('drivers.empty')}</p>
 		{/if}
 	</div>
 </section>

@@ -5,8 +5,8 @@
 	import LangField from '#lib/admin/LangField.svelte';
 	import SaveBar from '#lib/admin/SaveBar.svelte';
 	import { keep, confirmFirst } from '#lib/admin/forms.ts';
-	import { t } from '#lib/admin/i18n.ts';
-	import { roundEnd } from '#lib/content.ts';
+	import { t, lang } from '#lib/admin/i18n.ts';
+	import { roundEnd, longRange, RACE_DAYS } from '#lib/content.ts';
 
 	let { data, form } = $props();
 
@@ -21,6 +21,11 @@
 		rows = fromSaved();
 	});
 	const finished = $derived(!!r.date && roundEnd(r) <= Date.now());
+
+	// The weekend spelled out under the length, so it's easy to check before saving
+	let date = $derived(r.date);
+	let days = $derived(r.days);
+	const spelled = $derived(date ? longRange({ date, days }, lang(), { year: false, weekday: true }) : '');
 
 	const add = () => (rows = [...rows, { pilotId: '', pos: '', name: '' }]);
 	const remove = (i: number) => (rows = rows.filter((_, j) => j !== i));
@@ -47,8 +52,25 @@
 					type="date"
 					value={r.date}
 					error={e.date}
+					oninput={(ev) => (date = ev.currentTarget.value)}
 					required
 				/>
+				<div class="a-field">
+					<span class="a-label">{t().round.days}</span>
+					<div class="a-choices days">
+						{#each RACE_DAYS as n}
+							<label class="a-choice">
+								<input type="radio" name="days" value={n} checked={r.days === n} onchange={() => (days = n)} />
+								{t().round.daysOption(n)}
+							</label>
+						{/each}
+					</div>
+					{#if spelled}
+						<p class="a-hint spelled">{spelled}</p>
+					{:else}
+						<p class="a-hint">{t().round.daysHint}</p>
+					{/if}
+				</div>
 				<TextField
 					name="location"
 					label={t().round.location}
@@ -142,6 +164,23 @@
 {/if}
 
 <style>
+	/* Four equal buttons, so the choice always fits on one line */
+	.days {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+	.days .a-choice {
+		justify-content: center;
+		padding: 0 0.4rem;
+		white-space: nowrap;
+	}
+	/* The weekend in words, under the length */
+	.spelled {
+		color: var(--fg-2);
+	}
+	.spelled::first-letter {
+		text-transform: uppercase;
+	}
 	.results {
 		display: grid;
 		gap: 0.6rem;

@@ -1,4 +1,5 @@
-import { numbered, roundEnd, type Content, type L } from '#lib/content.ts';
+import { numbered, roundEnd, type Content, type L, type Lang } from '#lib/content.ts';
+import { GROUPS, type TextKey } from '#lib/texts.ts';
 import type { AdminMessages } from './i18n.ts';
 
 export interface Check {
@@ -13,7 +14,7 @@ const missingEn = (v: L<string> | L<string[]>) => {
 };
 
 /** Things worth doing next, shown on the admin overview. */
-export function checks(content: Content, m: AdminMessages, now = Date.now()): Check[] {
+export function checks(content: Content, m: AdminMessages, lang: Lang, now = Date.now()): Check[] {
 	const list: Check[] = [];
 
 	for (const r of numbered(content.season)) {
@@ -29,11 +30,9 @@ export function checks(content: Content, m: AdminMessages, now = Date.now()): Ch
 	}
 
 	const untranslated: { text: string; href: string }[] = [];
-	const s = content.settings;
-	if ([s.heroEyebrow, s.heroLines, s.heroLead, s.seasonIntro, s.partnersIntro, s.tryouts, s.press].some(missingEn)) {
-		untranslated.push({ text: m.checks.settings, href: '/admin/settings' });
-	} else if (s.packages.some((p) => [p.tier, p.title, p.body].some(missingEn))) {
-		untranslated.push({ text: m.checks.settings, href: '/admin/settings' });
+	for (const g of GROUPS) {
+		const texts = g.fields.map((f) => content.texts[f.key as TextKey]).filter((v) => v !== undefined);
+		if (texts.some(missingEn)) untranslated.push({ text: m.checks.texts(g.label[lang]), href: `/admin/texts/${g.id}` });
 	}
 	for (const r of content.season) {
 		if ([r.venue, r.series].some(missingEn)) untranslated.push({ text: m.checks.round(r.location), href: `/admin/season/${r.id}` });

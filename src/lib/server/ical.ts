@@ -1,4 +1,4 @@
-import { numbered, tr, type Content, type Lang } from '#lib/content.ts';
+import { numbered, raceDays, tr, type Content, type Lang } from '#lib/content.ts';
 import { messages, pagePath } from '#lib/i18n.ts';
 
 // The race calendar as an iCalendar feed (RFC 5545). Each round is an all-day
@@ -64,9 +64,9 @@ export function calendar({ season }: Content, lang: Lang, origin: string) {
 			// The round id, so a round that moves to another date moves in people's calendars too
 			`UID:${r.id}@${host}`,
 			`DTSTAMP:${now}`,
-			// A race weekend is the start day and the one after, as in roundEnd
+			// All day, every day of the race weekend; the end date is the day after the last
 			`DTSTART;VALUE=DATE:${day(r.date)}`,
-			`DTEND;VALUE=DATE:${day(r.date, 2)}`,
+			`DTEND;VALUE=DATE:${day(r.date, raceDays(r))}`,
 			`SUMMARY:${text(t.event(r.location, r.round))}`,
 			`LOCATION:${text(`${tr(r.venue, lang)}, ${r.location}`)}`,
 			`DESCRIPTION:${text(notes.filter(Boolean).join('\n'))}`,

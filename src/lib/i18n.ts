@@ -1,5 +1,6 @@
 import { getContext, setContext } from 'svelte';
 import type { Lang } from '#lib/content.ts';
+import { textIn, linesIn, type Texts, type StringKey, type LinesKey } from '#lib/texts.ts';
 
 // Interface text for the public site. Portuguese is the main language and
 // English the fallback; content written in the admin falls back the same way
@@ -39,33 +40,15 @@ const en = {
 	},
 	hero: {
 		meet: 'Meet the drivers',
-		lightsOut: 'Lights out',
 		season: (y: number) => `${y} season`,
-		next: 'Next race',
-		when: (days: number) => (days <= 0 ? 'This weekend' : days === 1 ? 'Tomorrow' : `In ${days} days`),
-		done: 'Season complete',
-		soFar: (y: number) => `${y} so far`,
-		tally: (w: number, p: number) => `${plural(w, 'win', 'wins')}, ${plural(p, 'podium', 'podiums')}`,
-		from: (r: number, n: number) => `from ${r} of ${plural(n, 'round', 'rounds')}`,
-		drivers: (n: number) => plural(n, 'driver', 'drivers'),
-		classes: (c: number) => `across ${plural(c, 'class', 'classes')}`,
-		tower: (y: number) => `Drivers ${y}`,
-		towerSub: 'Wins this season',
-		towerMore: (n: number) => `${plural(n, 'more driver', 'more drivers')}`,
-		cols: { pos: 'Pos', driver: 'Driver', wins: 'Wins' },
 		lightsIn: 'Lights out in',
-		units: ['d', 'h', 'm', 's'],
-		scroll: 'Scroll'
+		round: (r: number, n: number) => `Round ${r} of ${n}`,
+		units: ['d', 'h', 'm', 's']
 	},
 	ticker: ['Kartódromo do Faial', 'Campeonato de Portugal de Karting', 'Madeira regional series', 'Rotax Max', 'X30', 'KZ2', 'From the Atlantic'],
 	hall: {
-		eyebrow: 'Hall of Fame',
-		title: ['Hall of', 'Fame'],
-		intro: 'Every season, every title and every driver who has raced in our colours.',
 		seasons: 'Seasons',
-		seasonsIntro: 'The years so far, newest first.',
 		drivers: 'Former drivers',
-		driversIntro: "They raced for K'ART. Most of them still race, now for other teams.",
 		enter: 'Enter the Hall of Fame',
 		totals: { seasons: 'Seasons', wins: 'Wins', podiums: 'Podiums', titles: 'Titles', alumni: 'Former drivers' },
 		stats: { rounds: 'Rounds', wins: 'Wins', podiums: 'Podiums', poles: 'Poles' },
@@ -74,15 +57,10 @@ const en = {
 		years: (a: number, b: number) => (a === b ? String(a) : `${a} → ${b}`),
 		withTeam: 'With the team',
 		now: 'Now racing in',
-		empty: 'The first chapter is still being written.',
 		metaTitle: "Hall of Fame, K'ART Racing Team",
 		metaDescription: "Every season, title and former driver of K'ART Racing Team, the karting team from Madeira."
 	},
 	team: {
-		eyebrow: 'The team',
-		title: ['A team', 'from Madeira'],
-		statement: 'A new team from an island with a single kart track.',
-		statementMuted: 'So we prepare harder, travel further and arrive at every round expecting to win.',
 		wins: (y: number) => `Wins in ${y}`,
 		winsNote: (r: number, n: number) => `From ${r} of ${plural(n, 'round', 'rounds')} so far`,
 		podiums: (y: number) => `Podiums in ${y}`,
@@ -96,26 +74,11 @@ const en = {
 		seasonPodiums: 'Rounds on the podium',
 		seasonAll: 'A team driver on the podium at every round so far',
 		seasonSome: 'Rounds with a team driver on the podium',
-		pillars: [
-			{
-				title: 'Workshop',
-				body: 'Chassis set-up, engine prep and data analysis all happen in-house, at our base at the Kartódromo do Faial. Nothing leaves the island until it is ready to win.'
-			},
-			{
-				title: 'Logistics',
-				body: 'Karts, tyres and tools cross the Atlantic by container for every mainland round. We plan weeks ahead so the drivers only have to think about lap time.'
-			},
-			{
-				title: 'Academy',
-				body: 'One ladder from Cadete to KZ2. Younger drivers share the awning with the older ones every weekend and learn what it takes, first hand.'
-			}
-		]
 	},
 	drivers: {
-		eyebrow: (y: number) => `On track in ${y}`,
-		title: ['The', 'drivers'],
-		intro: (n: number, c: number) =>
-			`${cap(spellEn(n))} ${n === 1 ? 'driver' : 'drivers'} across ${spellEn(c)} ${c === 1 ? 'class' : 'classes'}. Open a driver to see where they come from and what they race.`,
+		/** The automatic first sentence of the drivers page introduction */
+		count: (n: number, c: number) =>
+			`${cap(spellEn(n))} ${n === 1 ? 'driver' : 'drivers'} across ${spellEn(c)} ${c === 1 ? 'class' : 'classes'}.`,
 		open: (name: string, cat: string, n: number) => `${name}, ${cat}, number ${n}. View profile`,
 		close: 'Close',
 		country: 'Nationality',
@@ -127,13 +90,10 @@ const en = {
 		prev: 'Previous',
 		next: 'Next',
 		all: 'See the profiles',
-		empty: 'The drivers for the new season are announced soon.',
 		metaTitle: (y: number) => `Drivers ${y}, K'ART Racing Team`,
 		metaDescription: "The K'ART Racing Team drivers: classes, race numbers, nationalities and each driver's kart."
 	},
 	season: {
-		eyebrow: (y: number) => `Season ${y}`,
-		title: ['Calendar', '& results'],
 		soFar: (w: number, p: number, r: number) =>
 			`So far: ${plural(w, 'win', 'wins')} and ${plural(p, 'podium', 'podiums')} from ${plural(r, 'round', 'rounds')}.`,
 		notStarted: 'The season has not started yet.',
@@ -146,7 +106,6 @@ const en = {
 		pending: 'Result to follow',
 		upcoming: 'Upcoming',
 		all: 'Full calendar',
-		empty: 'The calendar for the new season is announced soon.',
 		metaTitle: (y: number) => `Season ${y}, K'ART Racing Team`,
 		metaDescription: "Race calendar and results of K'ART Racing Team, with a countdown to the next race."
 	},
@@ -162,26 +121,17 @@ const en = {
 		results: 'Results'
 	},
 	news: {
-		eyebrow: 'News',
-		title: ['From the', 'paddock'],
-		intro: 'Race reports, results and team news.',
 		all: 'All news',
 		read: 'Read the story',
-		empty: 'No news yet. Check back after the next race.',
 		draft: 'Preview. This post is a draft, so only people signed in to the admin can see it.',
 		scheduled: (date: string) =>
 			`Preview. This post appears on the site on ${date}. Until then, only people signed in to the admin can see it.`,
 		edit: 'Edit in the admin'
 	},
 	madeira: {
-		eyebrow: 'Home',
-		title: ['Built on', 'an island'],
-		intro: 'Madeira is a steep volcanic island in the middle of the Atlantic. Every mainland round means shipping the whole operation across the ocean, so nothing is left to chance.',
 		map: 'Contour map of Madeira with Faial and Pico Ruivo marked',
 		workshop: 'Kartódromo do Faial',
 		track: {
-			eyebrow: 'Home track',
-			place: 'Faial, Santana, on the north coast of Madeira. Our base, where we test and set up the karts all year.',
 			length: 'Lap length',
 			direction: 'Direction',
 			clockwise: 'Clockwise',
@@ -191,16 +141,8 @@ const en = {
 		},
 		peak: '1,862 m',
 		route: 'To Lisbon, 1,000 km',
-		facts: [
-			{ v: '57', u: 'km', l: 'From one end of the island to the other.' },
-			{ v: '1,862', u: 'm', l: 'Pico Ruivo, the highest point on the island.' },
-			{ v: '~1,000', u: 'km', l: 'Of open ocean to Lisbon. Every kart we race makes the crossing.' },
-			{ v: '12', u: 'months', l: 'Of mild Atlantic weather, so testing never stops for winter.' }
-		]
 	},
 	partners: {
-		eyebrow: 'Partnerships',
-		title: ['Your name', 'on the kart'],
 		positions: (n: number) =>
 			`Four positions on every kart, and ${spellEn(n)} ${n === 1 ? 'kart' : 'karts'} on the grid every weekend.`,
 		deck: 'Request the partner deck',
@@ -211,14 +153,11 @@ const en = {
 		metaDescription: "The four sponsorship positions on every K'ART Racing Team kart, and the partners already racing with us."
 	},
 	contact: {
-		eyebrow: 'Contact',
-		title: ["Let's go", 'racing.'],
 		drivers: 'Drivers',
 		press: 'Partners and press',
 		follow: 'Follow',
 		instagram: (h: string) => `Instagram, @${h}`,
 		direct: 'Or write to us',
-		band: "Racing with us, partnerships or press. Write to us and we'll get back to you.",
 		metaTitle: "Contact, K'ART Racing Team",
 		metaDescription: "Get in touch with K'ART Racing Team about racing with us, partnerships or press.",
 		form: {
@@ -276,33 +215,15 @@ const pt: Messages = {
 	},
 	hero: {
 		meet: 'Conheça os pilotos',
-		lightsOut: 'Luzes apagadas',
 		season: (y) => `Temporada ${y}`,
-		next: 'Próxima prova',
-		when: (days) => (days <= 0 ? 'Este fim de semana' : days === 1 ? 'Amanhã' : `Daqui a ${days} dias`),
-		done: 'Temporada concluída',
-		soFar: (y) => `${y} até agora`,
-		tally: (w, p) => `${plural(w, 'vitória', 'vitórias')}, ${plural(p, 'pódio', 'pódios')}`,
-		from: (r, n) => `em ${r} de ${plural(n, 'prova', 'provas')}`,
-		drivers: (n) => plural(n, 'piloto', 'pilotos'),
-		classes: (c) => `em ${plural(c, 'categoria', 'categorias')}`,
-		tower: (y) => `Pilotos ${y}`,
-		towerSub: 'Vitórias na temporada',
-		towerMore: (n) => `Mais ${plural(n, 'piloto', 'pilotos')}`,
-		cols: { pos: 'Pos', driver: 'Piloto', wins: 'Vit' },
 		lightsIn: 'Luzes apagam em',
-		units: ['d', 'h', 'm', 's'],
-		scroll: 'Deslizar'
+		round: (r, n) => `${r}.ª prova de ${n}`,
+		units: ['d', 'h', 'm', 's']
 	},
 	ticker: ['Kartódromo do Faial', 'Campeonato de Portugal de Karting', 'Regional da Madeira', 'Rotax Max', 'X30', 'KZ2', 'Do Atlântico'],
 	hall: {
-		eyebrow: 'Hall of Fame',
-		title: ['Hall of', 'Fame'],
-		intro: 'Todas as temporadas, todos os títulos e todos os pilotos que já correram com as nossas cores.',
 		seasons: 'Temporadas',
-		seasonsIntro: 'Os anos até agora, do mais recente para o mais antigo.',
 		drivers: 'Antigos pilotos',
-		driversIntro: "Correram pela K'ART. A maioria continua a correr, agora noutras equipas.",
 		enter: 'Ver o Hall of Fame',
 		totals: { seasons: 'Temporadas', wins: 'Vitórias', podiums: 'Pódios', titles: 'Títulos', alumni: 'Antigos pilotos' },
 		stats: { rounds: 'Provas', wins: 'Vitórias', podiums: 'Pódios', poles: 'Poles' },
@@ -311,15 +232,10 @@ const pt: Messages = {
 		years: (a, b) => (a === b ? String(a) : `${a} → ${b}`),
 		withTeam: 'Com a equipa',
 		now: 'Agora corre em',
-		empty: 'O primeiro capítulo ainda está a ser escrito.',
 		metaTitle: "Hall of Fame, K'ART Racing Team",
 		metaDescription: "Todas as temporadas, títulos e antigos pilotos da K'ART Racing Team, a equipa de karting da Madeira."
 	},
 	team: {
-		eyebrow: 'A equipa',
-		title: ['Uma equipa', 'da Madeira'],
-		statement: 'Uma equipa nova, de uma ilha com uma única pista de karting.',
-		statementMuted: 'Por isso preparamo-nos mais, viajamos mais longe e chegamos a cada prova para ganhar.',
 		wins: (y) => `Vitórias em ${y}`,
 		winsNote: (r, n) => `Em ${r} de ${plural(n, 'prova', 'provas')} até agora`,
 		podiums: (y) => `Pódios em ${y}`,
@@ -333,26 +249,10 @@ const pt: Messages = {
 		seasonPodiums: 'Provas com pódio',
 		seasonAll: 'Um piloto da equipa no pódio em todas as provas até agora',
 		seasonSome: 'Provas com um piloto da equipa no pódio',
-		pillars: [
-			{
-				title: 'Oficina',
-				body: 'A afinação dos chassis, a preparação dos motores e a análise de dados são feitas internamente, na nossa base no Kartódromo do Faial. Nada sai da ilha sem estar pronto para ganhar.'
-			},
-			{
-				title: 'Logística',
-				body: 'Karts, pneus e ferramentas atravessam o Atlântico em contentor para cada prova no continente. Planeamos com semanas de antecedência para que os pilotos só tenham de pensar no tempo por volta.'
-			},
-			{
-				title: 'Academia',
-				body: 'Um percurso único, de Cadete a KZ2. Os mais novos partilham a tenda com os mais velhos em cada fim de semana e aprendem, na primeira pessoa, o que é preciso para ganhar.'
-			}
-		]
 	},
 	drivers: {
-		eyebrow: (y) => `Na pista em ${y}`,
-		title: ['Os', 'pilotos'],
-		intro: (n, c) =>
-			`${cap(spellPt(n))} ${n === 1 ? 'piloto' : 'pilotos'} em ${spellPt(c, true)} ${c === 1 ? 'categoria' : 'categorias'}. Abra o perfil de cada piloto para ver de onde vem e com que kart corre.`,
+		count: (n, c) =>
+			`${cap(spellPt(n))} ${n === 1 ? 'piloto' : 'pilotos'} em ${spellPt(c, true)} ${c === 1 ? 'categoria' : 'categorias'}.`,
 		open: (name, cat, n) => `${name}, ${cat}, número ${n}. Ver perfil`,
 		close: 'Fechar',
 		country: 'Nacionalidade',
@@ -364,13 +264,10 @@ const pt: Messages = {
 		prev: 'Anterior',
 		next: 'Seguinte',
 		all: 'Ver os perfis',
-		empty: 'Os pilotos da nova temporada são anunciados em breve.',
 		metaTitle: (y) => `Pilotos ${y}, K'ART Racing Team`,
 		metaDescription: "Os pilotos da K'ART Racing Team: categorias, números, nacionalidades e o kart de cada piloto."
 	},
 	season: {
-		eyebrow: (y) => `Temporada ${y}`,
-		title: ['Calendário', 'e resultados'],
 		soFar: (w, p, r) =>
 			`Até agora: ${plural(w, 'vitória', 'vitórias')} e ${plural(p, 'pódio', 'pódios')} em ${plural(r, 'prova', 'provas')}.`,
 		notStarted: 'A temporada ainda não começou.',
@@ -383,7 +280,6 @@ const pt: Messages = {
 		pending: 'Resultado em breve',
 		upcoming: 'Por disputar',
 		all: 'Calendário completo',
-		empty: 'O calendário da nova temporada é anunciado em breve.',
 		metaTitle: (y) => `Temporada ${y}, K'ART Racing Team`,
 		metaDescription: "Calendário de provas e resultados da K'ART Racing Team, com contagem decrescente para a próxima corrida."
 	},
@@ -399,26 +295,17 @@ const pt: Messages = {
 		results: 'Resultados'
 	},
 	news: {
-		eyebrow: 'Notícias',
-		title: ['Direto do', 'paddock'],
-		intro: 'Crónicas de corrida, resultados e novidades da equipa.',
 		all: 'Todas as notícias',
 		read: 'Ler a notícia',
-		empty: 'Ainda não há notícias. Volte depois da próxima prova.',
 		draft: 'Pré-visualização. Esta notícia é um rascunho, por isso só é visível para quem tem sessão iniciada no admin.',
 		scheduled: (date) =>
 			`Pré-visualização. Esta notícia aparece no site a ${date}. Até lá, só é visível para quem tem sessão iniciada no admin.`,
 		edit: 'Editar no admin'
 	},
 	madeira: {
-		eyebrow: 'Casa',
-		title: ['Feitos', 'numa ilha'],
-		intro: 'A Madeira é uma ilha vulcânica e escarpada no meio do Atlântico. Cada prova no continente obriga a enviar toda a operação através do oceano, por isso nada fica ao acaso.',
 		map: 'Mapa topográfico da Madeira com o Faial e o Pico Ruivo assinalados',
 		workshop: 'Kartódromo do Faial',
 		track: {
-			eyebrow: 'A pista da casa',
-			place: 'Faial, Santana, na costa norte da Madeira. A nossa base, onde treinamos e afinamos os karts durante todo o ano.',
 			length: 'Perímetro',
 			direction: 'Sentido',
 			clockwise: 'Horário',
@@ -428,16 +315,8 @@ const pt: Messages = {
 		},
 		peak: '1862 m',
 		route: 'Para Lisboa, 1000 km',
-		facts: [
-			{ v: '57', u: 'km', l: 'De uma ponta à outra da ilha.' },
-			{ v: '1862', u: 'm', l: 'Pico Ruivo, o ponto mais alto da ilha.' },
-			{ v: '~1000', u: 'km', l: 'De mar aberto até Lisboa. Todos os nossos karts fazem a travessia.' },
-			{ v: '12', u: 'meses', l: 'De clima atlântico ameno, por isso os testes não param no inverno.' }
-		]
 	},
 	partners: {
-		eyebrow: 'Patrocínios',
-		title: ['O seu nome', 'no kart'],
 		positions: (n) =>
 			`Quatro posições em cada kart, e ${spellPt(n)} ${n === 1 ? 'kart' : 'karts'} na grelha em cada fim de semana.`,
 		deck: 'Pedir o dossiê de patrocínio',
@@ -448,14 +327,11 @@ const pt: Messages = {
 		metaDescription: "As quatro posições de patrocínio em cada kart da K'ART Racing Team e os parceiros que já correm connosco."
 	},
 	contact: {
-		eyebrow: 'Contacto',
-		title: ['Vamos', 'correr.'],
 		drivers: 'Pilotos',
 		press: 'Parceiros e imprensa',
 		follow: 'Siga-nos',
 		instagram: (h) => `Instagram, @${h}`,
 		direct: 'Ou escreva-nos',
-		band: 'Correr connosco, parcerias ou imprensa. Escreva-nos e respondemos em breve.',
 		metaTitle: "Contacto, K'ART Racing Team",
 		metaDescription: "Fale com a K'ART Racing Team sobre correr connosco, patrocínios ou imprensa.",
 		form: {
@@ -493,19 +369,26 @@ export const messages: Record<Lang, Messages> = { pt, en };
 
 export interface I18n {
 	readonly lang: Lang;
+	/** Interface text: menus, buttons, labels */
 	readonly t: Messages;
+	/** A text written in the admin's Site texts (lib/texts.ts) */
+	text(key: StringKey): string;
+	/** A title from the Site texts, one entry per line */
+	lines(key: LinesKey): string[];
 }
 
 const KEY = Symbol('i18n');
 
-export const setI18n = (getLang: () => Lang) =>
+export const setI18n = (getLang: () => Lang, getTexts: () => Texts) =>
 	setContext<I18n>(KEY, {
 		get lang() {
 			return getLang();
 		},
 		get t() {
 			return messages[getLang()];
-		}
+		},
+		text: (key) => textIn(getTexts(), key, getLang()),
+		lines: (key) => linesIn(getTexts(), key, getLang())
 	});
 
 export const useI18n = () => getContext<I18n>(KEY);

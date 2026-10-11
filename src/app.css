@@ -23,7 +23,7 @@
 
 	/* Type scale. Sizes on the site come from these few steps, so a heading and
 	   the text under it stay in proportion. Sizes at 1440px wide in brackets. */
-	--t-hero: clamp(2.75rem, 5vw, 5.75rem); /* the home page headline (72px) */
+	--t-hero: clamp(2.75rem, 6.2vw, 7rem); /* the home page headline (89px) */
 	--t-page: clamp(2.5rem, 4.4vw, 4.25rem); /* a page's title (63px) */
 	--t-section: clamp(1.85rem, 2.9vw, 2.75rem); /* a section's title or a statement (42px) */
 	--t-stat: clamp(3rem, 5.4vw, 5rem); /* headline numbers (78px) */

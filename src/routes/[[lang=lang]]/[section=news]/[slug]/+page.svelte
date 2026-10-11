@@ -52,7 +52,7 @@
 
 	{#if data.others.length}
 		<aside class="wrap more">
-			<p class="eyebrow">{i18n.t.news.eyebrow}</p>
+			<p class="eyebrow">{i18n.text('news.eyebrow')}</p>
 			<ul>
 				{#each data.others as post (post.id)}
 					<li><PostCard {post} /></li>

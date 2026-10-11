@@ -20,6 +20,7 @@ const en = {
 		hall: 'Hall of Fame',
 		news: 'News',
 		partners: 'Partners',
+		texts: 'Site texts',
 		settings: 'Site settings',
 		history: 'History',
 		account: 'My account',
@@ -143,7 +144,7 @@ const en = {
 		results: (round: number, location: string) => `Round ${round}, ${location}, has finished. Add the results.`,
 		photo: (name: string) => `${name} has no photo yet.`,
 		english: (what: string) => `${what}: no English version yet, so the English site shows the Portuguese text.`,
-		settings: 'Site settings',
+		texts: (page: string) => `Site texts, ${page} page`,
 		round: (location: string) => `${location} round`,
 		post: 'A news post'
 	},
@@ -205,6 +206,9 @@ const en = {
 		weekend: 'Race weekend',
 		weekendDesc: 'The location is shown large on the calendar, with the circuit underneath.',
 		date: 'First day of the weekend',
+		days: 'Length',
+		daysOption: (n: number): string => (n === 1 ? '1 day' : `${n} days`),
+		daysHint: 'Most race weekends are two days, Saturday and Sunday.',
 		location: 'Location',
 		locationHint: 'Town or region, for example Braga or Madeira',
 		circuit: 'Circuit',
@@ -372,7 +376,7 @@ const en = {
 		removed: 'Partner removed'
 	},
 	settings: {
-		lede: 'Contact details and the main texts on the homepage.',
+		lede: 'Contact details and the season year. The writing on each page is in Site texts.',
 		contact: 'Contact',
 		contactDesc: 'Used on the contact page, the home page, the footer and the partner deck button.',
 		email: 'Email',
@@ -380,32 +384,25 @@ const en = {
 		instagramHint: 'The handle, without the @',
 		location: 'Base',
 		locationHint: 'Shown in the footer',
-		hero: 'Hero',
-		heroDesc: 'The first thing visitors see.',
-		eyebrow: 'Small line above the title',
-		heroLines: 'Title',
-		heroLinesHint: 'One line per row, up to 16 characters each. The last line is highlighted in the team blue.',
-		heroLead: 'Introduction',
 		season: 'Season',
 		seasonYear: 'Season year',
 		seasonYearHint: 'Used in headings like “Temporada 2026”',
-		seasonIntro: 'Calendar introduction',
-		seasonIntroHint: 'The wins and podiums so far are added after this automatically.',
-		sponsorship: 'Sponsorship',
-		sponsorshipDesc:
-			'The pitch on the partnerships page and the home page, and the four positions on the kart. The number of karts is added automatically from the number of drivers.',
-		partnersIntro: 'Introduction',
-		zones: { pods: 'Sidepods', nassau: 'Nassau panel', nose: 'Front fairing', bumper: 'Rear bumper' },
-		pkgName: 'Name',
-		tier: 'Tier',
-		pkgBody: 'Description',
-		texts: 'Contact texts',
-		tryouts: 'For drivers',
-		press: 'For partners and press',
+		textsNote: 'Looking for the titles and texts on the pages? They are all in',
 		saveBtn: 'Save settings',
 		saved: 'Settings saved',
 		historyNote: 'Every change is kept. To see who changed what, or to undo something, go to',
 		historyLink: 'History'
+	},
+	texts: {
+		lede: 'Everything written on the site, page by page. Pick a page to change its titles and texts, in Portuguese and English.',
+		auto: 'Numbers, dates and counts, like the wins or how many drivers there are, are filled in automatically. Menus, buttons and form labels are part of the design and stay as they are.',
+		count: (n: number) => plural(n, 'text', 'texts'),
+		edit: 'Edit',
+		view: 'See the page',
+		noEnglish: 'Some have no English yet',
+		desc: 'Write the Portuguese first; English is optional, and the English site shows the Portuguese where it is empty.',
+		saveBtn: 'Save texts',
+		saved: 'Texts saved'
 	},
 	history: {
 		lede: 'Every change to the site, who made it and when. To undo something, go back to how the site was before it. Nothing is lost: going back is recorded too, so it can be undone as well.',
@@ -422,7 +419,8 @@ const en = {
 			posts: 'the post',
 			alumni: 'the former driver',
 			history: 'the season',
-			settings: 'the site settings'
+			settings: 'the site settings',
+			texts: 'the site texts'
 		} satisfies Record<Kind, string>,
 		moved: {
 			pilots: 'changed the order of the drivers',
@@ -431,7 +429,8 @@ const en = {
 			posts: 'changed the order of the posts',
 			alumni: 'changed the order of the former drivers',
 			history: 'changed the order of the seasons',
-			settings: 'changed the site settings'
+			settings: 'changed the site settings',
+			texts: 'changed the site texts'
 		} satisfies Record<Kind, string>,
 		times: (n: number) => (n > 1 ? `${n} times` : ''),
 		changed: (list: string) => `Changed: ${list}`,
@@ -480,7 +479,7 @@ const en = {
 			best: 'best result',
 			quote: 'quote'
 		},
-		season: { location: 'location', venue: 'circuit', date: 'date', series: 'championship', results: 'results' },
+		season: { location: 'location', venue: 'circuit', date: 'date', days: 'length', series: 'championship', results: 'results' },
 		partners: { name: 'name', url: 'website', logo: 'logo', tone: 'tile colour' },
 		posts: { slug: 'page address', title: 'title', date: 'date', excerpt: 'summary', body: 'text', cover: 'cover' },
 		alumni: {
@@ -510,7 +509,9 @@ const en = {
 			packages: 'sponsorship packages',
 			tryouts: 'text for drivers',
 			press: 'text for partners and press'
-		}
+		},
+		// Site texts are labelled from lib/texts.ts
+		texts: {}
 	} satisfies Record<Kind, Record<string, string>> as Record<Kind, Record<string, string>>,
 	account: {
 		title: 'My account',
@@ -606,6 +607,7 @@ const pt: AdminMessages = {
 		hall: 'Hall of Fame',
 		news: 'Notícias',
 		partners: 'Parceiros',
+		texts: 'Textos do site',
 		settings: 'Definições do site',
 		history: 'Histórico',
 		account: 'A minha conta',
@@ -736,7 +738,7 @@ const pt: AdminMessages = {
 		results: (round, location) => `A prova ${round}, ${location}, já terminou. Adicione os resultados.`,
 		photo: (name) => `${name} ainda não tem fotografia.`,
 		english: (what) => `${what}: ainda sem versão em inglês, por isso o site em inglês mostra o texto em português.`,
-		settings: 'Definições do site',
+		texts: (page) => `Textos do site, página ${page}`,
 		round: (location) => `Prova de ${location}`,
 		post: 'Uma notícia'
 	},
@@ -800,6 +802,9 @@ const pt: AdminMessages = {
 		weekend: 'Fim de semana de corrida',
 		weekendDesc: 'O local aparece em grande no calendário, com o circuito por baixo.',
 		date: 'Primeiro dia do fim de semana',
+		days: 'Duração',
+		daysOption: (n) => (n === 1 ? '1 dia' : `${n} dias`),
+		daysHint: 'A maioria das provas dura dois dias, sábado e domingo.',
 		location: 'Local',
 		locationHint: 'Cidade ou região, por exemplo Braga ou Madeira',
 		circuit: 'Circuito',
@@ -968,7 +973,7 @@ const pt: AdminMessages = {
 		removed: 'Parceiro removido'
 	},
 	settings: {
-		lede: 'Contactos e os principais textos da página inicial.',
+		lede: 'Contactos e o ano da temporada. Os textos de cada página estão em Textos do site.',
 		contact: 'Contactos',
 		contactDesc: 'Usados na página de contacto, na página inicial, no rodapé e no botão do dossiê de patrocínio.',
 		email: 'Email',
@@ -976,32 +981,25 @@ const pt: AdminMessages = {
 		instagramHint: 'O nome da conta, sem o @',
 		location: 'Base',
 		locationHint: 'Aparece no rodapé',
-		hero: 'Topo da página',
-		heroDesc: 'A primeira coisa que os visitantes veem.',
-		eyebrow: 'Linha pequena por cima do título',
-		heroLines: 'Título',
-		heroLinesHint: 'Uma linha do título por linha, até 16 caracteres cada. A última aparece no azul da equipa.',
-		heroLead: 'Introdução',
 		season: 'Temporada',
 		seasonYear: 'Ano da temporada',
 		seasonYearHint: 'Usado em títulos como “Temporada 2026”',
-		seasonIntro: 'Introdução do calendário',
-		seasonIntroHint: 'As vitórias e os pódios até agora são acrescentados automaticamente a seguir.',
-		sponsorship: 'Patrocínio',
-		sponsorshipDesc:
-			'A apresentação na página de patrocínios e na página inicial, e as quatro posições no kart. O número de karts é acrescentado automaticamente a partir do número de pilotos.',
-		partnersIntro: 'Introdução',
-		zones: { pods: 'Pontões laterais', nassau: 'Painel Nassau', nose: 'Carenagem frontal', bumper: 'Para-choques traseiro' },
-		pkgName: 'Nome',
-		tier: 'Nível',
-		pkgBody: 'Descrição',
-		texts: 'Textos de contacto',
-		tryouts: 'Para pilotos',
-		press: 'Para parceiros e imprensa',
+		textsNote: 'Procura os títulos e textos das páginas? Estão todos em',
 		saveBtn: 'Guardar definições',
 		saved: 'Definições guardadas',
 		historyNote: 'Todas as alterações ficam guardadas. Para ver quem alterou o quê, ou desfazer alguma coisa, vá ao',
 		historyLink: 'Histórico'
+	},
+	texts: {
+		lede: 'Tudo o que está escrito no site, página a página. Escolha uma página para mudar os títulos e os textos, em português e em inglês.',
+		auto: 'Os números, as datas e as contagens, como as vitórias ou quantos pilotos há, são preenchidos automaticamente. Os menus, os botões e os campos dos formulários fazem parte do design e ficam como estão.',
+		count: (n) => plural(n, 'texto', 'textos'),
+		edit: 'Editar',
+		view: 'Ver a página',
+		noEnglish: 'Alguns ainda sem inglês',
+		desc: 'Escreva primeiro em português; o inglês é opcional, e o site em inglês mostra o português onde estiver vazio.',
+		saveBtn: 'Guardar textos',
+		saved: 'Textos guardados'
 	},
 	history: {
 		lede: 'Todas as alterações ao site, quem as fez e quando. Para desfazer alguma coisa, volte ao estado do site antes dela. Nada se perde: voltar atrás também fica registado, por isso também pode ser desfeito.',
@@ -1018,7 +1016,8 @@ const pt: AdminMessages = {
 			posts: 'a notícia',
 			alumni: 'o antigo piloto',
 			history: 'a temporada',
-			settings: 'as definições do site'
+			settings: 'as definições do site',
+			texts: 'os textos do site'
 		},
 		moved: {
 			pilots: 'mudou a ordem dos pilotos',
@@ -1027,7 +1026,8 @@ const pt: AdminMessages = {
 			posts: 'mudou a ordem das notícias',
 			alumni: 'mudou a ordem dos antigos pilotos',
 			history: 'mudou a ordem das temporadas',
-			settings: 'alterou as definições do site'
+			settings: 'alterou as definições do site',
+			texts: 'alterou os textos do site'
 		},
 		times: (n) => (n > 1 ? `${n} vezes` : ''),
 		changed: (list) => `Alterado: ${list}`,
@@ -1077,7 +1077,7 @@ const pt: AdminMessages = {
 			best: 'melhor resultado',
 			quote: 'citação'
 		},
-		season: { location: 'local', venue: 'circuito', date: 'data', series: 'campeonato', results: 'resultados' },
+		season: { location: 'local', venue: 'circuito', date: 'data', days: 'duração', series: 'campeonato', results: 'resultados' },
 		partners: { name: 'nome', url: 'site', logo: 'logótipo', tone: 'cor do fundo' },
 		posts: { slug: 'endereço da página', title: 'título', date: 'data', excerpt: 'resumo', body: 'texto', cover: 'capa' },
 		alumni: {
@@ -1107,7 +1107,8 @@ const pt: AdminMessages = {
 			packages: 'pacotes de patrocínio',
 			tryouts: 'texto para pilotos',
 			press: 'texto para parceiros e imprensa'
-		}
+		},
+		texts: {}
 	},
 	account: {
 		title: 'A minha conta',

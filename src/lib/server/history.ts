@@ -1,6 +1,7 @@
 import type { Content } from '#lib/content.ts';
 import type { Actor, Change, LogEntry } from '#lib/admin/changes.ts';
 import { getContent, listBackups } from './store.ts';
+import { groupOf } from '#lib/texts.ts';
 import { readLog } from './log.ts';
 import { getUsers } from './auth.ts';
 
@@ -42,6 +43,10 @@ function link(c: Change, content: Content): string | undefined {
 			return has(content.history) ? `/admin/hall/seasons/${c.id}` : undefined;
 		case 'settings':
 			return '/admin/settings';
+		case 'texts': {
+			const g = groupOf(c.fields?.[0] ?? '');
+			return g ? `/admin/texts/${g}` : '/admin/texts';
+		}
 	}
 }
 
