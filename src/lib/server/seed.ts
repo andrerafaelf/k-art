@@ -18,12 +18,7 @@ const pilots: Pilot[] = [
 		chassis: 'Tony Kart Racer 401',
 		engine: 'IAME X30',
 		accent: 'lime',
-		record: { starts: 64, wins: 11, podiums: 27, poles: 9 },
-		best: same('P2, Campeonato de Portugal 2025'),
-		quote: {
-			pt: 'Aprende-se a travar tarde quando a ilha só tem uma pista.',
-			en: 'You learn to brake late when the island only has one track.'
-		}
+		country: 'pt'
 	},
 	{
 		id: 'beatriz-gouveia',
@@ -37,12 +32,7 @@ const pilots: Pilot[] = [
 		chassis: 'Kosmic Mercury R',
 		engine: 'IAME X30 Junior',
 		accent: 'cyan',
-		record: { starts: 41, wins: 6, podiums: 15, poles: 5 },
-		best: { pt: 'P1, Regional da Madeira 2025', en: 'P1, Madeira Regional 2025' },
-		quote: {
-			pt: 'Primeiro voltas limpas. As rápidas vêm depois.',
-			en: 'Clean laps first. The fast ones come after.'
-		}
+		country: 'pt'
 	},
 	{
 		id: 'rodrigo-abreu',
@@ -56,9 +46,7 @@ const pilots: Pilot[] = [
 		chassis: 'CRG Road Rebel',
 		engine: 'TM KZ-R2',
 		accent: 'lime',
-		record: { starts: 97, wins: 18, podiums: 39, poles: 14 },
-		best: same('P3, Taça de Portugal KZ2 2024'),
-		quote: { pt: 'Seis mudanças, sem espaço para dúvidas.', en: 'Six gears, no room for doubt.' }
+		country: 'pt'
 	},
 	{
 		id: 'duarte-nobrega',
@@ -72,9 +60,7 @@ const pilots: Pilot[] = [
 		chassis: 'Parolin Mini',
 		engine: 'IAME Swift',
 		accent: 'cyan',
-		record: { starts: 22, wins: 3, podiums: 9, poles: 2 },
-		best: { pt: 'P1, Regional da Madeira 2026, 2.ª prova', en: 'P1, Madeira Regional 2026, round 2' },
-		quote: { pt: 'Quero ser mais rápido do que o meu pai.', en: 'I want to go faster than my dad.' }
+		country: 'pt'
 	},
 	{
 		id: 'leonor-teixeira',
@@ -88,9 +74,7 @@ const pilots: Pilot[] = [
 		chassis: 'Birel ART AM29',
 		engine: 'IAME X30 Junior',
 		accent: 'lime',
-		record: { starts: 35, wins: 4, podiums: 13, poles: 3 },
-		best: { pt: 'P2, Campeonato de Portugal 2026, 3.ª prova', en: 'P2, Campeonato de Portugal 2026, round 3' },
-		quote: { pt: 'Os dias de chuva são os meus preferidos.', en: 'Rain days are my favourite days.' }
+		country: 'pt'
 	},
 	{
 		id: 'martim-jardim',
@@ -104,12 +88,7 @@ const pilots: Pilot[] = [
 		chassis: 'Sodi Sigma',
 		engine: 'Rotax 125 Max EVO',
 		accent: 'cyan',
-		record: { starts: 58, wins: 9, podiums: 22, poles: 6 },
-		best: same('P4, Rotax Max Challenge Portugal 2025'),
-		quote: {
-			pt: 'Uma ultrapassagem planeia-se três curvas antes.',
-			en: 'Overtakes are planned three corners early.'
-		}
+		country: 'pt'
 	}
 ];
 

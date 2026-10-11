@@ -58,8 +58,9 @@ admin is in European Portuguese by default; each person can switch it to English
 
 - **Overview**: the next race, season and career totals, and a to-do list (rounds that need
   results, drivers without photos, text with no English version yet).
-- **Drivers**: add, edit, reorder and remove. Career record, profile, quote, best result and photo.
-  The career records are added together for the team stats on the homepage.
+- **Drivers**: add, edit, reorder and remove. Name, number, class, nationality (a searchable list
+  of every country's flag, Portugal by default), profile and photo. The team numbers and the timing
+  tower on the homepage count this season's results from the calendar.
 - **Calendar & results**: add rounds; they are numbered by date automatically. After a race weekend,
   add each team driver's finishing position. Wins and podiums on the site are counted from these.
 - **Hall of Fame**: past seasons (headline, story, numbers, titles, line-up) and former drivers
@@ -119,6 +120,8 @@ Images:
   kerb, the page you are on); lime marks what is happening (buttons, the next race, wins, focus).
 - Type sizes come from the scale at the top of `src/app.css` (`--t-hero`, `--t-page`,
   `--t-section` and so on), so headings and the text under them stay in proportion.
+- `src/lib/flags.ts`: country flags from the `flag-icons` package (MIT), one file per flag in the
+  build so pages only download the ones they show. Country names come from `Intl.DisplayNames`.
 - `src/lib/madeira.ts`: the map of Madeira, generated from the OpenStreetMap coastline (ODbL)
   and NASA SRTM elevation, with contour lines every 150 m.
 - `src/lib/faial.ts`: the Kartódromo do Faial track map, drawn from the OpenStreetMap survey of the

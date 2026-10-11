@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
-import type { Content } from '#lib/content.ts';
+import type { Content, Pilot } from '#lib/content.ts';
+import { DEFAULT_COUNTRY } from '#lib/flags.ts';
 import { diff } from '#lib/admin/changes.ts';
 import { seed } from './seed.ts';
 import { dataDir, writeAtomic } from './files.ts';
@@ -40,7 +41,7 @@ function normalize(raw: Partial<Content>): Content {
 	const base = seed();
 	return {
 		settings: { ...base.settings, ...raw.settings },
-		pilots: raw.pilots ?? [],
+		pilots: (raw.pilots ?? []).map(driver),
 		season: raw.season ?? [],
 		partners: raw.partners ?? [],
 		posts: raw.posts ?? [],
@@ -48,6 +49,16 @@ function normalize(raw: Partial<Content>): Content {
 		history: raw.history ?? base.history,
 		updatedAt: raw.updatedAt ?? base.updatedAt
 	};
+}
+
+/**
+ * Drivers used to carry a hand-entered career record, a best result and a
+ * quote; they were dropped in October 2026 and are left out when an older file
+ * or backup is read. Drivers from before nationalities were added are Portuguese.
+ */
+function driver(raw: Pilot): Pilot {
+	const { record: _record, best: _best, quote: _quote, ...pilot } = raw as Pilot & Record<string, unknown>;
+	return { ...pilot, country: pilot.country || DEFAULT_COUNTRY };
 }
 
 const write = (content: Content) => writeAtomic(file, JSON.stringify(content, null, '\t'));

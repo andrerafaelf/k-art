@@ -126,8 +126,9 @@ const en = {
 		podiums: 'podiums',
 		published: 'published',
 		fromRounds: (r: number, n: number) => `From ${r} of ${n} rounds, counted from the results you enter`,
-		career: 'Team career record',
-		careerNote: "Totals of every driver's record, shown in the team section",
+		lineUp: 'Team',
+		drivers: (n: number): string => (n === 1 ? 'driver' : 'drivers'),
+		classes: (c: number) => `Across ${plural(c, 'class', 'classes')}`,
 		news: 'News',
 		drafts: (n: number) => plural(n, 'draft', 'drafts'),
 		scheduled: (n: number) => `${n} scheduled`,
@@ -147,17 +148,16 @@ const en = {
 		post: 'A news post'
 	},
 	drivers: {
-		lede: 'The line-up, in the order it appears on the site. Use the arrows to change the order. Career records are added together for the team stats on the homepage.',
+		lede: 'The drivers, in the order they appear on the site. Use the arrows to change the order.',
 		add: 'Add driver',
-		meta: (category: string, age: number, wins: number, podiums: number, poles: number) =>
-			`${category}, ${age} years old, ${plural(wins, 'win', 'wins')}, ${plural(podiums, 'podium', 'podiums')}, ${plural(poles, 'pole', 'poles')}`,
+		meta: (category: string, age: number, country: string) => `${category}, ${age} years old, ${country}`,
 		empty: 'No drivers yet. The Drivers page stays out of the site menu until you add one.',
 		addFirst: 'Add the first driver'
 	},
 	driver: {
 		new: 'New driver',
 		card: 'Driver',
-		cardDesc: 'Name, race number and class, as shown on the driver card.',
+		cardDesc: 'Name, race number, class and nationality, as shown on the driver card.',
 		category: 'Class',
 		categoryHint: 'For example Cadete, Júnior X30 or KZ2',
 		profile: 'Profile',
@@ -166,27 +166,23 @@ const en = {
 		since: 'Racing since',
 		chassis: 'Chassis',
 		engine: 'Engine',
-		record: 'Career record',
-		recordDesc:
-			"Totals for the driver's whole career, including results from before joining the team. These are added together for the team stats on the homepage. Season results are entered separately, in the calendar.",
-		words: 'Words',
-		wordsDesc: "Shown in the driver's profile. Write the Portuguese first; English is optional.",
-		best: 'Best result',
-		quote: 'Quote',
+		country: 'Nationality',
+		countryChange: 'Change',
+		countrySearch: 'Search for a country',
+		countrySearchHint: 'Type a few letters, in Portuguese or English',
+		countryNone: 'No country matches that search',
 		photoDesc: 'A portrait, ideally upright and at least 1200 pixels tall. It replaces the big number on the driver card.',
 		create: 'Add driver',
 		retire: 'Move to the Hall of Fame',
-		retireDesc: 'For drivers leaving the team. Their number, photo and record go with them, and you can edit the details after.',
+		retireDesc: "For drivers leaving the team. Their number, photo and this season's results go with them, and you can edit the details after.",
 		retireBtn: (first: string) => `Move ${first}`,
 		retireConfirm: (name: string) =>
-			`Move ${name} to the Hall of Fame? They leave the line-up and appear among the former drivers.`,
+			`Move ${name} to the Hall of Fame? They leave the current team and appear among the former drivers.`,
 		remove: 'Remove driver',
 		removeDesc: 'Takes them off the site. Results they scored stay in the calendar under their name.',
 		removeBtn: (first: string) => `Remove ${first}`,
 		removeConfirm: (name: string) => `Remove ${name} from the team? Their past results stay in the calendar.`,
 		numberTaken: (n: number, name: string) => `Number ${n} is already used by ${name}`,
-		startsPodiums: 'Can’t be lower than podiums',
-		startsPoles: 'Can’t be lower than poles',
 		saved: 'Driver saved',
 		added: 'Driver added',
 		removed: 'Driver removed',
@@ -279,7 +275,7 @@ const en = {
 	archive: {
 		title: (y: number) => `Season ${y}`,
 		fromCalendar:
-			"Rounds, wins, podiums and the line-up are filled in from this year's calendar and drivers. Add the poles, a headline and any titles, then save.",
+			"Rounds, wins, podiums and drivers are filled in from this year's calendar and team. Add the poles, a headline and any titles, then save.",
 		season: 'The season',
 		year: 'Year',
 		headline: 'Headline',
@@ -287,11 +283,11 @@ const en = {
 		numbers: 'Numbers',
 		numbersDesc: 'Team totals for the year, all drivers together.',
 		rounds: 'Rounds',
-		titlesLineup: 'Titles and line-up',
+		titlesLineup: 'Titles and drivers',
 		titles: 'Titles and highlights',
 		titlesHint:
 			'One per line, for example: Beatriz Gouveia, Campeã Regional da Madeira, Júnior X30. Each line counts as a title on the site.',
-		lineup: 'Line-up',
+		lineup: 'Drivers',
 		lineupHint: 'Surnames, separated by commas',
 		create: 'Add to the Hall of Fame',
 		del: 'Remove season',
@@ -397,7 +393,7 @@ const en = {
 		seasonIntroHint: 'The wins and podiums so far are added after this automatically.',
 		sponsorship: 'Sponsorship',
 		sponsorshipDesc:
-			'The pitch on the partnerships page and the home page, and the four positions on the kart. The number of karts is added automatically from the line-up.',
+			'The pitch on the partnerships page and the home page, and the four positions on the kart. The number of karts is added automatically from the number of drivers.',
 		partnersIntro: 'Introduction',
 		zones: { pods: 'Sidepods', nassau: 'Nassau panel', nose: 'Front fairing', bumper: 'Rear bumper' },
 		pkgName: 'Name',
@@ -478,6 +474,8 @@ const en = {
 			engine: 'engine',
 			accent: 'card colour',
 			photo: 'photo',
+			country: 'nationality',
+			// Fields drivers no longer have, for older history entries
 			record: 'career record',
 			best: 'best result',
 			quote: 'quote'
@@ -498,7 +496,7 @@ const en = {
 			titles: 'titles',
 			now: 'where they race now'
 		},
-		history: { year: 'year', headline: 'headline', summary: 'story', stats: 'numbers', titles: 'titles', lineup: 'line-up' },
+		history: { year: 'year', headline: 'headline', summary: 'story', stats: 'numbers', titles: 'titles', lineup: 'drivers' },
 		settings: {
 			seasonYear: 'season year',
 			email: 'email',
@@ -721,8 +719,9 @@ const pt: AdminMessages = {
 		podiums: 'pódios',
 		published: 'publicadas',
 		fromRounds: (r, n) => `Em ${r} de ${n} provas, contadas a partir dos resultados que introduz`,
-		career: 'Recorde de carreira da equipa',
-		careerNote: 'Soma do recorde de todos os pilotos, mostrada na secção da equipa',
+		lineUp: 'Equipa',
+		drivers: (n) => (n === 1 ? 'piloto' : 'pilotos'),
+		classes: (c) => `Em ${plural(c, 'categoria', 'categorias')}`,
 		news: 'Notícias',
 		drafts: (n) => plural(n, 'rascunho', 'rascunhos'),
 		scheduled: (n) => plural(n, 'agendada', 'agendadas'),
@@ -742,17 +741,16 @@ const pt: AdminMessages = {
 		post: 'Uma notícia'
 	},
 	drivers: {
-		lede: 'O plantel, pela ordem em que aparece no site. Use as setas para mudar a ordem. Os recordes de carreira são somados nas estatísticas da equipa na página inicial.',
+		lede: 'Os pilotos, pela ordem em que aparecem no site. Use as setas para mudar a ordem.',
 		add: 'Adicionar piloto',
-		meta: (category, age, wins, podiums, poles) =>
-			`${category}, ${age} anos, ${plural(wins, 'vitória', 'vitórias')}, ${plural(podiums, 'pódio', 'pódios')}, ${plural(poles, 'pole', 'poles')}`,
+		meta: (category, age, country) => `${category}, ${age} anos, ${country}`,
 		empty: 'Ainda não há pilotos. A página Pilotos fica fora do menu do site até adicionar o primeiro.',
 		addFirst: 'Adicionar o primeiro piloto'
 	},
 	driver: {
 		new: 'Novo piloto',
 		card: 'Piloto',
-		cardDesc: 'Nome, número de corrida e categoria, tal como aparecem no cartão do piloto.',
+		cardDesc: 'Nome, número de corrida, categoria e nacionalidade, tal como aparecem no cartão do piloto.',
 		category: 'Categoria',
 		categoryHint: 'Por exemplo Cadete, Júnior X30 ou KZ2',
 		profile: 'Perfil',
@@ -761,29 +759,25 @@ const pt: AdminMessages = {
 		since: 'Corre desde',
 		chassis: 'Chassis',
 		engine: 'Motor',
-		record: 'Recorde de carreira',
-		recordDesc:
-			'Totais de toda a carreira do piloto, incluindo resultados de antes de entrar na equipa. São somados nas estatísticas da equipa na página inicial. Os resultados da temporada introduzem-se à parte, no calendário.',
-		words: 'Textos',
-		wordsDesc: 'Aparecem no perfil do piloto. Escreva primeiro em português; o inglês é opcional.',
-		best: 'Melhor resultado',
-		quote: 'Citação',
+		country: 'Nacionalidade',
+		countryChange: 'Mudar',
+		countrySearch: 'Procurar um país',
+		countrySearchHint: 'Escreva algumas letras, em português ou inglês',
+		countryNone: 'Nenhum país corresponde à pesquisa',
 		photoDesc:
 			'Um retrato, de preferência na vertical e com pelo menos 1200 píxeis de altura. Substitui o número grande no cartão do piloto.',
 		create: 'Adicionar piloto',
 		retire: 'Passar para o Hall of Fame',
 		retireDesc:
-			'Para pilotos que saem da equipa. O número, a fotografia e o recorde passam também, e pode editar os detalhes depois.',
+			'Para pilotos que saem da equipa. O número, a fotografia e os resultados desta temporada passam também, e pode editar os detalhes depois.',
 		retireBtn: (first) => `Passar ${first}`,
 		retireConfirm: (name) =>
-			`Passar ${name} para o Hall of Fame? Sai do plantel e passa a aparecer nos antigos pilotos.`,
+			`Passar ${name} para o Hall of Fame? Sai da equipa atual e passa a aparecer nos antigos pilotos.`,
 		remove: 'Remover piloto',
 		removeDesc: 'Deixa de aparecer no site. Os resultados conquistados ficam no calendário, com o nome do piloto.',
 		removeBtn: (first) => `Remover ${first}`,
 		removeConfirm: (name) => `Remover ${name} da equipa? Os resultados anteriores ficam no calendário.`,
 		numberTaken: (n, name) => `O número ${n} já é usado por ${name}`,
-		startsPodiums: 'Não pode ser menor do que os pódios',
-		startsPoles: 'Não pode ser menor do que as poles',
 		saved: 'Piloto guardado',
 		added: 'Piloto adicionado',
 		removed: 'Piloto removido',
@@ -877,7 +871,7 @@ const pt: AdminMessages = {
 	archive: {
 		title: (y) => `Temporada ${y}`,
 		fromCalendar:
-			'As provas, as vitórias, os pódios e o plantel vêm do calendário e dos pilotos deste ano. Acrescente as poles, um título e os títulos conquistados, e guarde.',
+			'As provas, as vitórias, os pódios e os pilotos vêm do calendário e da equipa deste ano. Acrescente as poles, um título e os títulos conquistados, e guarde.',
 		season: 'A temporada',
 		year: 'Ano',
 		headline: 'Título',
@@ -885,11 +879,11 @@ const pt: AdminMessages = {
 		numbers: 'Números',
 		numbersDesc: 'Totais da equipa no ano, com todos os pilotos.',
 		rounds: 'Provas',
-		titlesLineup: 'Títulos e plantel',
+		titlesLineup: 'Títulos e pilotos',
 		titles: 'Títulos e destaques',
 		titlesHint:
 			'Um por linha, por exemplo: Beatriz Gouveia, Campeã Regional da Madeira, Júnior X30. Cada linha conta como um título no site.',
-		lineup: 'Plantel',
+		lineup: 'Pilotos',
 		lineupHint: 'Apelidos, separados por vírgulas',
 		create: 'Adicionar ao Hall of Fame',
 		del: 'Remover temporada',
@@ -995,7 +989,7 @@ const pt: AdminMessages = {
 		seasonIntroHint: 'As vitórias e os pódios até agora são acrescentados automaticamente a seguir.',
 		sponsorship: 'Patrocínio',
 		sponsorshipDesc:
-			'A apresentação na página de patrocínios e na página inicial, e as quatro posições no kart. O número de karts é acrescentado automaticamente a partir do plantel.',
+			'A apresentação na página de patrocínios e na página inicial, e as quatro posições no kart. O número de karts é acrescentado automaticamente a partir do número de pilotos.',
 		partnersIntro: 'Introdução',
 		zones: { pods: 'Pontões laterais', nassau: 'Painel Nassau', nose: 'Carenagem frontal', bumper: 'Para-choques traseiro' },
 		pkgName: 'Nome',
@@ -1077,6 +1071,8 @@ const pt: AdminMessages = {
 			engine: 'motor',
 			accent: 'cor do cartão',
 			photo: 'fotografia',
+			country: 'nacionalidade',
+			// Fields drivers no longer have, for older history entries
 			record: 'recorde de carreira',
 			best: 'melhor resultado',
 			quote: 'citação'
@@ -1097,7 +1093,7 @@ const pt: AdminMessages = {
 			titles: 'títulos',
 			now: 'onde corre agora'
 		},
-		history: { year: 'ano', headline: 'título', summary: 'história', stats: 'números', titles: 'títulos', lineup: 'plantel' },
+		history: { year: 'ano', headline: 'título', summary: 'história', stats: 'números', titles: 'títulos', lineup: 'pilotos' },
 		settings: {
 			seasonYear: 'ano da temporada',
 			email: 'email',

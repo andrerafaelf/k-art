@@ -7,8 +7,10 @@
 <script lang="ts">
 	import { browser } from '$app/env';
 	import Arrow from './Arrow.svelte';
-	import { numbered, nextRound, shortDate, tr, code3 } from '#lib/content.ts';
+	import Flag from './Flag.svelte';
+	import { numbered, nextRound, shortDate, tr, code3, driverSeason } from '#lib/content.ts';
 	import type { Pilot, Round, Settings } from '#lib/content.ts';
+	import { countryName } from '#lib/flags.ts';
 	import { useI18n, pagePath } from '#lib/i18n.ts';
 
 	interface Props {
@@ -38,10 +40,18 @@
 	const next = $derived(nextRound(rounds, now));
 	const lines = $derived(tr(settings.heroLines, i18n.lang).filter((l) => l.trim()));
 
-	// Timing tower: the line-up ranked by career wins. The rows fill in one by
-	// one, top down, when the lights go out.
+	// Timing tower: the line-up ranked by this season's results from the
+	// calendar, wins first, then podiums, then best finish; drivers level stay in
+	// line-up order. The rows fill in one by one, top down, when the lights go out.
 	const ranked = $derived(
-		[...pilots].sort((a, b) => b.record.wins - a.record.wins || b.record.podiums - a.record.podiums)
+		pilots
+			.map((p) => ({ ...p, season: driverSeason(season, p.id) }))
+			.sort(
+				(a, b) =>
+					b.season.wins - a.season.wins ||
+					b.season.podiums - a.season.podiums ||
+					(a.season.best ?? 99) - (b.season.best ?? 99)
+			)
 	);
 
 	const pad = (n: number) => String(n).padStart(2, '0');
@@ -120,16 +130,18 @@
 								<li
 									class="row {p.accent}"
 									class:p1={i === 0}
+									class:lead={i === 0 && p.season.wins > 0}
 									style:--i={i}
 									role="row"
 								>
 									<span class="plate num">{p.number}</span>
 									<span class="who" role="cell">
+										<Flag code={p.country} alt={countryName(p.country, i18n.lang)} />
 										<b>{code3(p.last)}</b>
 										<small class="mono">{p.first} {p.last}</small>
 									</span>
 									<span class="cat mono" role="cell">{p.category}</span>
-									<span class="wins mono" role="cell">{p.record.wins}</span>
+									<span class="wins mono" role="cell">{p.season.wins}</span>
 								</li>
 							{/each}
 						</ol>
@@ -433,6 +445,11 @@
 		gap: 0.75rem;
 		min-width: 0;
 	}
+	.who :global(.flag) {
+		align-self: center;
+		margin-right: -0.2rem;
+		font-size: 0.85rem;
+	}
 	.who b {
 		font-size: 1.15rem;
 		font-style: italic;
@@ -460,8 +477,8 @@
 		font-weight: 700;
 		text-align: right;
 	}
-	/* Best overall, in timing-screen purple */
-	.row.p1 .wins {
+	/* Most wins this season, in timing-screen purple */
+	.row.lead .wins {
 		color: var(--purple);
 		text-shadow: 0 0 14px rgb(181 77 255 / 0.6);
 	}

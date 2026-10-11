@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Icon from '#lib/admin/Icon.svelte';
-	import { t } from '#lib/admin/i18n.ts';
+	import Flag from '#lib/components/Flag.svelte';
+	import { countryName } from '#lib/flags.ts';
+	import { t, lang } from '#lib/admin/i18n.ts';
 
 	let { data } = $props();
 </script>
@@ -27,7 +29,9 @@
 				{/if}
 				<span class="grow">
 					<a class="name" href="/admin/drivers/{p.id}">{p.first} {p.last}</a>
-					<span class="meta">{t().drivers.meta(p.category, p.age, p.record.wins, p.record.podiums, p.record.poles)}</span>
+					<span class="meta"
+						><Flag code={p.country} />{t().drivers.meta(p.category, p.age, countryName(p.country, lang()))}</span
+					>
 				</span>
 				<span class="tools">
 					<form method="post" action="?/move" use:enhance>

@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { slugify, type Alumnus, type Pilot } from '#lib/content.ts';
+import { slugify, driverSeason, type Alumnus, type Pilot } from '#lib/content.ts';
+import { COUNTRIES, DEFAULT_COUNTRY } from '#lib/flags.ts';
 import { getContent, update, newId } from '#lib/server/store.ts';
 import { FormReader } from '#lib/server/form.ts';
 import { readImage } from '#lib/server/images.ts';
@@ -19,9 +20,7 @@ const blank = (): Pilot => ({
 	chassis: '',
 	engine: '',
 	accent: 'lime',
-	record: { starts: 0, wins: 0, podiums: 0, poles: 0 },
-	best: { pt: '', en: '' },
-	quote: { pt: '', en: '' }
+	country: DEFAULT_COUNTRY
 });
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -51,27 +50,16 @@ export const actions: Actions = {
 			number: f.int('number', { min: 0, max: 999 }),
 			accent: f.choice('accent', ['lime', 'cyan'] as const, 'lime'),
 			category: f.text('category', { required: true, max: 40 }),
+			country: f.choice('country', COUNTRIES, DEFAULT_COUNTRY),
 			age: f.int('age', { min: 4, max: 99 }),
 			hometown: f.text('hometown', { max: 60 }),
 			since: f.int('since', { min: 1950, max: year }),
 			chassis: f.text('chassis', { max: 60 }),
-			engine: f.text('engine', { max: 60 }),
-			record: {
-				starts: f.int('starts', { min: 0, max: 9999 }),
-				wins: f.int('wins', { min: 0, max: 9999 }),
-				podiums: f.int('podiums', { min: 0, max: 9999 }),
-				poles: f.int('poles', { min: 0, max: 9999 })
-			},
-			best: f.l('best', { max: 120 }),
-			quote: f.l('quote', { max: 200 })
+			engine: f.text('engine', { max: 60 })
 		};
 
 		const clash = content.pilots.find((p) => p.number === fields.number && p.id !== existing?.id);
 		if (clash) f.error('number', m.driver.numberTaken(fields.number, `${clash.first} ${clash.last}`));
-		const r = fields.record;
-		if (r.podiums < r.wins) f.error('podiums', m.errors.podiums);
-		if (r.starts < r.podiums) f.error('starts', m.driver.startsPodiums);
-		if (r.starts < r.poles) f.error('starts', m.driver.startsPoles);
 		if (!f.ok) return f.fail();
 		const conflict = await f.conflict(existing, 'pilots', existing?.id);
 		if (conflict) return conflict;
@@ -113,6 +101,7 @@ export const actions: Actions = {
 			if (!p) error(404, 'Driver not found');
 			const year = draft.settings.seasonYear;
 			id = draft.alumni.some((a) => a.id === p.id) ? `${p.id}-${newId()}` : p.id;
+			const { best: _, ...results } = driverSeason(draft.season, p.id);
 			const alumnus: Alumnus = {
 				id,
 				number: p.number,
@@ -123,8 +112,9 @@ export const actions: Actions = {
 				to: year,
 				categories: p.category,
 				photo: p.photo,
-				record: { ...p.record },
-				titles: { pt: p.best.pt ? [p.best.pt] : [], en: p.best.en ? [p.best.en] : [] },
+				// This season's results from the calendar, to check and add to by hand
+				record: { ...results, poles: 0 },
+				titles: { pt: [], en: [] },
 				now: { pt: '', en: '' }
 			};
 			if (!alumnus.photo) delete alumnus.photo;

@@ -38,9 +38,9 @@
 		<span class="s">{t().overview.fromRounds(data.summary.raced, data.total)}</span>
 	</a>
 	<a class="tile" href="/admin/drivers">
-		<span class="k">{t().overview.career}</span>
-		<span class="v num">{data.record.wins}<small>{t().overview.wins}</small> {data.record.podiums}<small>{t().overview.podiums}</small></span>
-		<span class="s">{t().overview.careerNote}</span>
+		<span class="k">{t().overview.lineUp}</span>
+		<span class="v num">{data.drivers}<small>{t().overview.drivers(data.drivers)}</small></span>
+		<span class="s">{t().overview.classes(data.classes)}</span>
 	</a>
 	<a class="tile" href="/admin/news">
 		<span class="k">{t().overview.news}</span>

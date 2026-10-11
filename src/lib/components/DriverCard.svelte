@@ -1,9 +1,11 @@
 <script lang="ts">
 	import Arrow from './Arrow.svelte';
+	import Flag from './Flag.svelte';
 	import type { Pilot } from '#lib/content.ts';
+	import { countryName } from '#lib/flags.ts';
 	import { useI18n } from '#lib/i18n.ts';
 
-	// A driver on the grid: the race number outlined behind, the name in front.
+	// A driver on the grid: the race number outlined behind, the name and flag in front.
 	// A button that opens the profile on the drivers page, a link to it elsewhere.
 	interface Props {
 		p: Pilot;
@@ -18,7 +20,8 @@
 
 	const i18n = useI18n();
 	const t = $derived(i18n.t.drivers);
-	const label = $derived(t.open(`${p.first} ${p.last}`, p.category, p.number));
+	const country = $derived(countryName(p.country, i18n.lang));
+	const label = $derived(t.open(`${p.first} ${p.last}, ${country}`, p.category, p.number));
 </script>
 
 {#snippet inside()}
@@ -34,11 +37,7 @@
 		<span class="last">{p.last}</span>
 	</span>
 	<span class="meta">
-		<span><b class="num">{p.record.wins}</b>{t.wins}</span>
-		<span><b class="num">{p.record.podiums}</b>{t.podiums}</span>
-		{#if !compact}
-			<span><b class="num">{p.record.poles}</b>{t.poles}</span>
-		{/if}
+		<span class="from"><Flag code={p.country} />{country}</span>
 		<span class="go"><Arrow /></span>
 	</span>
 {/snippet}
@@ -201,21 +200,25 @@
 	}
 	.meta {
 		display: flex;
-		gap: 1.5rem;
+		align-items: center;
+		gap: 1rem;
 		margin-top: 1.25rem;
 		padding-top: 1rem;
 		border-top: 1px solid var(--hair-2);
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--fg-3);
 	}
-	.meta b {
-		display: block;
-		margin-bottom: 0.3rem;
-		font-size: 1.75rem;
-		color: var(--fg);
-		letter-spacing: 0;
+	.from {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.65rem;
+		min-width: 0;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--fg-2);
+	}
+	.from :global(.flag) {
+		font-size: 1.05rem;
 	}
 
 	/* ---------- compact ---------- */
@@ -234,12 +237,7 @@
 		font-size: clamp(1.5rem, 9cqi, 2.25rem);
 	}
 	.compact .meta {
-		gap: 1.25rem;
 		margin-top: 1rem;
 		padding-top: 0.85rem;
-		font-size: 0.7rem;
-	}
-	.compact .meta b {
-		font-size: 1.5rem;
 	}
 </style>

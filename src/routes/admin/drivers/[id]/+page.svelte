@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import Icon from '#lib/admin/Icon.svelte';
 	import TextField from '#lib/admin/TextField.svelte';
-	import LangField from '#lib/admin/LangField.svelte';
+	import CountryField from '#lib/admin/CountryField.svelte';
 	import ImageField from '#lib/admin/ImageField.svelte';
 	import SaveBar from '#lib/admin/SaveBar.svelte';
 	import { keep, confirmFirst } from '#lib/admin/forms.ts';
@@ -58,6 +58,7 @@
 				<datalist id="categories">
 					{#each data.categories as c}<option value={c}></option>{/each}
 				</datalist>
+				<CountryField name="country" label={t().driver.country} value={p.country} />
 				<div class="a-field wide">
 					<span class="a-label">{t().common.cardColour}</span>
 					<div class="a-choices">
@@ -82,34 +83,6 @@
 				<TextField name="since" label={t().driver.since} type="number" min="1950" value={p.since} error={e.since} required />
 				<TextField name="chassis" label={t().driver.chassis} value={p.chassis} error={e.chassis} optional />
 				<TextField name="engine" label={t().driver.engine} value={p.engine} error={e.engine} optional />
-			</div>
-		</section>
-
-		<section class="a-card">
-			<h2>{t().driver.record}</h2>
-			<p class="a-desc">{t().driver.recordDesc}</p>
-			<div class="a-fields record">
-				<TextField name="starts" label={t().common.starts} type="number" min="0" value={p.record.starts} error={e.starts} />
-				<TextField name="wins" label={t().common.wins} type="number" min="0" value={p.record.wins} error={e.wins} />
-				<TextField name="podiums" label={t().common.podiums} type="number" min="0" value={p.record.podiums} error={e.podiums} />
-				<TextField name="poles" label={t().common.poles} type="number" min="0" value={p.record.poles} error={e.poles} />
-			</div>
-		</section>
-
-		<section class="a-card">
-			<h2>{t().driver.words}</h2>
-			<p class="a-desc">{t().driver.wordsDesc}</p>
-			<div class="a-fields">
-				<LangField
-					name="best"
-					label={t().driver.best}
-					value={p.best}
-					errors={e}
-					maxlength={120}
-					placeholder="P2, Campeonato de Portugal 2025"
-					wide
-				/>
-				<LangField name="quote" label={t().driver.quote} value={p.quote} errors={e} maxlength={200} rows={2} wide />
 			</div>
 		</section>
 
@@ -168,8 +141,5 @@
 		height: 3.75rem;
 		font-size: 2.2rem;
 		border-radius: 8px;
-	}
-	.record {
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
 	}
 </style>

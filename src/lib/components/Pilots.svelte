@@ -2,7 +2,9 @@
 	import SectionHead from './SectionHead.svelte';
 	import DriverCard from './DriverCard.svelte';
 	import Arrow from './Arrow.svelte';
-	import { tr, type Pilot } from '#lib/content.ts';
+	import Flag from './Flag.svelte';
+	import type { Pilot } from '#lib/content.ts';
+	import { countryName } from '#lib/flags.ts';
 	import { useI18n } from '#lib/i18n.ts';
 	import { inview } from '#lib/motion.ts';
 
@@ -76,7 +78,7 @@
 					<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" /></svg>
 				</button>
 				<div class="plate-who">
-					<span class="cat">#{pilot.number}, {pilot.category}</span>
+					<span class="cat"><Flag code={pilot.country} />#{pilot.number}, {pilot.category}</span>
 					<h3 id="pilot-name">
 						<span class="first">{pilot.first}</span>
 						<span class="last">{pilot.last}</span>
@@ -85,26 +87,22 @@
 			</header>
 
 			<div class="body">
-				{#if tr(pilot.quote, i18n.lang)}
-					<blockquote>“{tr(pilot.quote, i18n.lang)}”</blockquote>
-				{/if}
-
-				<dl class="record">
-					<div><dt>{t.starts}</dt><dd class="num">{pilot.record.starts}</dd></div>
-					<div><dt>{t.wins}</dt><dd class="num">{pilot.record.wins}</dd></div>
-					<div><dt>{t.podiums}</dt><dd class="num">{pilot.record.podiums}</dd></div>
-					<div><dt>{t.poles}</dt><dd class="num">{pilot.record.poles}</dd></div>
-				</dl>
-
 				<dl class="specs">
-					{#if tr(pilot.best, i18n.lang)}
-						<div><dt>{t.best}</dt><dd>{tr(pilot.best, i18n.lang)}</dd></div>
-					{/if}
+					<div>
+						<dt>{t.country}</dt>
+						<dd class="from"><Flag code={pilot.country} />{countryName(pilot.country, i18n.lang)}</dd>
+					</div>
 					<div><dt>{t.age}</dt><dd>{pilot.age}</dd></div>
-					<div><dt>{t.hometown}</dt><dd>{pilot.hometown}</dd></div>
+					{#if pilot.hometown}
+						<div><dt>{t.hometown}</dt><dd>{pilot.hometown}</dd></div>
+					{/if}
 					<div><dt>{t.since}</dt><dd>{pilot.since}</dd></div>
-					<div><dt>{t.chassis}</dt><dd>{pilot.chassis}</dd></div>
-					<div><dt>{t.engine}</dt><dd>{pilot.engine}</dd></div>
+					{#if pilot.chassis}
+						<div><dt>{t.chassis}</dt><dd>{pilot.chassis}</dd></div>
+					{/if}
+					{#if pilot.engine}
+						<div><dt>{t.engine}</dt><dd>{pilot.engine}</dd></div>
+					{/if}
 				</dl>
 			</div>
 
@@ -282,10 +280,17 @@
 		position: relative;
 	}
 	.plate .cat {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
 		font-size: 0.75rem;
 		font-weight: 600;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
+	}
+	.plate .cat :global(.flag) {
+		font-size: 1rem;
+		box-shadow: 0 0 0 1px rgb(0 0 0 / 0.18);
 	}
 	h3 {
 		display: flex;
@@ -311,33 +316,6 @@
 		flex: 1;
 		padding: 2rem 1.75rem;
 	}
-	blockquote {
-		font-size: clamp(1.35rem, 2.4vw, 1.7rem);
-		font-weight: 600;
-		font-stretch: 105%;
-		letter-spacing: -0.02em;
-		line-height: 1.25;
-		text-wrap: balance;
-	}
-	.record {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		margin-top: 2rem;
-		border-block: 1px solid var(--hair-2);
-	}
-	.record div {
-		display: flex;
-		flex-direction: column-reverse;
-		padding: 1rem 0 1.1rem;
-	}
-	.record div + div {
-		padding-left: 1rem;
-		border-left: 1px solid var(--hair);
-	}
-	.record dd {
-		font-size: var(--t-figure);
-	}
-	.record dt,
 	.specs dt {
 		margin-top: 0.4rem;
 		font-size: 0.7rem;
@@ -349,14 +327,22 @@
 	.specs {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		margin-top: 0.5rem;
 	}
 	.specs div {
 		padding: 1rem 1rem 1rem 0;
 		border-bottom: 1px solid var(--hair);
 	}
+	/* Nationality, on a row of its own */
 	.specs div:first-child {
 		grid-column: 1 / -1;
+	}
+	.specs .from {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+	.from :global(.flag) {
+		font-size: 1.1rem;
 	}
 	.specs dt {
 		margin: 0 0 0.35rem;

@@ -2,7 +2,7 @@
 	import Arrow from './Arrow.svelte';
 	import SectionHead from './SectionHead.svelte';
 	import { inview, countup } from '#lib/motion.ts';
-	import { teamRecord, seasonSummary, type Pilot, type Round } from '#lib/content.ts';
+	import { seasonSummary, type Pilot, type Round } from '#lib/content.ts';
 	import { useI18n, pagePath } from '#lib/i18n.ts';
 
 	interface Props {
@@ -20,17 +20,22 @@
 	const i18n = useI18n();
 	const t = $derived(i18n.t.team);
 
+	// This season so far, counted from the results entered in the calendar
 	const stats = $derived.by(() => {
-		const record = teamRecord(pilots);
 		const summary = seasonSummary(season);
+		const classes = new Set(pilots.map((p) => p.category)).size;
 		return [
-			{ value: record.wins, label: t.wins, note: t.winsNote },
-			{ value: record.podiums, label: t.podiums, note: t.podiumsNote(record.starts) },
-			{ value: record.poles, label: t.poles, note: t.polesNote },
+			{
+				value: summary.wins,
+				label: t.wins(year),
+				note: summary.raced ? t.winsNote(summary.raced, season.length) : i18n.t.season.notStarted
+			},
+			{ value: summary.podiums, label: t.podiums(year), note: t.podiumsNote },
+			{ value: pilots.length, label: t.drivers, note: t.driversNote(classes) },
 			{
 				value: summary.podiumRounds,
 				of: summary.raced,
-				label: t.seasonPodiums(year),
+				label: t.seasonPodiums,
 				note: summary.raced && summary.podiumRounds === summary.raced ? t.seasonAll : t.seasonSome
 			}
 		];

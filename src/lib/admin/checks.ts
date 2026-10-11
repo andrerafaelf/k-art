@@ -35,9 +35,6 @@ export function checks(content: Content, m: AdminMessages, now = Date.now()): Ch
 	} else if (s.packages.some((p) => [p.tier, p.title, p.body].some(missingEn))) {
 		untranslated.push({ text: m.checks.settings, href: '/admin/settings' });
 	}
-	for (const p of content.pilots) {
-		if ([p.best, p.quote].some(missingEn)) untranslated.push({ text: `${p.first} ${p.last}`, href: `/admin/drivers/${p.id}` });
-	}
 	for (const r of content.season) {
 		if ([r.venue, r.series].some(missingEn)) untranslated.push({ text: m.checks.round(r.location), href: `/admin/season/${r.id}` });
 	}

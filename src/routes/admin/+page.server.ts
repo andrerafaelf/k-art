@@ -3,7 +3,7 @@ import { getContent } from '#lib/server/store.ts';
 import { historyRows } from '#lib/server/history.ts';
 import { msg } from '#lib/server/lang.ts';
 import { checks } from '#lib/admin/checks.ts';
-import { isLive, numbered, nextRound, seasonSummary, teamRecord } from '#lib/content.ts';
+import { isLive, numbered, nextRound, seasonSummary } from '#lib/content.ts';
 
 export const load: PageServerLoad = async () => {
 	const content = await getContent();
@@ -12,7 +12,8 @@ export const load: PageServerLoad = async () => {
 		next: nextRound(rounds, Date.now()),
 		total: rounds.length,
 		summary: seasonSummary(content.season),
-		record: teamRecord(content.pilots),
+		drivers: content.pilots.length,
+		classes: new Set(content.pilots.map((p) => p.category)).size,
 		year: content.settings.seasonYear,
 		posts: {
 			published: content.posts.filter((p) => isLive(p)).length,

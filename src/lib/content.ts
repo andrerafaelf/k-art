@@ -32,12 +32,10 @@ export interface Pilot {
 	chassis: string;
 	engine: string;
 	accent: Accent;
+	/** Nationality as a lowercase ISO country code, 'pt' unless the admin picks another */
+	country: string;
 	/** Uploaded portrait, e.g. '/uploads/abc123.jpg' */
 	photo?: string;
-	/** Career record, entered by hand so it can include results from before the team */
-	record: { starts: number; wins: number; podiums: number; poles: number };
-	best: L;
-	quote: L;
 }
 
 export interface Result {
@@ -182,17 +180,16 @@ export const seasonSummary = (season: Round[]) => {
 
 // ---------- drivers ----------
 
-/** Career totals across the whole line-up. */
-export const teamRecord = (pilots: Pilot[]) =>
-	pilots.reduce(
-		(t, p) => ({
-			starts: t.starts + p.record.starts,
-			wins: t.wins + p.record.wins,
-			podiums: t.podiums + p.record.podiums,
-			poles: t.poles + p.record.poles
-		}),
-		{ starts: 0, wins: 0, podiums: 0, poles: 0 }
-	);
+/** A driver's results this season, counted from the calendar. */
+export const driverSeason = (season: Round[], pilotId: string) => {
+	const results = season.flatMap((r) => r.results.filter((x) => x.pilotId === pilotId));
+	return {
+		starts: results.length,
+		wins: results.filter((x) => x.pos === 1).length,
+		podiums: results.filter((x) => x.pos <= 3).length,
+		best: results.length ? Math.min(...results.map((x) => x.pos)) : undefined
+	};
+};
 
 /** Three-letter timing-screen code: Nóbrega becomes NOB */
 export const code3 = (last: string) =>
