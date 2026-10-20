@@ -32,7 +32,9 @@
 		{#if c.href}<a href={c.href}>{m.history.moved[c.kind]}</a>{:else}{m.history.moved[c.kind]}{/if}{#if row.count > 1}{' '}<span
 				class="times">({m.history.times(row.count)})</span
 			>{/if}
-	{:else if c.kind === 'settings' || c.kind === 'texts'}
+	{:else if c.kind === 'shop' && c.op !== 'edit'}
+		{#if c.href}<a href={c.href}>{m.history.shop[c.op === 'publish' ? 'on' : 'off']}</a>{:else}{m.history.shop[c.op === 'publish' ? 'on' : 'off']}{/if}
+	{:else if c.kind === 'settings' || c.kind === 'shop' || c.kind === 'texts'}
 		{m.history.verbs[c.op]}{' '}{#if c.href}<a href={c.href}>{m.history.nouns[c.kind]}</a>{:else}{m.history.nouns[c.kind]}{/if}
 	{:else}
 		{`${m.history.verbs[c.op]} ${m.history.nouns[c.kind]}${c.kind === 'season' && c.date ? ` ${shortDate(c.date, lang())},` : ''} `}{#if c.href}<a

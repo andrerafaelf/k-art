@@ -368,6 +368,10 @@
 		.desk a:not(.current):hover::after {
 			opacity: 0.45;
 		}
+		.desk a,
+		.cta {
+			white-space: nowrap;
+		}
 		.cta {
 			display: inline-flex;
 		}
@@ -377,6 +381,23 @@
 		.menu-btn,
 		.sheet {
 			display: none;
+		}
+	}
+	/* Just wide enough for the full menu, the shop included: a little tighter */
+	@media (min-width: 1000px) and (max-width: 1139px) {
+		.bar {
+			gap: 1.5rem;
+		}
+		.brand,
+		.solid .brand {
+			width: 9.5rem;
+		}
+		.desk a {
+			padding-inline: 0.6rem;
+		}
+		.desk a::after {
+			left: 0.6rem;
+			right: 0.6rem;
 		}
 	}
 </style>

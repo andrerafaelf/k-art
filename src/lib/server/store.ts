@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
-import { raceDays, ZONES, type Content, type L, type Pilot, type Settings } from '#lib/content.ts';
+import { raceDays, ZONES, type Content, type L, type Pilot, type Product, type Settings } from '#lib/content.ts';
 import { withStarts, type Texts } from '#lib/texts.ts';
 import { DEFAULT_COUNTRY } from '#lib/flags.ts';
 import { diff } from '#lib/admin/changes.ts';
@@ -50,6 +50,8 @@ function normalize(raw: Partial<Content>): Content {
 		posts: raw.posts ?? [],
 		alumni: raw.alumni ?? base.alumni,
 		history: raw.history ?? base.history,
+		products: (raw.products ?? []).map(product),
+		shop: { enabled: raw.shop?.enabled ?? false, whatsapp: raw.shop?.whatsapp ?? '' },
 		texts: withStarts({ ...movedTexts(raw.settings), ...raw.texts }),
 		updatedAt: raw.updatedAt ?? base.updatedAt
 	};
@@ -90,6 +92,27 @@ function movedTexts(old: Partial<Settings> | undefined): Texts {
 function driver(raw: Pilot): Pilot {
 	const { record: _record, best: _best, quote: _quote, ...pilot } = raw as Pilot & Record<string, unknown>;
 	return { ...pilot, country: pilot.country || DEFAULT_COUNTRY };
+}
+
+/** A product with every field present, so the shop can rely on them. */
+function product(raw: Partial<Product> & Pick<Product, 'id'>): Product {
+	const blank = { pt: '', en: '' };
+	return {
+		slug: raw.id,
+		name: blank,
+		description: blank,
+		category: 'other',
+		condition: 'new',
+		stock: 0,
+		...raw,
+		fits: raw.fits ?? [],
+		conditionNote: raw.conditionNote ?? blank,
+		options: raw.options ?? [],
+		optionName: raw.optionName ?? blank,
+		onOrder: raw.onOrder ?? false,
+		photos: raw.photos ?? [],
+		visible: raw.visible ?? true
+	};
 }
 
 const write = (content: Content) => writeAtomic(file, JSON.stringify(content, null, '\t'));

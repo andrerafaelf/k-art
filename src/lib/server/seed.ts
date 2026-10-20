@@ -181,6 +181,8 @@ export const seed = (): Content => ({
 	posts: [],
 	alumni: structuredClone(alumni),
 	history: structuredClone(history),
+	products: [],
+	shop: { enabled: false, whatsapp: '' },
 	texts: withStarts(undefined),
 	updatedAt: new Date(0).toISOString()
 });

@@ -14,7 +14,12 @@
 	const pt = $derived(page.url.origin + alternatePath(page.url.pathname, 'pt'));
 	const en = $derived(page.url.origin + alternatePath(page.url.pathname, 'en'));
 	const links = $derived(
-		siteLinks(i18n.t, i18n.lang, { drivers: data.pilots.length > 0, season: data.season.length > 0, news: data.hasNews })
+		siteLinks(i18n.t, i18n.lang, {
+			drivers: data.pilots.length > 0,
+			season: data.season.length > 0,
+			news: data.hasNews,
+			shop: data.shop.enabled
+		})
 	);
 </script>
 

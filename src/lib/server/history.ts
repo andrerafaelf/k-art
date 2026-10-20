@@ -41,8 +41,12 @@ function link(c: Change, content: Content): string | undefined {
 			return c.op === 'move' ? '/admin/hall' : has(content.alumni) ? `/admin/hall/drivers/${c.id}` : undefined;
 		case 'history':
 			return has(content.history) ? `/admin/hall/seasons/${c.id}` : undefined;
+		case 'products':
+			return c.op === 'move' ? '/admin/shop' : has(content.products) ? `/admin/shop/${c.id}` : undefined;
 		case 'settings':
 			return '/admin/settings';
+		case 'shop':
+			return '/admin/shop';
 		case 'texts': {
 			const g = groupOf(c.fields?.[0] ?? '');
 			return g ? `/admin/texts/${g}` : '/admin/texts';

@@ -80,6 +80,57 @@ export interface Post {
 	published: boolean;
 }
 
+/** A size or variant of a product, with its own stock */
+export interface ProductOption {
+	id: string;
+	/** As shown to the visitor, for example "M", "54" or "10x4.60-5" */
+	label: string;
+	stock: number;
+	/** Price in cents when this option costs more or less than the product */
+	price?: number;
+}
+
+/** Something for sale in the shop (lib/shop.ts) */
+export interface Product {
+	id: string;
+	slug: string;
+	name: L;
+	description: L;
+	/** One of CATEGORIES in lib/shop.ts */
+	category: string;
+	brand?: string;
+	/** Manufacturer's part number */
+	ref?: string;
+	/** Chassis, engines or classes it fits, for example "OTK" or "Rotax Max" */
+	fits: string[];
+	condition: 'new' | 'used';
+	/** For used items: the state it is in */
+	conditionNote: L;
+	/** Price in cents, VAT included. Missing means price on request */
+	price?: number;
+	/** The earlier price in cents, shown struck through */
+	was?: number;
+	/** Units in stock, for products without options */
+	stock: number;
+	/** Sizes or variants, each with its own stock. Empty for most products */
+	options: ProductOption[];
+	/** What the options are called, "Tamanho" / "Size" when left empty */
+	optionName: L;
+	/** Can still be asked for when out of stock */
+	onOrder: boolean;
+	/** Uploaded photos, the first is the main one */
+	photos: string[];
+	/** Shown in the shop; hidden ones can be previewed by people signed in to the admin */
+	visible: boolean;
+}
+
+/** Whether the shop is open on the site, and where WhatsApp messages go */
+export interface Shop {
+	enabled: boolean;
+	/** Digits only, with the country code, for example 351912345678. Empty hides the WhatsApp button */
+	whatsapp: string;
+}
+
 /** Contact details and the season year; everything written on the pages is in Texts (lib/texts.ts) */
 export interface Settings {
 	seasonYear: number;
@@ -130,6 +181,8 @@ export interface Content {
 	posts: Post[];
 	alumni: Alumnus[];
 	history: SeasonArchive[];
+	products: Product[];
+	shop: Shop;
 	/** What the pages say, edited in the admin's Site texts */
 	texts: Texts;
 	updatedAt: string;

@@ -49,6 +49,13 @@
 			{t().overview.drafts(data.posts.drafts)}{#if data.posts.scheduled}, {t().overview.scheduled(data.posts.scheduled)}{/if}
 		</span>
 	</a>
+	{#if data.shop}
+		<a class="tile" class:waiting={data.shop.waiting > 0} href={data.shop.waiting ? '/admin/shop/requests' : '/admin/shop'}>
+			<span class="k">{t().overview.shop}{#if !data.shop.enabled}, {t().overview.shopOff}{/if}</span>
+			<span class="v num">{data.shop.waiting}<small>{t().overview.newRequests(data.shop.waiting)}</small></span>
+			<span class="s">{t().overview.forSale(data.shop.products, data.shop.out)}</span>
+		</a>
+	{/if}
 </div>
 
 <div class="cols">
@@ -114,6 +121,13 @@
 		background: var(--lime);
 		border-color: var(--lime);
 		color: var(--black);
+	}
+	/* New shop requests waiting for a reply */
+	.tile.waiting {
+		border-color: var(--lime);
+	}
+	.tile.waiting .v {
+		color: var(--lime);
 	}
 	.k {
 		font-size: 0.7rem;

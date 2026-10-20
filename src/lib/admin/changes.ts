@@ -4,7 +4,7 @@ import type { Content } from '#lib/content.ts';
 // it, so each entry says exactly what changed without the pages having to
 // describe their own edits.
 
-export type Kind = 'pilots' | 'season' | 'partners' | 'posts' | 'alumni' | 'history' | 'settings' | 'texts';
+export type Kind = 'pilots' | 'season' | 'partners' | 'posts' | 'alumni' | 'history' | 'products' | 'settings' | 'shop' | 'texts';
 export type Op = 'add' | 'edit' | 'remove' | 'move' | 'publish' | 'unpublish';
 
 export interface Change {
@@ -51,9 +51,9 @@ export interface LogEntry {
 
 type Item = { id: string } & Record<string, unknown>;
 
-const COLLECTIONS = ['pilots', 'season', 'posts', 'partners', 'alumni', 'history'] as const;
+const COLLECTIONS = ['pilots', 'season', 'posts', 'partners', 'alumni', 'history', 'products'] as const;
 // Lists shown on the site in the order they are stored. The others are sorted by date or year.
-const ORDERED = new Set<Kind>(['pilots', 'partners', 'alumni']);
+const ORDERED = new Set<Kind>(['pilots', 'partners', 'alumni', 'products']);
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -71,6 +71,10 @@ function label(kind: Kind, x: Item): Pick<Change, 'name' | 'date'> {
 		case 'posts': {
 			const title = x.title as { pt: string; en: string };
 			return { name: title.pt || title.en };
+		}
+		case 'products': {
+			const name = x.name as { pt: string; en: string };
+			return { name: name.pt || name.en };
 		}
 		case 'partners':
 			return { name: String(x.name) };
@@ -100,9 +104,11 @@ export function diff(before: Content, after: Content): Change[] {
 			let fields = changedKeys(prev, x);
 			if (!fields.length) continue;
 			let op: Op = 'edit';
-			if (kind === 'posts' && fields.includes('published')) {
-				op = x.published ? 'publish' : 'unpublish';
-				fields = fields.filter((f) => f !== 'published');
+			// Publishing a post or showing a product reads as its own action
+			const flag = kind === 'posts' ? 'published' : kind === 'products' ? 'visible' : undefined;
+			if (flag && fields.includes(flag)) {
+				op = x[flag] ? 'publish' : 'unpublish';
+				fields = fields.filter((f) => f !== flag);
 			}
 			out.push({ kind, op, id: x.id, ...label(kind, x), ...(fields.length && { fields }) });
 		}
@@ -124,6 +130,14 @@ export function diff(before: Content, after: Content): Change[] {
 		after.settings as unknown as Record<string, unknown>
 	);
 	if (fields.length) out.push({ kind: 'settings', op: 'edit', fields });
+
+	// Opening or closing the shop reads as its own action
+	const shop = changedKeys(
+		before.shop as unknown as Record<string, unknown>,
+		after.shop as unknown as Record<string, unknown>
+	);
+	if (shop.includes('enabled')) out.push({ kind: 'shop', op: after.shop.enabled ? 'publish' : 'unpublish' });
+	if (shop.some((f) => f !== 'enabled')) out.push({ kind: 'shop', op: 'edit', fields: shop.filter((f) => f !== 'enabled') });
 
 	// Each text that changed, by its key in lib/texts.ts
 	const texts = changedKeys(

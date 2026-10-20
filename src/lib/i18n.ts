@@ -32,6 +32,7 @@ const en = {
 		hall: 'Hall of Fame',
 		madeira: 'Madeira',
 		partners: 'Partners',
+		shop: 'Shop',
 		contact: 'Contact',
 		cta: 'Get in touch',
 		open: 'Open menu',
@@ -187,6 +188,122 @@ const en = {
 			failed: "The message didn't go through. Try again, or email us at"
 		}
 	},
+	shop: {
+		all: 'All',
+		filters: 'Categories',
+		search: 'Name, brand or part number',
+		searchLabel: 'Search the shop',
+		used: 'Used',
+		new: 'New',
+		usedOnly: 'Used only',
+		count: (n: number) => plural(n, 'item', 'items'),
+		noMatch: 'Nothing matches that search.',
+		clear: 'Show everything',
+		onRequest: 'Price on request',
+		from: (price: string) => `From ${price}`,
+		was: (price: string) => `Was ${price}`,
+		vat: 'VAT included',
+		stock: {
+			in: (n: number) => `${n} in stock`,
+			low: (n: number) => (n === 1 ? 'Last one in stock' : `Last ${n} in stock`),
+			out: 'Sold out',
+			order: 'Out of stock, we can order it in'
+		},
+		condition: 'Condition',
+		brand: 'Brand',
+		ref: 'Part number',
+		fits: 'Fits',
+		category: 'Category',
+		pick: (what: string) => `Choose: ${what.toLowerCase()}`,
+		pickFirst: 'Choose an option first',
+		soldOut: (label: string) => `${label}, sold out`,
+		qty: 'Quantity',
+		less: 'One fewer',
+		more: 'One more',
+		add: 'Add to list',
+		addOne: (name: string) => `Add ${name} to your list`,
+		added: 'Added to your list',
+		onList: (n: number) => `${n} on your list`,
+		chooseSize: 'Choose',
+		photo: (n: number, total: number) => `Photo ${n} of ${total}`,
+		back: 'Back to the shop',
+		bar: (n: number) => `Your list, ${plural(n, 'item', 'items')}`,
+		view: 'View list',
+		list: {
+			empty: 'Your list is empty.',
+			unknown: 'An item no longer in the shop',
+			emptyMore: 'Add parts from the shop and they appear here, ready to send to the team.',
+			browse: 'Browse the shop',
+			item: 'Item',
+			each: 'Each',
+			total: 'Total',
+			estimate: 'Estimated total',
+			plusRequest: (n: number) => `Plus ${plural(n, 'item', 'items')} priced on request`,
+			remove: (name: string) => `Remove ${name}`,
+			clear: 'Clear the list',
+			clearConfirm: 'Remove everything from your list?',
+			problems: {
+				gone: 'No longer for sale. Remove it from the list.',
+				size: 'This option is no longer available. Choose another one.',
+				out: 'Sold out since you added it.',
+				less: (n: number) => (n === 1 ? 'Only one left, so the quantity went down.' : `Only ${n} left, so the quantity went down.`)
+			},
+			ways: 'Send the list',
+			pdf: 'Download as PDF',
+			whatsapp: 'Send on WhatsApp',
+			email: 'Send to the team',
+			emailNote: 'We reply by email'
+		},
+		form: {
+			name: 'Name',
+			email: 'Email',
+			phone: 'Phone',
+			message: 'Message',
+			optional: 'Optional',
+			hints: {
+				name: 'Your name',
+				email: 'you@example.com',
+				phone: 'If you prefer a call',
+				message: 'Anything we should know, like your kart or when you can collect'
+			},
+			send: 'Send the list',
+			sending: 'Sending',
+			received: 'List received',
+			thanks: (name: string, n: number) => `Thanks, ${name}. That is request no. ${n}.`,
+			reply: (email: string) => `We'll reply to ${email} with availability, payment and pickup.`,
+			pdf: 'Download a copy as PDF',
+			again: 'Back to the shop'
+		},
+		errors: {
+			phone: 'Check the phone number, or leave it empty.',
+			long: 'That is too long. Keep it under 2000 characters.',
+			empty: 'Your list has nothing that can be ordered yet.',
+			changed: 'Some items changed while you were here. Check the list and send it again.'
+		},
+		whatsapp: {
+			hello: "Hello! I'd like these from the K'ART shop:",
+			request: 'price on request',
+			total: (price: string) => `Estimated total: ${price}`,
+			thanks: 'Thanks!'
+		},
+		pdf: {
+			title: 'Shopping list',
+			request: (n: number) => `Request no. ${n}`,
+			qty: 'Qty',
+			item: 'Item',
+			each: 'Each',
+			total: 'Total',
+			ref: (r: string) => `Ref. ${r}`,
+			page: (n: number, total: number) => `Page ${n} of ${total}`,
+			file: 'kart-shopping-list'
+		},
+		preview: 'Preview. The shop is switched off, so only people signed in to the admin can see it.',
+		hidden: 'Preview. This product is hidden, so only people signed in to the admin can see it.',
+		edit: 'Edit in the admin',
+		metaTitle: "Shop, K'ART Racing Team",
+		metaDescription: "Karting parts, tyres and kit from K'ART Racing Team, new and used, collected at the Kartódromo do Faial in Madeira.",
+		listTitle: "Your list, K'ART Racing Team"
+	},
 	footer: { top: 'Back to top', credit: 'Site by' }
 };
 
@@ -207,6 +324,7 @@ const pt: Messages = {
 		hall: 'Hall of Fame',
 		madeira: 'Madeira',
 		partners: 'Parceiros',
+		shop: 'Loja',
 		contact: 'Contacto',
 		cta: 'Fale connosco',
 		open: 'Abrir menu',
@@ -360,6 +478,122 @@ const pt: Messages = {
 			failed: 'A mensagem não seguiu. Tente outra vez, ou escreva para'
 		}
 	},
+	shop: {
+		all: 'Tudo',
+		filters: 'Categorias',
+		search: 'Nome, marca ou referência',
+		searchLabel: 'Procurar na loja',
+		used: 'Usado',
+		new: 'Novo',
+		usedOnly: 'Só usados',
+		count: (n) => plural(n, 'artigo', 'artigos'),
+		noMatch: 'Nada corresponde a essa pesquisa.',
+		clear: 'Ver tudo',
+		onRequest: 'Preço sob consulta',
+		from: (price) => `Desde ${price}`,
+		was: (price) => `Antes ${price}`,
+		vat: 'IVA incluído',
+		stock: {
+			in: (n) => `${n} em stock`,
+			low: (n) => (n === 1 ? 'Última unidade' : `Últimas ${n} unidades`),
+			out: 'Esgotado',
+			order: 'Esgotado, podemos encomendar'
+		},
+		condition: 'Estado',
+		brand: 'Marca',
+		ref: 'Referência',
+		fits: 'Compatível com',
+		category: 'Categoria',
+		pick: (what) => `Escolha: ${what.toLowerCase()}`,
+		pickFirst: 'Escolha primeiro uma opção',
+		soldOut: (label) => `${label}, esgotado`,
+		qty: 'Quantidade',
+		less: 'Menos um',
+		more: 'Mais um',
+		add: 'Adicionar à lista',
+		addOne: (name) => `Adicionar ${name} à lista`,
+		added: 'Adicionado à sua lista',
+		onList: (n) => `${n} na sua lista`,
+		chooseSize: 'Escolher',
+		photo: (n, total) => `Fotografia ${n} de ${total}`,
+		back: 'Voltar à loja',
+		bar: (n) => `A sua lista, ${plural(n, 'artigo', 'artigos')}`,
+		view: 'Ver lista',
+		list: {
+			empty: 'A sua lista está vazia.',
+			unknown: 'Um artigo que já não está na loja',
+			emptyMore: 'Adicione peças da loja e elas aparecem aqui, prontas a enviar à equipa.',
+			browse: 'Ver a loja',
+			item: 'Artigo',
+			each: 'Unidade',
+			total: 'Total',
+			estimate: 'Total estimado',
+			plusRequest: (n) => `Mais ${plural(n, 'artigo', 'artigos')} com preço sob consulta`,
+			remove: (name) => `Remover ${name}`,
+			clear: 'Limpar a lista',
+			clearConfirm: 'Remover tudo da sua lista?',
+			problems: {
+				gone: 'Já não está à venda. Remova-o da lista.',
+				size: 'Esta opção já não está disponível. Escolha outra.',
+				out: 'Esgotou depois de o adicionar.',
+				less: (n) => (n === 1 ? 'Só resta uma unidade, por isso a quantidade baixou.' : `Só restam ${n}, por isso a quantidade baixou.`)
+			},
+			ways: 'Enviar a lista',
+			pdf: 'Descarregar em PDF',
+			whatsapp: 'Enviar por WhatsApp',
+			email: 'Enviar à equipa',
+			emailNote: 'Respondemos por email'
+		},
+		form: {
+			name: 'Nome',
+			email: 'Email',
+			phone: 'Telefone',
+			message: 'Mensagem',
+			optional: 'Opcional',
+			hints: {
+				name: 'O seu nome',
+				email: 'nome@exemplo.pt',
+				phone: 'Se preferir que lhe liguemos',
+				message: 'Algo que devamos saber, como o seu kart ou quando pode levantar'
+			},
+			send: 'Enviar a lista',
+			sending: 'A enviar',
+			received: 'Lista recebida',
+			thanks: (name, n) => `Obrigado, ${name}. É o pedido n.º ${n}.`,
+			reply: (email) => `Vamos responder para ${email} com a disponibilidade, o pagamento e o levantamento.`,
+			pdf: 'Descarregar uma cópia em PDF',
+			again: 'Voltar à loja'
+		},
+		errors: {
+			phone: 'Confirme o número de telefone, ou deixe-o em branco.',
+			long: 'A mensagem é demasiado longa. Use menos de 2000 caracteres.',
+			empty: 'A sua lista ainda não tem nada que se possa encomendar.',
+			changed: 'Alguns artigos mudaram entretanto. Reveja a lista e envie de novo.'
+		},
+		whatsapp: {
+			hello: "Olá! Gostava destes artigos da loja K'ART:",
+			request: 'preço sob consulta',
+			total: (price) => `Total estimado: ${price}`,
+			thanks: 'Obrigado!'
+		},
+		pdf: {
+			title: 'Lista de compras',
+			request: (n) => `Pedido n.º ${n}`,
+			qty: 'Qtd.',
+			item: 'Artigo',
+			each: 'Unidade',
+			total: 'Total',
+			ref: (r) => `Ref. ${r}`,
+			page: (n, total) => `Página ${n} de ${total}`,
+			file: 'kart-lista-de-compras'
+		},
+		preview: 'Pré-visualização. A loja está desligada, por isso só é visível para quem tem sessão iniciada no admin.',
+		hidden: 'Pré-visualização. Este artigo está oculto, por isso só é visível para quem tem sessão iniciada no admin.',
+		edit: 'Editar no admin',
+		metaTitle: "Loja, K'ART Racing Team",
+		metaDescription: "Peças, pneus e equipamento de karting da K'ART Racing Team, novos e usados, para levantar no Kartódromo do Faial, na Madeira.",
+		listTitle: "A sua lista, K'ART Racing Team"
+	},
 	footer: { top: 'Voltar ao topo', credit: 'Site por' }
 };
 
@@ -410,6 +644,7 @@ export const PAGES = {
 	news: { pt: 'noticias', en: 'news' },
 	hall: { pt: 'hall-of-fame', en: 'hall-of-fame' },
 	partners: { pt: 'parceiros', en: 'partners' },
+	shop: { pt: 'loja', en: 'shop' },
 	contact: { pt: 'contacto', en: 'contact' }
 } as const;
 
@@ -421,6 +656,17 @@ export const pagePath = (id: PageId, lang: Lang) => localize(`/${PAGES[id][lang]
 export const newsPath = (lang: Lang, slug?: string) => pagePath('news', lang) + (slug ? `/${slug}` : '');
 
 export const hallPath = (lang: Lang) => pagePath('hall', lang);
+
+/** The visitor's list inside the shop: /loja/lista and /en/shop/list */
+export const LIST = { pt: 'lista', en: 'list' } as const;
+
+/** The shop, or a product in it: /loja/pneus-mg-red, /en/shop/pneus-mg-red */
+export const shopPath = (lang: Lang, slug?: string) => pagePath('shop', lang) + (slug ? `/${slug}` : '');
+
+export const listPath = (lang: Lang) => shopPath(lang, LIST[lang]);
+
+/** The list as a PDF: /loja/lista.pdf and /en/shop/list.pdf */
+export const listPdfPath = (lang: Lang) => shopPath(lang, `${LIST[lang]}.pdf`);
 
 const langOf = (pathname: string): Lang => (/^\/en(\/|$)/.test(pathname) ? 'en' : 'pt');
 const segments = (pathname: string) => pathname.replace(/^\/en(?=\/|$)/, '').split('/').filter(Boolean);
@@ -449,11 +695,14 @@ export function alternatePath(pathname: string, to: Lang) {
 	const id = pageOf(pathname);
 	const [first, ...rest] = segments(pathname);
 	if (!first) return localize('/', to);
+	// The list keeps its place in the shop: /loja/lista is /en/shop/list
+	const from = langOf(pathname);
+	if (id === 'shop' && rest[0]?.replace(/\.pdf$/, '') === LIST[from]) rest[0] = rest[0].replace(LIST[from], LIST[to]);
 	return localize(`/${[id ? PAGES[id][to] : first, ...rest].join('/')}`, to);
 }
 
 /** Links to the pages, for the header and footer. Pages with nothing on them yet are left out. */
-export function siteLinks(t: Messages, lang: Lang, has: { drivers: boolean; season: boolean; news: boolean }) {
-	const ids = PAGE_IDS.filter((id) => (id === 'drivers' || id === 'season' || id === 'news' ? has[id] : true));
+export function siteLinks(t: Messages, lang: Lang, has: { drivers: boolean; season: boolean; news: boolean; shop: boolean }) {
+	const ids = PAGE_IDS.filter((id) => (id === 'drivers' || id === 'season' || id === 'news' || id === 'shop' ? has[id] : true));
 	return ids.map((id) => ({ id, label: t.nav[id], href: pagePath(id, lang) }));
 }

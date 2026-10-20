@@ -1,6 +1,7 @@
 import type { LayoutServerLoad } from './$types';
 import { getContent } from '#lib/server/store.ts';
 import { lastSave } from '#lib/server/history.ts';
+import { getRequests } from '#lib/server/requests.ts';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
 	const lang = locals.lang ?? 'pt';
@@ -17,7 +18,10 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 			season: content.season.length,
 			news: content.posts.length,
 			partners: content.partners.length,
-			hall: content.history.length + content.alumni.length
+			hall: content.history.length + content.alumni.length,
+			shop: content.products.length,
+			// Only the ones waiting for a reply
+			requests: (await getRequests()).filter((r) => r.status === 'new').length
 		}
 	};
 };

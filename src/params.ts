@@ -15,6 +15,10 @@ export const params = defineParams({
 	/** The Hall of Fame is /hall-of-fame in both languages; the old /hall-da-fama redirects there */
 	hall: either('hall-da-fama', 'hall-of-fame'),
 	partners: either('parceiros', 'partners'),
+	/** The shop is /loja in Portuguese and /en/shop in English, with the visitor's list at /loja/lista and /en/shop/list */
+	shop: either('loja', 'shop'),
+	list: either('lista', 'list'),
+	listPdf: either('lista.pdf', 'list.pdf'),
 	contact: either('contacto', 'contact'),
 	/** The race calendar feed is /calendario.ics in Portuguese and /en/calendar.ics in English */
 	calendar: either('calendario.ics', 'calendar.ics')

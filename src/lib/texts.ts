@@ -352,6 +352,85 @@ export const GROUPS = [
 		]
 	},
 	{
+		id: 'shop',
+		label: { pt: 'Loja', en: 'Shop' },
+		desc: {
+			pt: 'Os textos da loja e da lista de compras. Os nomes, preços e stock dos artigos estão em Loja.',
+			en: 'The texts of the shop and the shopping list. Product names, prices and stock are under Shop.'
+		},
+		path: { pt: '/loja', en: '/en/shop' },
+		fields: [
+			...part({ pt: 'Loja', en: 'Shop' }, [
+				line('shop.eyebrow', EYEBROW, { pt: 'Loja', en: 'Shop' }, { max: 40 }),
+				title('shop.title', { pt: ['Peças e', 'equipamento'], en: ['Parts', 'and kit'] }),
+				text(
+					'shop.intro',
+					INTRO,
+					{
+						pt: 'As peças, os pneus e o equipamento que usamos em pista, novos e usados. Faça a sua lista e combinamos o resto consigo.',
+						en: "The parts, tyres and kit we use on track, new and used. Put a list together and we'll sort out the rest with you."
+					},
+					{ max: 220 }
+				),
+				text('shop.empty', EMPTY, {
+					pt: 'A loja está a ser preparada. Volte em breve.',
+					en: 'The shop is being stocked. Check back soon.'
+				}, { max: 160 }),
+				text(
+					'shop.terms',
+					{ pt: 'Pagamento e levantamento', en: 'Payment and pickup' },
+					{
+						pt: 'Não há pagamentos no site. Envie-nos a lista e respondemos com a disponibilidade, a forma de pagamento e o levantamento no Kartódromo do Faial.',
+						en: "There are no payments on the site. Send us your list and we'll reply with availability, payment and pickup at the Kartódromo do Faial."
+					},
+					{
+						max: 260,
+						hint: {
+							pt: 'Aparece em cada artigo, na lista e no PDF.',
+							en: 'Shown on every product, on the list and on the PDF.'
+						}
+					}
+				)
+			] as const),
+			...part({ pt: 'Lista de compras', en: 'Shopping list' }, [
+				title('shop.list.title', { pt: ['A sua', 'lista'], en: ['Your', 'list'] }),
+				text(
+					'shop.list.intro',
+					INTRO,
+					{
+						pt: 'Reveja as quantidades e escolha como nos quer fazer chegar a lista.',
+						en: 'Check the quantities, then choose how to send us the list.'
+					},
+					{ max: 200 }
+				),
+				text(
+					'shop.list.send',
+					{ pt: 'Texto do formulário de envio', en: 'Text of the send form' },
+					{
+						pt: 'Deixe o seu contacto e respondemos por email com a disponibilidade e o total final.',
+						en: "Leave your details and we'll reply by email with availability and the final total."
+					},
+					{ max: 200 }
+				),
+				text(
+					'shop.list.privacy',
+					{ pt: 'Nota sobre os dados pessoais', en: 'Note on personal details' },
+					{
+						pt: 'Usamos o seu contacto só para responder a este pedido. Guardamo-lo até um ano depois de o pedido estar concluído.',
+						en: 'We only use your details to reply to this request, and keep them for up to a year after it is done.'
+					},
+					{
+						max: 240,
+						hint: {
+							pt: 'Aparece por baixo do formulário de envio.',
+							en: 'Shown under the send form.'
+						}
+					}
+				)
+			] as const)
+		]
+	},
+	{
 		id: 'contact',
 		label: { pt: 'Contacto', en: 'Contact' },
 		desc: {

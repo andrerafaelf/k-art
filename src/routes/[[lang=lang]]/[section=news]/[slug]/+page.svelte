@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import PostCard from '#lib/components/PostCard.svelte';
 	import Arrow from '#lib/components/Arrow.svelte';
+	import AdminBar from '#lib/components/AdminBar.svelte';
 	import { tr, longDate } from '#lib/content.ts';
 	import { useI18n, newsPath } from '#lib/i18n.ts';
 	import { render } from '#lib/markdown.ts';
@@ -64,15 +65,17 @@
 
 <!-- Only for people signed in to the admin -->
 {#if data.edit}
-	<aside class="adminbar" class:preview={data.preview}>
-		{#if data.preview}
-			<p>
-				<span class="dot" aria-hidden="true"></span>
-				{data.preview.scheduled ? i18n.t.news.scheduled(longDate(data.post.date, i18n.lang)) : i18n.t.news.draft}
-			</p>
-		{/if}
-		<a href={data.edit}>{i18n.t.news.edit} <Arrow /></a>
-	</aside>
+	<div class="dock" class:preview={data.preview}>
+		<AdminBar
+			href={data.edit}
+			label={i18n.t.news.edit}
+			notice={data.preview
+				? data.preview.scheduled
+					? i18n.t.news.scheduled(longDate(data.post.date, i18n.lang))
+					: i18n.t.news.draft
+				: undefined}
+		/>
+	</div>
 {/if}
 
 <style>
@@ -135,62 +138,17 @@
 		margin: clamp(2.5rem, 5vw, 4rem) auto 0;
 	}
 
-	.adminbar {
+	.dock {
 		position: fixed;
 		right: 1rem;
 		bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
 		z-index: 150;
 		display: flex;
-		align-items: center;
-		gap: 0.75rem 1.25rem;
-		max-width: calc(100vw - 2rem);
-		padding: 0.5rem 0.5rem 0.5rem 1rem;
-		border: 1px solid var(--hair-2);
-		border-radius: 8px;
-		background: rgb(18 20 24 / 0.94);
-		backdrop-filter: blur(14px);
-		-webkit-backdrop-filter: blur(14px);
-		box-shadow: 0 18px 50px rgb(0 0 0 / 0.5);
-		font-size: 0.85rem;
+		justify-content: flex-end;
 	}
-	.adminbar:not(.preview) {
-		padding-left: 0.5rem;
-	}
-	.adminbar.preview {
+	.dock.preview {
 		left: 1rem;
-		margin-inline: auto;
-		width: fit-content;
-		flex-wrap: wrap;
-	}
-	.adminbar p {
-		display: flex;
-		align-items: baseline;
-		gap: 0.6rem;
-		line-height: 1.45;
-		color: var(--fg-2);
-	}
-	.dot {
-		flex-shrink: 0;
-		width: 0.5rem;
-		height: 0.5rem;
-		border-radius: 50%;
-		background: var(--plate);
-		translate: 0 -0.05rem;
-	}
-	.adminbar a {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.55rem;
-		flex-shrink: 0;
-		margin-left: auto;
-		padding: 0.55rem 0.85rem;
-		border-radius: 6px;
-		background: var(--lime);
-		color: var(--black);
-		font-weight: 700;
-	}
-	.adminbar a :global(svg) {
-		width: 0.8rem;
+		justify-content: center;
 	}
 
 	.more {

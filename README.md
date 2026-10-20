@@ -41,7 +41,7 @@ Environment variables (see `.env.example`):
 | Variable | Purpose |
 | --- | --- |
 | `ADMIN_USER`, `ADMIN_PASSWORD` | The first admin account, created on first start while no accounts exist. After that, accounts are managed in the admin and these are ignored. The admin stays locked until there is an account. |
-| `DATA_DIR` | Folder for `content.json`, `backups/`, `uploads/`, the accounts (`users.json`, `sessions.json`) and the change log (`changelog.jsonl`). Default `data`. Point it at the persistent volume. |
+| `DATA_DIR` | Folder for `content.json`, `backups/`, `uploads/`, the accounts (`users.json`, `sessions.json`), the change log (`changelog.jsonl`) and the shop requests (`requests.json`). Default `data`. Point it at the persistent volume. |
 | `BODY_SIZE_LIMIT` | Set to `10M`. The default of 512 KB is too small for photo uploads. |
 | `PORT` | Port to listen on. |
 | `PROTOCOL_HEADER`, `HOST_HEADER`, `ADDRESS_HEADER` | Only behind a reverse proxy that speaks plain HTTP to Node, usually `x-forwarded-proto`, `x-forwarded-host` and `x-forwarded-for`. Without them, saving in the admin fails with "Cross-site POST form submissions are forbidden". |
@@ -76,8 +76,24 @@ admin is in European Portuguese by default; each person can switch it to English
   A published post with a future date waits until that day (Madeira time). Drafts and scheduled
   posts can be previewed on the real page by anyone signed in.
 - **Partners**: sponsor logos for the "Our partners" strip (SVG or transparent PNG).
+- **Shop**: parts and kit for sale, at `/loja` (`/en/shop`). A switch at the top turns the shop on or
+  off: while it is off its pages are a 404 and it is out of the menu, but anyone signed in can still
+  preview it. Each product has a name and description in both languages, a category (a fixed list in
+  `src/lib/shop.ts`), brand, part number, up to eight photos, a price with VAT (empty means price on
+  request) and an earlier price for discounts, stock, new or used with a note on its state, and the
+  chassis, engines or classes it fits. Products can be sold in sizes, each with its own stock and,
+  if it differs, its own price. "Can be ordered when sold out" keeps a product on offer at zero stock.
+  Products can be hidden, duplicated and reordered, and stock can be nudged up or down from the list.
+  There are no payments: visitors build a list in their browser, then download it as a PDF, send it
+  on WhatsApp (when a number is set) or send it to the team with a form, which goes through the same
+  Turnstile check, rate limit and Resend account as the contact form.
+- **Shop requests**: every list sent from the shop, newest first, with a count of new ones in the
+  menu. Each has the person's details, what they asked for next to the stock now, a status (new,
+  answered, done) and a button that takes the quantities off the stock once the sale is agreed. A
+  request is saved even when its email fails. Requests hold personal details, so they live in
+  `requests.json`, outside the site's versions and history; finished ones are deleted after a year.
 - **Site texts**: every title, introduction and paragraph on the site, one form per page (home,
-  team, drivers, season, Hall of Fame, news, partners, contact), in Portuguese and English. The list
+  team, drivers, season, Hall of Fame, news, partners, shop, contact), in Portuguese and English. The list
   of texts, their limits and the text the site starts with are in `src/lib/texts.ts`. Numbers,
   dates and counts stay automatic, and so do menus, buttons and form labels (`src/lib/i18n.ts`).
 - **Site settings**: contact details and the season year.
@@ -139,13 +155,18 @@ Images:
 ```
 src/routes/[[lang=lang]]/   Public site. Each page has an address per language, listed in PAGES
                             in lib/i18n.ts: /equipa, /pilotos, /temporada, /noticias,
-                            /hall-of-fame, /parceiros, /contacto, and /en/team, /en/drivers...
+                            /hall-of-fame, /parceiros, /loja, /contacto, and /en/team,
+                            /en/drivers... The shop list is /loja/lista and /en/shop/list
 src/routes/admin/           Admin pages and their form actions
 src/routes/uploads/         Serves uploaded images
 src/hooks.server.ts         Sessions and the /admin sign-in check, page language
 src/lib/content.ts          Content types and the stats derived from them
 src/lib/i18n.ts             Interface text in Portuguese and English, language URLs
 src/lib/server/store.ts     Reads and writes content.json, backups and uploads
+src/lib/shop.ts             Shop categories, prices, stock and the visitor's list
+src/lib/server/shop.ts      The shop on the site: closed while off, sending a list
+src/lib/server/requests.ts  Lists sent from the shop (requests.json)
+src/lib/server/pdf.ts       The shopping list as a PDF
 src/lib/server/auth.ts      Admin accounts, passwords and sessions
 src/lib/server/log.ts       The change log (who changed what)
 src/lib/admin/i18n.ts       Admin interface text in Portuguese and English

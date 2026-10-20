@@ -70,6 +70,6 @@ export async function lastChange(kind: string, id?: string) {
 	const entries = await readLog();
 	for (let i = entries.length - 1; i >= 0; i--) {
 		const e = entries[i];
-		if (e.changes?.some((c) => c.kind === kind && (kind === 'settings' || kind === 'texts' || c.id === id))) return e;
+		if (e.changes?.some((c) => c.kind === kind && (kind === 'settings' || kind === 'shop' || kind === 'texts' || c.id === id))) return e;
 	}
 }

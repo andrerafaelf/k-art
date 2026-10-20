@@ -104,6 +104,16 @@ export class FormReader {
 		return value instanceof File && value.size > 0 ? value : undefined;
 	}
 
+	/** Every value sent under one name, for rows of fields repeated in order */
+	all(name: string) {
+		return this.data.getAll(name).map((v) => (typeof v === 'string' ? v.trim() : ''));
+	}
+
+	/** Every file chosen in a picker that takes several */
+	files(name: string) {
+		return this.data.getAll(name).filter((v): v is File => v instanceof File && v.size > 0);
+	}
+
 	error(name: string, message: string) {
 		this.errors[name] = message;
 	}

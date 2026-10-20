@@ -17,13 +17,22 @@
 		{ href: '/admin/hall', label: t().nav.hall, icon: 'trophy', count: 'hall' },
 		{ href: '/admin/news', label: t().nav.news, icon: 'news', count: 'news' },
 		{ href: '/admin/partners', label: t().nav.partners, icon: 'partners', count: 'partners' },
+		{ href: '/admin/shop', label: t().nav.shop, icon: 'shop', count: 'shop' },
+		{ href: '/admin/shop/requests', label: t().nav.requests, icon: 'inbox', count: 'requests' },
 		{ href: '/admin/texts', label: t().nav.texts, icon: 'texts' },
 		{ href: '/admin/settings', label: t().nav.settings, icon: 'settings' },
 		{ href: '/admin/history', label: t().nav.history, icon: 'history' }
 	]);
 
-	const active = (href: string) =>
-		href === '/admin' ? page.url.pathname === '/admin' : page.url.pathname.startsWith(href);
+	const matches = (href: string) =>
+		href === '/admin' ? page.url.pathname === '/admin' : page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
+	// The closest section wins, so the shop's requests don't also light up the shop
+	const closest = $derived(
+		sections
+			.filter((s) => matches(s.href))
+			.sort((a, b) => b.href.length - a.href.length)[0]?.href
+	);
+	const active = (href: string) => (href === '/admin/account' ? matches(href) : href === closest);
 	const current = $derived(
 		active('/admin/account') ? t().nav.account : (sections.find((s) => active(s.href))?.label ?? t().nav.overview)
 	);
@@ -79,7 +88,9 @@
 				<a href={s.href} class:on={active(s.href)} aria-current={active(s.href) ? 'page' : undefined}>
 					<Icon name={s.icon} />
 					{s.label}
-					{#if s.count && data.counts}<span class="count">{data.counts[s.count]}</span>{/if}
+					{#if s.count && data.counts}<span class="count" class:hot={s.count === 'requests' && data.counts.requests > 0}
+						>{data.counts[s.count]}</span
+					>{/if}
 				</a>
 			{/each}
 		</nav>
